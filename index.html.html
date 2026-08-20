@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F1428">
+<meta name="description" content="MINHA META — acompanhe a evolução do aluno no Kumon: progresso, constância, prêmios e trilha de evolução.">
+<title>MINHA META</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%2337E2A0' width='100' height='100' rx='18'/%3E%3Ctext x='50' y='60' font-size='60' text-anchor='middle' fill='%2306301F' font-family='Arial'%3E%F0%9F%9A%80%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!-- === FIREBASE: já inserido com a sua configuração (modo compat) === -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+  // Sua firebaseConfig (inserida conforme você enviou)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDPaKr3viwcLL4KFynJyALeJSClEaEg_GE",
+    authDomain: "app-minha-meta.firebaseapp.com",
+    projectId: "app-minha-meta",
+    storageBucket: "app-minha-meta.firebasestorage.app",
+    messagingSenderId: "197588270013",
+    appId: "1:197588270013:web:6f976c535dc7f671da70d4",
+    measurementId: "G-51LK8E32Q8"
+  };
+
+  // Inicializa Firebase (modo compat, simples)
+  try {
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+    console.info('Firebase inicializado com sucesso.');
+  } catch (e) {
+    console.warn('Falha ao inicializar Firebase (continua com localStorage):', e);
+    var db = null;
+  }
+</script>
+<!-- === fim Firebase === -->
+
+<style>
+:root{
+  --bg-deep:#0F1428;
+  --bg-surface:#171D3A;
+  --bg-surface-2:#202849;
+  --bg-surface-3:#28316099;
+  --mint:#37E2A0;
+  --mint-dim:#37E2A02e;
+  --amber:#FFB648;
+  --amber-dim:#FFB6482e;
+  --peri:#8C93FF;
+  --peri-dim:#8C93FF2e;
+  --forgot:#FF8A4C;
+  --forgot-dim:#FF8A4C2e;
+  --gray-node:#3A4270;
+  --text:#F4F6FF;
+  --text-muted:#9AA3C9;
+  --text-faint:#6B739C;
+  --border:rgba(255,255,255,0.08);
+  --danger:#FF6B6B;
+  --radius:16px;
+  --radius-sm:10px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(circle at 15% 0%, #1c2452 0%, transparent 45%),
+    radial-gradient(circle at 90% 8%, #17204a 0%, transparent 40%),
+    var(--bg-deep);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
+.mono{font-family:'JetBrains Mono',monospace;}
+#app{
+  max-width:520px;
+  margin:0 auto;
+  min-height:100vh;
+  position:relative;
+  padding-bottom:calc(84px + var(--safe-bottom));
+}
+::-webkit-scrollbar{height:6px;width:6px;}
+::-webkit-scrollbar-thumb{background:var(--bg-surface-2);border-radius:10px;}
+a{color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+input,select{font-family:inherit;}
+
+/* ---------- Generic layout bits ---------- */
+.screen{padding:20px 18px 8px;animation:fadein .35s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.card{
+  background:linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-surface-2) 100%);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px;
+  margin-bottom:14px;
+}
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  display:flex;align-items:center;gap:6px;margin-bottom:8px;
+}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--bg-surface-3);
+  border:1px solid var(--border);
+  padding:5px 11px;border-radius:999px;
+  font-size:12.5px;color:var(--text-muted);
+  font-family:'JetBrains Mono',monospace;
+}
+.btn{
+  border:none;border-radius:12px;padding:13px 18px;
+  font-weight:600;font-size:15px;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .12s ease, filter .12s ease;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--mint),#20C488);color:#06301F;box-shadow:0 6px 18px -6px #37E2A066;}
+.btn-primary:hover{filter:brightness(1.06);}
+.btn-ghost{background:var(--bg-surface-2);color:var(--text);border:1px solid var(--border);}
+.btn-outline{background:transparent;color:var(--mint);border:1px solid #37E2A055;}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid #FF6B6B44;}
+.btn-block{width:100%;}
+.btn-sm{padding:9px 12px;font-size:13px;border-radius:9px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12.5px;color:var(--text-muted);margin-bottom:6px;font-weight:600;}
+.field input, .field select{
+  width:100%;background:var(--bg-surface-2);border:1px solid var(--border);
+  color:var(--text);padding:12px 13px;border-radius:10px;font-size:14.5px;outline:none;
+}
+.field input:focus, .field select:focus{border-color:#37E2A088;}
+.field-row{display:flex;gap:10px;}
+.field-row .field{flex:1;}
+.muted{color:var(--text-muted);}
+.faint{color:var(--text-faint);}
+.center{text-align:center;}
+.section-title{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin:22px 0 10px;font-weight:600;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.badge-green{color:var(--mint);background:var(--mint-dim);border:1px solid #37E2A044;}
+.badge-amber{color:var(--amber);background:var(--amber-dim);border:1px solid #FFB64844;}
+.badge-peri{color:var(--peri);background:var(--peri-dim);border:1px solid #8C93FF44;}
+.badge{padding:3px 9px;border-radius:8px;font-size:11.5px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
+/* ---------- Landing ---------- */
+.landing-wrap{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px;text-align:center;gap:6px;
+}
+.logo-mark{
+  width:74px;height:74px;border-radius:22px;
+  background:linear-gradient(135deg,var(--mint),#5AC8FF 60%, var(--peri));
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+  margin-bottom:18px;box-shadow:0 12px 34px -10px #37E2A055;
+}
+.wordmark{font-size:26px;font-weight:700;letter-spacing:.01em;}
+.wordmark span{color:var(--mint);}
+.tagline{color:var(--text-muted);font-size:14px;margin:6px 0 30px;max-width:280px;line-height:1.5;}
+.code-box{width:100%;max-width:300px;}
+.code-input{
+  width:100%;text-align:center;letter-spacing:.3em;font-family:'JetBrains Mono',monospace;
+  font-size:22px;padding:16px;border-radius:14px;background:var(--bg-surface);
+  border:1px solid var(--border);color:var(--text);outline:none;margin-bottom:12px;
+}
+.code-input:focus{border-color:#37E2A088;}
+.landing-link{margin-top:26px;font-size:13px;color:var(--text-faint);text-decoration:underline;background:none;border:none;}
+.error-msg{color:var(--danger);font-size:13px;margin-top:8px;min-height:16px;}
+
+/* ---------- Bottom nav ---------- */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  max-width:520px;margin:0 auto;
+  background:rgba(20,25,50,0.86);backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+  display:flex;padding:8px 6px calc(8px + var(--safe-bottom));
+  z-index:50;
+}
+.nav-btn{
+  flex:1;background:none;border:none;color:var(--text-faint);
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;border-radius:12px;
+  font-size:10.5px;font-weight:600;
+}
+.nav-btn .ic{font-size:19px;}
+.nav-btn.active{color:var(--mint);background:#37E2A014;}
+
+/* ---------- Header ---------- */
+.top-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 18px 4px;
+}
+.avatar-circle{
+  width:46px;height:46px;border-radius:14px;
+  background:linear-gradient(135deg,var(--peri),#5AC8FF);
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
+}
+.greeting-name{font-size:19px;font-weight:700;font-family:'Space Grotesk',sans-serif;}
+.icon-btn{
+  width:38px;height:38px;border-radius:10px;background:var(--bg-surface-2);
+  border:1px solid var(--border);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+
+/* ---------- Progress bar ---------- */
+.progress-track{
+  width:100%;height:12px;border-radius:20px;background:var(--bg-surface-2);
+  overflow:hidden;border:1px solid var(--border);
+}
+.progress-fill{
+  height:100%;border-radius:20px;
+  background:linear-gradient(90deg,var(--mint),#5AC8FF);
+  transition:width .5s cubic-bezier(.2,.8,.2,1);
+}
+.progress-pct{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;}
+
+/* ---------- Trilha de evolução (signature element) ---------- */
+.trail-wrap{
+  position:relative;overflow-x:auto;overflow-y:hidden;
+  padding:20px 6px 16px;margin:0 -4px;
+  -webkit-overflow-scrolling:touch;
+}
+.trail-track{
+  display:flex;align-items:center;position:relative;min-width:max-content;padding:0 13px;
+}
+.trail-marker{
+  display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;position:relative;z-index:2;
+}
+.trail-marker .cap{
+  width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;background:var(--bg-surface-2);border:1px solid var(--border);
+}
+.trail-node{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;position:relative;z-index:2;
+  margin:0 3px;border:2px solid var(--gray-node);background:var(--bg-surface);
+}
+.trail-node.done-corrected{background:var(--mint);border-color:var(--mint);}
+.trail-node.done-pending{background:var(--amber);border-color:var(--amber);}
+.trail-node.current{box-shadow:0 0 0 3px #8C93FF40;}
+.trail-line{
+  position:absolute;left:36px;right:36px;top:50%;height:2.5px;background:var(--gray-node);
+  transform:translateY(-50%);border-radius:4px;z-index:1;
+}
+.trail-line-fill{
+  position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--mint),var(--amber));
+  border-radius:4px;transition:width .5s ease;
+}
+
+/* ---------- Meu ritmo ---------- */
+.ritmo-cols{display:flex;gap:12px;}
+.ritmo-col{flex:1;background:var(--bg-surface-2);border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border);}
+.ritmo-num{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;}
+.ritmo-label{font-size:11px;color:var(--text-faint);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;}
+.ritmo-delta{margin-top:10px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;}
+
+/* ---------- Goal banner ---------- */
+.goal-banner{
+  background:linear-gradient(135deg,#8C93FF22,#37E2A022);
+  border:1px solid #8C93FF55;border-radius:var(--radius);
+  padding:20px;text-align:center;margin-bottom:14px;
+  animation:pulseglow 2.4s ease-in-out infinite;
+}
+@keyframes pulseglow{0%,100%{box-shadow:0 0 0 0 #8C93FF22;}50%{box-shadow:0 0 26px 4px #8C93FF33;}}
+.goal-banner .star{font-size:34px;display:block;margin-bottom:6px;}
+
+/* ---------- Hall ---------- */
+.hall-row{
+  display:flex;align-items:center;gap:12px;padding:12px 10px;border-radius:12px;margin-bottom:6px;
+}
+.hall-row.me{background:#8C93FF14;border:1px solid #8C93FF33;}
+.hall-rank{width:22px;text-align:center;font-family:'JetBrains Mono',monospace;color:var(--text-faint);font-size:13px;flex-shrink:0;}
+.hall-avatar{width:36px;height:36px;border-radius:10px;background:var(--bg-surface-2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.hall-name{font-weight:600;font-size:14px;}
+.hall-metric{margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;flex-shrink:0;}
+.growth-msg{
+  background:var(--bg-surface-2);border:1px dashed var(--border);border-radius:12px;padding:12px 14px;
+  font-size:13px;color:var(--text-muted);margin-bottom:16px;
+}
+
+/* ---------- Profile badges ---------- */
+.badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.badge-tile{
+  background:var(--bg-surface-2);border:1px solid var(--border);border-radius:14px;
+  padding:14px 6px;text-align:center;
+}
+.badge-tile.locked{opacity:.35;}
+.badge-tile .bic{font-size:24px;display:block;margin-bottom:6px;}
+.badge-tile .blabel{font-size:10.5px;color:var(--text-muted);font-weight:600;}
+
+/* ---------- Admin blocks grid ---------- */
+.blocks-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.block-tile-wrap{position:relative;}
+.block-btn{
+  width:100%;
+  border-radius:10px;border:1px solid var(--border);background:var(--bg-surface-2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-faint);
+  font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700;gap:4px;padding:11px 4px;
+}
+.block-btn .status-ic{font-size:13px;}
+.block-btn.pending{background:var(--amber-dim);border-color:#FFB64866;color:var(--amber);}
+.block-btn.corrected{background:var(--mint-dim);border-color:#37E2A066;color:var(--mint);}
+.block-label-input{
+  width:100%;background:var(--bg-surface-2);border:1px solid var(--border);color:var(--text);
+  padding:10px 4px;border-radius:9px;font-size:11.5px;text-align:center;font-family:'JetBrains Mono',monospace;
+}
+.forgot-flag{
+  position:absolute;top:-7px;right:-7px;width:21px;height:21px;border-radius:50%;
+  background:var(--bg-surface);border:1px solid var(--border);font-size:10px;
+  display:flex;align-items:center;justify-content:center;color:var(--text-faint);z-index:2;
+}
+.forgot-flag.active{background:var(--forgot);border-color:var(--forgot);color:#3A1400;box-shadow:0 0 0 3px #FF8A4C33;}
+
+/* ---------- Aviso de material esquecido (aluno) ---------- */
+.forgot-banner{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--forgot-dim);border:1px solid #FF8A4C55;border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:14px;
+}
+.forgot-banner .fic{font-size:20px;flex-shrink:0;}
+.forgot-editor{
+  margin-top:14px;padding:14px;border-radius:12px;
+  background:var(--forgot-dim);border:1px solid #FF8A4C55;
+}
+
+/* ---------- Calendário de constância ---------- */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-month-label{font-weight:700;font-size:14px;text-transform:capitalize;font-family:'Space Grotesk',sans-serif;}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+.cal-weekdays span{text-align:center;font-size:10px;color:var(--text-faint);font-weight:700;display:block;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-cell{
+  aspect-ratio:1;border-radius:9px;border:1px solid var(--border);background:var(--bg-surface-2);
+  color:var(--text-muted);font-size:11.5px;font-family:'JetBrains Mono',monospace;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+}
+.cal-cell.empty{background:transparent;border:none;}
+.cal-cell.marked{background:var(--mint);border-color:var(--mint);color:#06301F;font-weight:700;}
+.cal-cell.today{box-shadow:0 0 0 2px var(--peri) inset;}
+
+/* ---------- Admin list rows ---------- */
+.student-row{
+  display:flex;align-items:center;gap:12px;padding:13px;border-radius:14px;background:var(--bg-surface);
+  border:1px solid var(--border);margin-bottom:10px;
+}
+.student-row .info{flex:1;min-width:0;}
+.student-row .prog-line{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.mini-track{flex:1;height:7px;border-radius:8px;background:var(--bg-surface-2);overflow:hidden;}
+.mini-fill{height:100%;background:linear-gradient(90deg,var(--mint),#5AC8FF);}
+.search-input{
+  width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text);
+  padding:12px 14px;border-radius:12px;font-size:14px;outline:none;margin-bottom:14px;
+}
+
+/* ---------- Stat grid (admin overview) ---------- */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.stat-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;padding:15px;}
+.stat-num{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;}
+.stat-label{font-size:11.5px;color:var(--text-faint);margin-top:2px;}
+
+/* ---------- Bar chart ---------- */
+.bars-wrap{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:8px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;}
+.bar-fill{width:100%;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,#5AC8FF,var(--mint));min-height:4px;}
+.bar-label{font-size:9.5px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
+
+/* ---------- Prêmios: pontinhos de progresso + lista individual ---------- */
+.reward-dots{display:flex;gap:7px;margin:2px 0 12px;}
+.reward-dot{width:11px;height:11px;border-radius:50%;background:var(--bg-surface);border:1.5px solid var(--gray-node);flex-shrink:0;}
+.reward-dot.filled{background:var(--mint);border-color:var(--mint);}
+.reward-list{display:flex;flex-direction:column;gap:8px;}
+.reward-item{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;border-radius:11px;background:var(--bg-surface-2);border:1px solid var(--border);
+  font-size:13px;
+}
+.reward-choice{display:flex;gap:6px;}
+.reward-chip{
+  padding:8px 12px;border-radius:9px;font-size:12px;font-weight:600;
+  background:var(--bg-surface);border:1px solid var(--border);color:var(--text-muted);
+}
+.reward-chip.active{background:var(--mint-dim);border-color:#37E2A066;color:var(--mint);}
+.avatar-picker{display:flex;flex-wrap:wrap;gap:8px;}
+.avatar-opt{
+  width:42px;height:42px;border-radius:11px;background:var(--bg-surface-2);border:2px solid transparent;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.avatar-opt.sel{border-color:var(--mint);}
+.emoji-status{font-family:inherit;}
+.toast{
+  position:fixed;bottom:96px;left:50%;transform:translateX(-50%);
+  background:var(--mint);color:#06301F;padding:10px 18px;border-radius:12px;font-weight:700;
+  font-size:13.5px;z-index:100;box-shadow:0 10px 24px -8px #000a;animation:toastin .25s ease;
+}
+@keyframes toastin{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
+/* small responsive tweaks */
+@media (max-width:420px){ .blocks-grid{grid-template-columns:repeat(3,1fr);} .avatar-circle{width:40px;height:40px;} }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<noscript>
+  <div style="background:#111827;color:#fff;padding:12px;text-align:center;">Este aplicativo requer JavaScript. Ative o JavaScript para usar MINHA META.</div>
+</noscript>
+
+<script>
+/* =========================================================
+   MINHA META — estado, dados e persistência (localStorage / Firestore)
+   Compatível com GitHub Pages
+   ========================================================= */
+
+const STORAGE_KEY = 'kumon_level_up_v1';
+const ADMIN_PASSCODE = '2580'; // altere se quiser
+const AVATARS = ['🚀','🦁','🐯','🦊','🐧','🦉','🐼','🦄','🐝','🦋','🐢','🐬'];
+const STAGES = ['7A','6A','5A','4A','3A','2A','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
+
+let DATA = null;                 // { students:[...] }
+let SESSION = { role:null, studentId:null }; // role: 'student' | 'admin'
+let ADMIN_VIEW = 'overview';     // overview | students | detail | add | evolution
+let STUDENT_VIEW = 'journey';    // journey | hall | profile
+let SELECTED_STUDENT_ID = null;
+let SEARCH_TERM = '';
+let LOGIN_ERROR = '';
+let ADMIN_LOGIN_STAGE = false;   // showing passcode screen
+let TOAST = null;
+let CALENDAR_MONTH = null;       // {year, month}
+let EDIT_LABELS_MODE = false;
+let EDITING_FORGOT_INDEX = null;
+let DELETE_CONFIRM_ID = null;
+
+/* ---------- storage wrapper usando Firebase (com fallback para localStorage) ---------- */
+const storage = {
+  async get(key){
+    // tenta buscar do Firestore se inicializado
+    if(window.firebase && typeof db !== 'undefined' && db){
+      try{
+        const doc = await db.collection('app_state').doc(key).get();
+        if(doc.exists){
+          // o valor é salvo como string (JSON) - compatível com uso anterior
+          return { value: doc.data().value };
+        } else {
+          return { value: null };
+        }
+      }catch(e){
+        console.warn('firebase.get error', e);
+      }
+    }
+    // fallback: localStorage
+    try{
+      const v = localStorage.getItem(key);
+      return { value: v };
+    }catch(e){
+      console.warn('storage.get error', e); return { value: null };
+    }
+  },
+  async set(key, value){
+    // tenta salvar no Firestore se inicializado
+    if(window.firebase && typeof db !== 'undefined' && db){
+      try{
+        // salva um documento com id = key e campo value = string JSON
+        await db.collection('app_state').doc(key).set({
+          value: value,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        return true;
+      }catch(e){
+        console.warn('firebase.set error', e);
+      }
+    }
+    // fallback: localStorage
+    try{
+      localStorage.setItem(key, value);
+      return true;
+    }catch(e){
+      console.warn('storage.set error', e); return false;
+    }
+  }
+};
+
+/* ---------- helpers ---------- */
+const uid = () => 'id_' + Math.random().toString(36).slice(2,10);
+const todayISO = () => new Date().toISOString().slice(0,10);
+const fmtDate = (iso) => { if(!iso) return '—'; const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); };
+const fmtDateTime = (iso) => {
+  if(!iso) return '—';
+  const d = new Date(iso);
+  const datePart = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+  const timePart = d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  return `${datePart} às ${timePart}`;
+};
+const daysBetween = (a,b) => Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000);
+const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function touch(student){ student.updatedAt = new Date().toISOString(); }
+
+/* ---------- estrutura de estágios e blocos ---------- */
+const BLOCKS_PER_STAGE = 20;
+function stagePoint(stage, sheet){
+  const idx = STAGES.indexOf(stage);
+  const safeIdx = idx===-1 ? 0 : idx;
+  return safeIdx*BLOCKS_PER_STAGE + Math.round(Number(sheet)/10);
+}
+function blockLabelForPoint(point){
+  const stageIdx = clamp(Math.floor((point-1)/BLOCKS_PER_STAGE), 0, STAGES.length-1);
+  const blockInStage = ((point-1) % BLOCKS_PER_STAGE) + 1;
+  const rangeStart = (blockInStage-1)*10 + 1;
+  return `${STAGES[stageIdx]}${rangeStart}`;
+}
+function buildBlocks(startStage, startSheet, targetStage, targetSheet){
+  const startPoint = stagePoint(startStage, startSheet);
+  const targetPoint = stagePoint(targetStage, targetSheet);
+  const total = Math.max(1, Math.abs(targetPoint - startPoint));
+  const dir = targetPoint >= startPoint ? 1 : -1;
+  const blocks = [];
+  for(let i=1;i<=total;i++){
+    const point = startPoint + dir*i;
+    blocks.push({ index:i, label: blockLabelForPoint(point), status:'not_done', doneDate:null, correctedDate:null, onTime:null, forgotten:false, forgottenDate:null, forgottenNote:'' });
+  }
+  return { total, blocks };
+}
+function stats(student){
+  const blocks = student.blocks;
+  const total = student.totalBlocks;
+  const done = blocks.filter(b=>b.status!=='not_done').length;
+  const corrected = blocks.filter(b=>b.status==='corrected').length;
+  const pending = blocks.filter(b=>b.status==='pending_correction').length;
+  const percent = total>0 ? Math.round((done/total)*100) : 0;
+  const daysRemaining = daysBetween(todayISO(), student.targetEnd);
+  const goalReached = total>0 && corrected===total;
+  const correctionRatio = done>0 ? corrected/done : 0;
+  const sheetsCompleted = done*10;
+  return { total, done, corrected, pending, percent, daysRemaining, goalReached, correctionRatio, sheetsCompleted };
+}
+function weeklyDelta(student){
+  const h = student.weeklyHistory;
+  if(h.length===0) return { thisWeek:0, lastWeek:0, delta:0 };
+  const thisWeek = h[h.length-1].sheets;
+  const lastWeek = h.length>1 ? h[h.length-2].sheets : 0;
+  return { thisWeek, lastWeek, delta: thisWeek-lastWeek };
+}
+function streakStats(student){
+  const set = new Set(student.studyDays || []);
+  return { total: set.size };
+}
+function isRecentlyActive(student){
+  const days = student.studyDays || [];
+  if(days.length===0) return false;
+  const today = todayISO();
+  return days.some(d => daysBetween(d, today) <= 14);
+}
+const BLOCKS_PER_REWARD = 3;
+function rewardStats(student){
+  const s = stats(student);
+  const earned = Math.floor(s.corrected / BLOCKS_PER_REWARD);
+  const rewards = student.rewards || {};
+  let given = 0;
+  for(let i=0;i<earned;i++){ if(rewards[i]) given++; }
+  const pending = earned - given;
+  const remaining = BLOCKS_PER_REWARD - (s.corrected % BLOCKS_PER_REWARD);
+  return { earned, given, pending, remaining };
+}
+function renderRewardDots(student){
+  const s = stats(student);
+  const posInCycle = s.corrected % BLOCKS_PER_REWARD;
+  let dots = '';
+  for(let i=0;i<BLOCKS_PER_REWARD;i++){
+    dots += `<span class="reward-dot ${i<posInCycle?'filled':''}"></span>`;
+  }
+  return `<div class="reward-dots">${dots}</div>`;
+}
+function showToast(msg){
+  TOAST = msg; render();
+  setTimeout(()=>{ TOAST=null; render(); }, 1800);
+}
+
+/* ---------- persistência usando localStorage / Firestore ---------- */
+async function loadData(){
+  try{
+    const res = await storage.get(STORAGE_KEY);
+    if(res && res.value){
+      DATA = JSON.parse(res.value);
+      return;
+    }
+  }catch(e){}
+  DATA = seedDemoData();
+  await saveData();
+}
+async function saveData(){
+  try{
+    await storage.set(STORAGE_KEY, JSON.stringify(DATA));
+  }catch(e){ console.error('Erro ao salvar dados', e); }
+}
+function seedDemoData(){
+  const today = new Date();
+  const iso = (d) => d.toISOString().slice(0,10);
+  const daysAgo = (n) => { const d=new Date(today); d.setDate(d.getDate()-n); return iso(d); };
+  const daysAhead = (n) => { const d=new Date(today); d.setDate(d.getDate()+n); return iso(d); };
+  const consecutiveDates = (endOffsetDaysAgo, count) => {
+    const arr=[]; for(let k=0;k<count;k++) arr.push(daysAgo(endOffsetDaysAgo+k)); return arr;
+  };
+
+  function buildStudent({name, avatar, code, startStage, startSheet, targetStage, targetSheet, startDate, endDate, doneCount, pendingCount, studyDays, history, updatedDaysAgo, rewardsPattern, forgottenIndices, forgottenNote}){
+    const { total, blocks } = buildBlocks(startStage, startSheet, targetStage, targetSheet);
+    let i=0;
+    for(; i<doneCount && i<total; i++){
+      blocks[i].status = 'corrected';
+      blocks[i].doneDate = daysAgo(30 - i);
+      blocks[i].correctedDate = daysAgo(28 - i);
+      blocks[i].onTime = true;
+    }
+    for(let p=0; p<pendingCount && i<total; p++, i++){
+      blocks[i].status = 'pending_correction';
+      blocks[i].doneDate = daysAgo(4 - p);
+    }
+    (forgottenIndices || []).forEach(idx=>{
+      if(blocks[idx]){ blocks[idx].forgotten = true; blocks[idx].forgottenDate = daysAgo(1); blocks[idx].forgottenNote = forgottenNote || ''; }
+    });
+    const rewards = {};
+    (rewardsPattern || []).forEach((candy, idx)=>{ rewards[idx] = candy; });
+    return {
+      id: uid(), code, name, avatar,
+      startStage, startSheet:Number(startSheet), startDate,
+      targetStage, targetSheet:Number(targetSheet), targetStart:startDate, targetEnd:endDate,
+      totalBlocks: total, blocks,
+      weeklyHistory: history || [],
+      studyDays: studyDays || [],
+      rewards,
+      createdAt: daysAgo(60),
+      updatedAt: daysAgo(updatedDaysAgo || 0)
+    };
+  }
+
+  const students = [
+    buildStudent({
+      name:'João', avatar:'🚀', code:'1111',
+      startStage:'C', startSheet:40, targetStage:'D', targetSheet:80,
+      startDate:daysAgo(58), endDate:daysAhead(32),
+      doneCount:14, pendingCount:1, updatedDaysAgo:0, rewardsPattern:['bombom','fini','bombom'],
+      studyDays:[...consecutiveDates(0,12), ...consecutiveDates(22,15)],
+      history:[ {week:1,sheets:32,date:daysAgo(28)}, {week:2,sheets:38,date:daysAgo(21)}, {week:3,sheets:41,date:daysAgo(14)}, {week:4,sheets:35,date:daysAgo(7)}, {week:5,sheets:42,date:daysAgo(1)} ]
+    }),
+    buildStudent({
+      name:'Ana', avatar:'🦋', code:'2222',
+      startStage:'E', startSheet:100, targetStage:'F', targetSheet:60,
+      startDate:daysAgo(50), endDate:daysAhead(40),
+      doneCount:11, pendingCount:2, updatedDaysAgo:2, rewardsPattern:['fini','fini','bombom'],
+      studyDays:[...consecutiveDates(0,6), ...consecutiveDates(16,19)],
+      history:[ {week:1,sheets:28,date:daysAgo(28)}, {week:2,sheets:30,date:daysAgo(21)}, {week:3,sheets:26,date:daysAgo(14)}, {week:4,sheets:33,date:daysAgo(7)}, {week:5,sheets:31,date:daysAgo(1)} ]
+    }),
+    buildStudent({
+      name:'Pedro', avatar:'🦉', code:'3333',
+      startStage:'A', startSheet:0, targetStage:'A', targetSheet:200,
+      startDate:daysAgo(70), endDate:daysAhead(20),
+      doneCount:19, pendingCount:1, updatedDaysAgo:0, rewardsPattern:['bombom','bombom','fini'],
+      studyDays: consecutiveDates(0,21),
+      history:[ {week:1,sheets:36,date:daysAgo(28)}, {week:2,sheets:40,date:daysAgo(21)}, {week:3,sheets:44,date:daysAgo(14)}, {week:4,sheets:39,date:daysAgo(7)}, {week:5,sheets:45,date:daysAgo(1)} ]
+    }),
+    buildStudent({
+      name:'Beatriz', avatar:'🐼', code:'4444',
+      startStage:'G', startSheet:100, targetStage:'G', targetSheet:180,
+      startDate:daysAgo(40), endDate:daysAhead(50),
+      doneCount:5, pendingCount:3, updatedDaysAgo:5, forgottenIndices:[6], forgottenNote:'165, 168',
+      studyDays:[...consecutiveDates(0,2), ...consecutiveDates(12,9)],
+      history:[ {week:1,sheets:18,date:daysAgo(21)}, {week:2,sheets:22,date:daysAgo(14)}, {week:3,sheets:16,date:daysAgo(7)}, {week:4,sheets:24,date:daysAgo(1)} ]
+    }),
+  ];
+  return { students };
+}
+
+/* =========================================================
+   RENDER — roteador principal
+   ========================================================= */
+function render(){
+  const app = document.getElementById('app');
+  if(!DATA){ app.innerHTML = renderLoading(); return; }
+
+  let html = '';
+  if(SESSION.role === 'student'){
+    html = renderStudentApp();
+  } else if(SESSION.role === 'admin'){
+    html = renderAdminApp();
+  } else {
+    html = ADMIN_LOGIN_STAGE ? renderAdminLogin() : renderLanding();
+  }
+  if(TOAST) html += `<div class="toast" role="status" aria-live="polite">${esc(TOAST)}</div>`;
+  app.innerHTML = html;
+  attachHandlers();
+}
+function renderLoading(){
+  return `<div class="landing-wrap"><div class="logo-mark">🚀</div><div class="wordmark">MINHA <span>META</span></div><p class="muted" style="margin-top:14px;">Carregando…</p></div>`;
+}
+
+/* ---------- Landing ---------- */
+function renderLanding(){
+  return `
+  <div class="landing-wrap" role="main">
+    <div class="logo-mark">🚀</div>
+    <div class="wordmark">MINHA <span>META</span></div>
+    <p class="tagline">De onde eu comecei → onde estou → onde quero chegar.</p>
+    <div class="code-box">
+      <input id="student-code-input" class="code-input" inputmode="numeric" maxlength="6" placeholder="• • • •" autocomplete="off" aria-label="Código do aluno">
+      <button class="btn btn-primary btn-block" id="btn-enter-code">Entrar</button>
+      <div class="error-msg" id="login-error">${esc(LOGIN_ERROR)}</div>
+    </div>
+    <button class="landing-link" id="btn-go-admin">Sou orientador</button>
+  </div>`;
+}
+function renderAdminLogin(){
+  return `
+  <div class="landing-wrap" role="main">
+    <div class="logo-mark" style="background:linear-gradient(135deg,var(--peri),#5AC8FF);">🧑‍🏫</div>
+    <div class="wordmark">Área do <span>Orientador</span></div>
+    <p class="tagline">Digite o código de acesso administrativo.</p>
+    <div class="code-box">
+      <input id="admin-pass-input" type="password" class="code-input" inputmode="numeric" maxlength="8" placeholder="• • • •" autocomplete="off" aria-label="Código do orientador">
+      <button class="btn btn-primary btn-block" id="btn-enter-admin">Entrar</button>
+      <div class="error-msg">${esc(LOGIN_ERROR)}</div>
+    </div>
+    <button class="landing-link" id="btn-back-landing">← Voltar</button>
+  </div>`;
+}
+
+/* =========================================================
+   ÁREA DO ALUNO (sem mudanças funcionais visíveis)
+   ========================================================= */
+
+function renderStudentApp(){
+  const student = DATA.students.find(s=>s.id===SESSION.studentId);
+  if(!student){ SESSION = {role:null, studentId:null}; return renderLanding(); }
+  let body = '';
+  if(STUDENT_VIEW==='journey') body = renderJourney(student);
+  else if(STUDENT_VIEW==='hall') body = renderHall(student);
+  else body = renderStudentProfile(student);
+
+  return `
+    <div class="top-header">
+      <div class="row" style="gap:12px;">
+        <div class="avatar-circle" aria-hidden="true">${student.avatar}</div>
+        <div>
+          <div class="greeting-name">Olá, ${esc(student.name)}! 👋</div>
+          <div class="faint" style="font-size:12px;">Estágio ${esc(student.targetStage)}</div>
+        </div>
+      </div>
+    </div>
+    ${body}
+    ${renderStudentNav()}
+  `;
+}
+function renderStudentNav(){
+  const items = [ ['journey','🏠','Minha Jornada'], ['hall','🏆','Hall da Evolução'], ['profile','👤','Meu Perfil'] ];
+  return `<div class="bottom-nav" role="navigation" aria-label="Menu inferior">
+    ${items.map(([id,ic,label])=>`
+      <button class="nav-btn ${STUDENT_VIEW===id?'active':''}" data-nav="${id}" aria-label="${label}">
+        <span class="ic">${ic}</span><span>${label}</span>
+      </button>`).join('')}
+  </div>`;
+}
+
+function renderJourney(student){
+  const s = stats(student);
+  const wd = weeklyDelta(student);
+  const rw = rewardStats(student);
+  const deltaIcon = wd.delta>0 ? '📈' : (wd.delta<0 ? '📉' : '➖');
+  const deltaColor = wd.delta>0 ? 'var(--mint)' : (wd.delta<0 ? 'var(--danger)' : 'var(--text-muted)');
+  const deltaSign = wd.delta>0 ? '+' : '';
+
+  return `
+  <div class="screen" role="region" aria-label="Minha jornada">
+    ${s.goalReached ? `
+      <div class="goal-banner" role="status" aria-live="polite">
+        <span class="star">⭐</span>
+        <div class="display" style="font-size:18px;font-weight:700;">META CONCLUÍDA!</div>
+        <div class="muted" style="font-size:12.5px;margin-top:4px;">Você chegou ao estágio ${esc(student.targetStage)}-${esc(student.targetSheet)}. Incrível constância!</div>
+      </div>` : ''}
+
+    ${(() => {
+      const forgottenBlocks = student.blocks.filter(b=>b.forgotten);
+      if(forgottenBlocks.length===0) return '';
+      return `
+      <div class="forgot-banner">
+        <span class="fic">📌</span>
+        <div>
+          <div style="font-weight:700;font-size:13.5px;">Não esqueça de trazer:</div>
+          <div class="muted" style="font-size:12.5px;margin-top:2px;">
+            ${forgottenBlocks.map(b=> b.forgottenNote ? `Bloco ${esc(b.label)} — folha${b.forgottenNote.includes(',')?'s':''} ${esc(b.forgottenNote)}` : `Bloco ${esc(b.label)}`).join('; ')}
+            — traga na próxima aula.
+          </div>
+        </div>
+      </div>`;
+    })()}
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="eyebrow">📍 Ponto de partida</div>
+          <div class="display" style="font-size:22px;font-weight:700;">${esc(student.startStage)}${esc(student.startSheet)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="eyebrow" style="justify-content:flex-end;">🎯 Sua meta</div>
+          <div class="display" style="font-size:22px;font-weight:700;color:var(--mint);">${esc(student.targetStage)}${esc(student.targetSheet)}</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="row">
+        <span class="pill">🗓 ${fmtDate(student.targetStart)} → ${fmtDate(student.targetEnd)}</span>
+        <span class="pill" style="color:var(--peri);border-color:#8C93FF44;">⏰ ${s.daysRemaining>=0?s.daysRemaining:0} dias restantes</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="margin-bottom:10px;">
+        <span class="eyebrow" style="margin:0;">📈 Progresso da meta</span>
+        <span class="progress-pct">${s.percent}%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${s.percent}%;"></div></div>
+      <div class="row" style="margin-top:12px;">
+        <span class="muted" style="font-size:12.5px;">🟢 ${s.done}/${s.total} blocos</span>
+        <span class="muted" style="font-size:12.5px;">📄 ~${s.sheetsCompleted} folhas</span>
+        <span class="muted" style="font-size:12.5px;">🟡 ${s.pending} pendente${s.pending===1?'':'s'}</span>
+      </div>
+    </div>
+
+    <div class="section-title">Trilha de evolução</div>
+    <div class="card" style="padding-top:8px;">
+      ${renderTrail(student)}
+    </div>
+
+    <div class="section-title">🍬 Prêmios</div>
+    <div class="card">
+      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">A cada 3 blocos corrigidos 🟢 você ganha um doce — um bombom ou um Fini!</p>
+      ${renderRewardDots(student)}
+      <div class="row">
+        <span class="badge badge-peri">🍬 ${rw.earned} conquistado${rw.earned===1?'':'s'}</span>
+        <span class="muted mono" style="font-size:12px;">faltam ${rw.remaining} bloco${rw.remaining===1?'':'s'}</span>
+      </div>
+      ${rw.given>0 ? `<div class="faint" style="font-size:16px;margin-top:10px;letter-spacing:2px;">${Array.from({length: rw.earned}).map((_,i)=>{
+        const chosen = (student.rewards || {})[i];
+        return chosen==='bombom' ? '🍫' : (chosen==='fini' ? '🍬' : '⚪');
+      }).join('')}</div>` : ''}
+    </div>
+
+    <div class="section-title">📚 Meu ritmo</div>
+    <div class="card">
+      <div class="ritmo-cols">
+        <div class="ritmo-col">
+          <div class="ritmo-num">${wd.thisWeek}</div>
+          <div class="ritmo-label">Esta semana</div>
+        </div>
+        <div class="ritmo-col">
+          <div class="ritmo-num">${wd.lastWeek}</div>
+          <div class="ritmo-label">Semana passada</div>
+        </div>
+      </div>
+      <div class="center ritmo-delta" style="color:${deltaColor};">${deltaIcon} ${deltaSign}${wd.delta} folhas</div>
+    </div>
+  </div>`;
+}
+
+function renderTrail(student){
+  const blocks = student.blocks;
+  const total = blocks.length;
+  const done = blocks.filter(b=>b.status!=='not_done').length;
+  const fillPct = total>0 ? clamp((done-1)/Math.max(total-1,1)*100,0,100) : 0;
+  const currentIndex = Math.max(0, done-1);
+
+  const nodes = blocks.map((b,i)=>{
+    let cls='trail-node';
+    if(b.status==='corrected'){ cls+=' done-corrected'; }
+    else if(b.status==='pending_correction'){ cls+=' done-pending'; }
+    if(i===currentIndex && b.status!=='not_done') cls+=' current';
+    return `<div class="${cls}" title="Bloco ${esc(b.label)}"></div>`;
+  }).join('');
+
+  return `
+  <div class="trail-wrap">
+    <div class="trail-track" aria-hidden="true">
+      <div class="trail-marker"><div class="cap">📍</div></div>
+      <div style="position:relative;flex-shrink:0;display:flex;align-items:center;">
+        <div class="trail-line" style="left:0;right:0;"><div class="trail-line-fill" style="width:${fillPct}%;"></div></div>
+        ${nodes}
+      </div>
+      <div class="trail-marker"><div class="cap" style="background:var(--mint-dim);border-color:#37E2A066;">🎯</div></div>
+    </div>
+  </div>
+  <div class="row" style="padding:0 4px;">
+    <span class="faint" style="font-size:11px;">🟢 feito + corrigido &nbsp; 🟡 aguardando correção &nbsp; ⚪ a fazer</span>
+  </div>`;
+}
+
+function growthMessage(student){
+  const s = stats(student);
+  const streak = streakStats(student);
+  if(s.goalReached) return 'Você alcançou sua meta! Hora de mirar ainda mais alto. 🚀';
+  if(streak.total>=30) return 'Sua constância está impressionante — continue evoluindo!';
+  if(streak.total>=14) return 'Você está construindo uma baita constância! 🔥';
+  if(s.correctionRatio>=0.9 && s.done>0) return 'Suas correções estão sempre em dia. Isso é mentalidade de crescimento!';
+  if(s.percent>=50) return 'Seu progresso está crescendo — siga nesse ritmo!';
+  return 'Cada dia de estudo conta. Continue acumulando constância!';
+}
+
+function renderHall(student){
+  const list = DATA.students;
+  const byStreak = [...list].sort((a,b)=>streakStats(b).total-streakStats(a).total);
+  const byCorrection = [...list].sort((a,b)=> stats(b).correctionRatio - stats(a).correctionRatio || stats(b).done - stats(a).done);
+  const myStreak = streakStats(student);
+
+  const streakRows = byStreak.map((st,i)=>`
+    <div class="hall-row ${st.id===student.id?'me':''}">
+      <span class="hall-rank">${i+1}</span>
+      <span class="hall-avatar">${st.avatar}</span>
+      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}</span>
+      <span class="hall-metric" style="color:var(--amber);">🔥 ${streakStats(st).total}</span>
+    </div>`).join('');
+
+  const corrRows = byCorrection.map((st,i)=>{
+    const r = stats(st);
+    const pct = Math.round(r.correctionRatio*100);
+    return `
+    <div class="hall-row ${st.id===student.id?'me':''}">
+      <span class="hall-rank">${i+1}</span>
+      <span class="hall-avatar">${st.avatar}</span>
+      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}</span>
+      <span class="hall-metric" style="color:var(--mint);">🧠 ${pct}%</span>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="screen">
+    <div class="growth-msg">✨ ${esc(growthMessage(student))}</div>
+
+    <div class="section-title">🎯 Constância</div>
+    <div class="card">
+      <div class="row" style="margin-bottom:14px;">
+        <span class="muted" style="font-size:12.5px;">Dias acumulados de Kumon</span>
+        <span class="badge badge-amber">🔥 ${myStreak.total} dias</span>
+      </div>
+      ${streakRows}
+    </div>
+
+    <div class="section-title">🧠 Correções em dia</div>
+    <div class="card">
+      ${corrRows}
+    </div>
+  </div>`;
+}
+
+function renderStudentProfile(student){
+  const s = stats(student);
+  const streak = streakStats(student);
+  const badges = [
+    { ic:'⭐', label:'Meta concluída', unlocked:s.goalReached },
+    { ic:'🔥', label:'7 dias acumulados', unlocked:streak.total>=7 },
+    { ic:'🚀', label:'14 dias acumulados', unlocked:streak.total>=14 },
+    { ic:'🏆', label:'30 dias acumulados', unlocked:streak.total>=30 },
+    { ic:'🧠', label:'Correções em dia', unlocked:s.done>0 && s.correctionRatio===1 },
+    { ic:'✨', label:'Metade da meta', unlocked:s.percent>=50 },
+  ];
+  return `
+  <div class="screen" role="region" aria-label="Meu perfil">
+    ${(() => {
+      const forgottenBlocks = student.blocks.filter(b=>b.forgotten);
+      if(forgottenBlocks.length===0) return '';
+      return `
+      <div class="forgot-banner">
+        <span class="fic">📌</span>
+        <div>
+          <div style="font-weight:700;font-size:13.5px;">Não esqueça de trazer:</div>
+          <div class="muted" style="font-size:12.5px;margin-top:2px;">
+            ${forgottenBlocks.map(b=> b.forgottenNote ? `Bloco ${esc(b.label)} — folha${b.forgottenNote.includes(',')?'s':''} ${esc(b.forgottenNote)}` : `Bloco ${esc(b.label)}`).join('; ')}
+            — traga na próxima aula.
+          </div>
+        </div>
+      </div>`;
+    })()}
+
+    <div class="card center">
+      <div class="avatar-circle" style="width:64px;height:64px;font-size:30px;margin:0 auto 10px;">${student.avatar}</div>
+      <div class="display" style="font-size:19px;font-weight:700;">${esc(student.name)}</div>
+      <div class="faint mono" style="font-size:12px;margin-top:4px;">código ${esc(student.code)}</div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${s.percent}%</div><div class="stat-label">Progresso da meta</div></div>
+      <div class="stat-card"><div class="stat-num">${s.sheetsCompleted}</div><div class="stat-label">Folhas realizadas</div></div>
+      <div class="stat-card"><div class="stat-num">${s.pending}</div><div class="stat-label">Correções pendentes</div></div>
+      <div class="stat-card"><div class="stat-num">${streak.total}</div><div class="stat-label">Dias de constância</div></div>
+    </div>
+
+    <div class="section-title">🏅 Conquistas</div>
+    <div class="badges-grid">
+      ${badges.map(b=>`
+        <div class="badge-tile ${b.unlocked?'':'locked'}">
+          <span class="bic">${b.ic}</span>
+          <span class="blabel">${esc(b.label)}</span>
+        </div>`).join('')}
+    </div>
+
+    <button class="btn btn-ghost btn-block" style="margin-top:22px;" id="btn-logout">Sair</button>
+  </div>`;
+}
+
+/* =========================================================
+   ÁREA DO ORIENTADOR (sem mudanças significativas)
+   ========================================================= */
+
+function renderAdminApp(){
+  let body = '';
+  if(ADMIN_VIEW==='overview') body = renderAdminOverview();
+  else if(ADMIN_VIEW==='students') body = renderAdminStudents();
+  else if(ADMIN_VIEW==='detail') body = renderAdminDetail();
+  else if(ADMIN_VIEW==='add') body = renderAdminAdd();
+  else if(ADMIN_VIEW==='evolution') body = renderAdminEvolution();
+
+  return `
+    <div class="top-header">
+      <div>
+        <div class="greeting-name">🧑‍🏫 Painel do Orientador</div>
+        <div class="faint" style="font-size:12px;">${DATA.students.length} aluno${DATA.students.length===1?'':'s'} cadastrado${DATA.students.length===1?'':'s'}</div>
+      </div>
+      <button class="icon-btn" id="btn-logout" aria-label="Sair">⎋</button>
+    </div>
+    ${body}
+    ${renderAdminNav()}
+  `;
+}
+function renderAdminNav(){
+  const items = [ ['overview','🏠','Visão geral'], ['students','👥','Alunos'], ['add','➕','Cadastrar'], ['evolution','📊','Evolução'] ];
+  return `<div class="bottom-nav">
+    ${items.map(([id,ic,label])=>`
+      <button class="nav-btn ${ADMIN_VIEW===id || (ADMIN_VIEW==='detail' && id==='students') ?'active':''}" data-adminnav="${id}" aria-label="${label}">
+        <span class="ic">${ic}</span><span>${label}</span>
+      </button>`).join('')}
+  </div>`;
+}
+
+function renderAdminOverview(){
+  const list = DATA.students;
+  const totalStudents = list.length;
+  const active = list.filter(s=>isRecentlyActive(s)).length;
+  const avgProgress = totalStudents ? Math.round(list.reduce((sum,s)=>sum+stats(s).percent,0)/totalStudents) : 0;
+  const pendingTotal = list.reduce((sum,s)=>sum+stats(s).pending,0);
+  const alerts = list.filter(s=>stats(s).pending>=2);
+
+  return `
+  <div class="screen">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${totalStudents}</div><div class="stat-label">Alunos cadastrados</div></div>
+      <div class="stat-card"><div class="stat-num">${active}</div><div class="stat-label">Alunos ativos</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--mint);">${avgProgress}%</div><div class="stat-label">Progresso médio</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${pendingTotal}</div><div class="stat-label">Correções pendentes</div></div>
+    </div>
+
+    <div class="section-title">Atenção necessária</div>
+    <div class="card">
+      ${alerts.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum aluno com correções acumuladas. 🎉</span>` :
+        alerts.map(s=>`
+          <div class="row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+            <span class="row" style="gap:8px;"><span class="hall-avatar">${s.avatar}</span>${esc(s.name)}</span>
+            <span class="badge badge-amber">${stats(s).pending} pendentes</span>
+          </div>`).join('')
+      }
+    </div>
+
+    <div class="section-title">Alunos por progresso</div>
+    <div class="card">
+      ${list.slice().sort((a,b)=>stats(b).percent-stats(a).percent).map(s=>{
+        const p = stats(s).percent;
+        return `<div style="margin-bottom:12px;">
+          <div class="row" style="margin-bottom:5px;">
+            <span style="font-size:13px;font-weight:600;">${s.avatar} ${esc(s.name)}</span>
+            <span class="mono" style="font-size:12.5px;color:var(--mint);">${p}%</span>
+          </div>
+          <div class="mini-track"><div class="mini-fill" style="width:${p}%;"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderAdminStudents(){
+  const term = SEARCH_TERM.toLowerCase();
+  const list = DATA.students.filter(s=>s.name.toLowerCase().includes(term));
+  return `
+  <div class="screen">
+    <input class="search-input" id="admin-search" placeholder="🔍 Buscar aluno…" value="${esc(SEARCH_TERM)}" aria-label="Buscar aluno">
+    ${list.length===0 ? `<p class="muted center" style="margin-top:30px;">Nenhum aluno encontrado.</p>` : ''}
+    ${list.map(s=>{
+      const st = stats(s);
+      return `
+      <button class="student-row" data-open-student="${s.id}" aria-label="Abrir ${esc(s.name)}">
+        <div class="hall-avatar" style="width:44px;height:44px;font-size:20px;">${s.avatar}</div>
+        <div class="info">
+          <div class="row"><span style="font-weight:700;font-size:14.5px;">${esc(s.name)}</span><span class="badge badge-peri">${esc(s.targetStage)}</span></div>
+          <div class="prog-line">
+            <div class="mini-track"><div class="mini-fill" style="width:${st.percent}%;"></div></div>
+            <span class="mono faint" style="font-size:11.5px;">${st.percent}%</span>
+          </div>
+          <div class="faint" style="font-size:10px;margin-top:4px;">🕓 atualizado em ${fmtDateTime(s.updatedAt)}</div>
+        </div>
+      </button>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderBlocksSection(student){
+  if(EDIT_LABELS_MODE){
+    return `
+      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Personalize o número de cada bloco (ex: E141, E151…) conforme o material do aluno. Toque em "Salvar números" ao concluir.</p>
+      <div class="blocks-grid">
+        ${student.blocks.map(b=>`
+          <input class="block-label-input" data-block-label-input="${b.index}" value="${esc(b.label)}">
+        `).join('')}
+      </div>
+      <div class="field-row" style="margin-top:14px;">
+        <button class="btn btn-ghost btn-block btn-sm" id="btn-cancel-labels">Cancelar</button>
+        <button class="btn btn-primary btn-block btn-sm" id="btn-save-labels">Salvar números</button>
+      </div>`;
+  }
+  return `
+    <div class="row" style="align-items:flex-start;margin-bottom:12px;">
+      <p class="faint" style="font-size:11.5px;margin:0;flex:1;">Toque no bloco para alternar status. Toque no 📌 para marcar que o aluno esqueceu de trazer a folha.</p>
+      <button class="btn btn-ghost btn-sm" id="btn-edit-labels" style="flex-shrink:0;">✏️ Números</button>
+    </div>
+    <div class="blocks-grid">
+      ${student.blocks.map(b=>{
+        let cls='block-btn', ic='⚪';
+        if(b.status==='pending_correction'){ cls+=' pending'; ic='🟡'; }
+        else if(b.status==='corrected'){ cls+=' corrected'; ic='🟢'; }
+        return `
+        <div class="block-tile-wrap">
+          <button class="${cls}" data-toggle-block="${b.index}" aria-label="Alternar ${esc(b.label)}"><span>${esc(b.label)}</span><span class="status-ic">${ic}</span></button>
+          <button class="forgot-flag ${b.forgotten?'active':''}" data-toggle-forgot="${b.index}" title="${b.forgotten ? 'Esqueceu: folha(s) '+esc(b.forgottenNote||'') : 'Marcar que esqueceu de trazer a folha'}">📌</button>
+        </div>`;
+      }).join('')}
+    </div>
+    ${renderForgotEditor(student)}`;
+}
+
+function renderForgotEditor(student){
+  if(EDITING_FORGOT_INDEX===null) return '';
+  const block = student.blocks.find(b=>b.index===EDITING_FORGOT_INDEX);
+  if(!block) return '';
+  return `
+    <div class="forgot-editor">
+      <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:8px;">📌 Bloco ${esc(block.label)} — quais folhas ele esqueceu de trazer?</label>
+      <input class="block-label-input" style="text-align:left;padding:11px 13px;font-size:13px;" id="input-forgot-note" placeholder="Ex: 145, 148" value="${esc(block.forgottenNote||'')}">
+      <div class="field-row" style="margin-top:10px;">
+        <button class="btn btn-ghost btn-sm btn-block" id="btn-cancel-forgot">Cancelar</button>
+        ${block.forgotten ? `<button class="btn btn-danger btn-sm btn-block" id="btn-remove-forgot">Remover</button>` : ''}
+        <button class="btn btn-primary btn-sm btn-block" id="btn-save-forgot">Salvar</button>
+      </div>
+    </div>`;
+}
+
+function renderCalendar(student){
+  if(!CALENDAR_MONTH){
+    const now = new Date();
+    CALENDAR_MONTH = { year: now.getFullYear(), month: now.getMonth() };
+  }
+  const { year, month } = CALENDAR_MONTH;
+  const set = new Set(student.studyDays || []);
+  const first = new Date(year, month, 1);
+  const startWeekday = first.getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const monthLabel = first.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+  const todayIso = todayISO();
+  const weekdayLabels = ['D','S','T','Q','Q','S','S'];
+
+  let cells = '';
+  for(let i=0;i<startWeekday;i++) cells += `<div class="cal-cell empty"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const dateObj = new Date(year, month, d);
+    const cellIso = dateObj.toISOString().slice(0,10);
+    const marked = set.has(cellIso);
+    const isToday = cellIso===todayIso;
+    cells += `<button class="cal-cell ${marked?'marked':''} ${isToday?'today':''}" data-cal-day="${cellIso}" aria-pressed="${marked}">${d}</button>`;
+  }
+
+  return `
+    <div class="cal-header">
+      <button class="icon-btn" id="btn-cal-prev" aria-label="Mês anterior">‹</button>
+      <span class="cal-month-label">${esc(monthLabel)}</span>
+      <button class="icon-btn" id="btn-cal-next" aria-label="Próximo mês">›</button>
+    </div>
+    <div class="cal-weekdays">${weekdayLabels.map(w=>`<span>${w}</span>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>
+    <p class="faint" style="font-size:11px;margin-top:10px;">Toque em um dia para marcar/desmarcar que o aluno fez Kumon.</p>
+  `;
+}
+
+function renderAdminDetail(){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  if(!student){ ADMIN_VIEW='students'; return renderAdminStudents(); }
+  const s = stats(student);
+  const wd = weeklyDelta(student);
+  const streak = streakStats(student);
+  const rw = rewardStats(student);
+
+  return `
+  <div class="screen">
+    <button class="btn btn-ghost btn-sm" id="btn-back-students" style="margin-bottom:14px;">← Alunos</button>
+
+    <div class="card">
+      <div class="row">
+        <div class="row" style="gap:10px;">
+          <div class="avatar-circle">${student.avatar}</div>
+          <div>
+            <div style="font-weight:700;font-size:16.5px;">${esc(student.name)}</div>
+            <div class="faint mono" style="font-size:11.5px;">código ${esc(student.code)}</div>
+          </div>
+        </div>
+        ${DELETE_CONFIRM_ID === student.id
+          ? `<div class="row" style="gap:6px;">
+               <button class="btn btn-ghost btn-sm" id="btn-cancel-delete">Cancelar</button>
+               <button class="btn btn-danger btn-sm" id="btn-confirm-delete">Confirmar exclusão</button>
+             </div>`
+          : `<button class="btn btn-danger btn-sm" id="btn-delete-student">Excluir</button>`}
+      </div>
+      <div class="divider"></div>
+      <div class="row">
+        <span class="pill">📍 ${esc(student.startStage)}${esc(student.startSheet)}</span>
+        <span class="pill" style="color:var(--mint);border-color:#37E2A044;">🎯 ${esc(student.targetStage)}${esc(student.targetSheet)}</span>
+        <span class="pill" style="color:var(--peri);border-color:#8C93FF44;">⏰ ${s.daysRemaining>=0?s.daysRemaining:0}d</span>
+      </div>
+      <div class="faint mono" style="font-size:11px;margin-top:10px;">🕓 Última atualização: ${fmtDateTime(student.updatedAt)}</div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${s.percent}%</div><div class="stat-label">Progresso</div></div>
+      <div class="stat-card"><div class="stat-num">${s.done}/${s.total}</div><div class="stat-label">Blocos feitos</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${s.pending}</div><div class="stat-label">Correções pendentes</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--peri);">🔥 ${streak.total}</div><div class="stat-label">Dias de constância</div></div>
+    </div>
+
+    <div class="section-title">Atualizar blocos da semana</div>
+    <div class="card">
+      ${renderBlocksSection(student)}
+    </div>
+
+    <div class="section-title">Registrar semana</div>
+    <div class="card">
+      <div class="field">
+        <label>Folhas realizadas esta semana</label>
+        <input type="number" min="0" id="input-weekly-sheets" placeholder="Ex: 35">
+      </div>
+      <button class="btn btn-primary btn-block" id="btn-register-week">Registrar semana</button>
+    </div>
+
+    <div class="section-title">🍬 Prêmios (bombom ou Fini)</div>
+    <div class="card">
+      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">A cada 3 blocos corrigidos, o aluno ganha 1 doce — um bombom ou um Fini, não os dois. Toque no doce que ele escolheu; toque de novo para desfazer.</p>
+      ${renderRewardDots(student)}
+      <p class="faint" style="font-size:11px;margin:0 0 14px;">faltam ${rw.remaining} bloco${rw.remaining===1?'':'s'} para o próximo doce</p>
+      ${rw.earned===0 ? `<p class="faint" style="font-size:11.5px;margin:0;">Ainda não conquistou nenhum doce.</p>` : `
+      <div class="reward-list">
+        ${Array.from({length: rw.earned}).map((_,i)=>{
+          const chosen = (student.rewards || {})[i] || null;
+          return `<div class="reward-item">
+            <span>Doce ${i+1}</span>
+            <div class="reward-choice">
+              <button class="reward-chip ${chosen==='bombom'?'active':''}" data-reward-choice="${i}:bombom">🍫 Bombom</button>
+              <button class="reward-chip ${chosen==='fini'?'active':''}" data-reward-choice="${i}:fini">🍬 Fini</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>
+
+    <div class="section-title">🔥 Constância</div>
+    <div class="card">
+      <div class="row" style="margin-bottom:14px;">
+        <span class="pill" style="color:var(--amber);border-color:#FFB64844;">🔥 ${streak.total} dias acumulados</span>
+      </div>
+      ${renderCalendar(student)}
+    </div>
+
+    <div class="section-title">Histórico semanal</div>
+    <div class="card">
+      ${student.weeklyHistory.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro ainda.</span>` :
+        student.weeklyHistory.slice().reverse().map(h=>`
+          <div class="row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+            <span class="muted" style="font-size:13px;">Semana ${h.week} · ${fmtDate(h.date)}</span>
+            <span class="mono" style="font-size:13px;font-weight:700;">${h.sheets} folhas</span>
+          </div>`).join('')
+      }
+    </div>
+  </div>`;
+}
+
+function renderAdminAdd(){ 
+  return `
+  <div class="screen">
+    <h3 style="margin:0 0 4px;">Cadastrar aluno</h3>
+    <p class="faint" style="font-size:12.5px;margin:0 0 18px;">Preencha os dados do aluno, o ponto de partida e a meta trimestral.</p>
+
+    <div class="section-title" style="margin-top:0;">Dados do aluno</div>
+    <div class="card">
+      <div class="field"><label>Nome</label><input id="f-name" placeholder="Nome do aluno"></div>
+      <div class="field"><label>Código individual de acesso</label><input id="f-code" inputmode="numeric" placeholder="Ex: 5678"></div>
+      <div class="field"><label>Avatar</label>
+        <div class="avatar-picker" id="avatar-picker">
+          ${AVATARS.map((a,i)=>`<button type="button" class="avatar-opt ${i===0?'sel':''}" data-avatar="${a}" aria-label="Avatar ${a}">${a}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <p class="faint" style="font-size:11.5px;margin:-6px 0 16px;">Cada estágio tem 200 folhas (20 blocos de 10 folhas: 1-10, 11-20 … 191-200). Ao ultrapassar 200, a contagem continua no próximo estágio.</p>
+
+    <div class="section-title">Ponto de partida</div>
+    <div class="card">
+      <div class="field-row">
+        <div class="field"><label>Estágio</label>
+          <select id="f-start-stage">${STAGES.map(st=>`<option value="${st}">${st}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Folha inicial (0–200)</label><input type="number" id="f-start-sheet" placeholder="Ex: 140"></div>
+      </div>
+      <div class="field"><label>Data de início</label><input type="date" id="f-start-date" value="${todayISO()}"></div>
+    </div>
+
+    <div class="section-title">Meta trimestral</div>
+    <div class="card">
+      <div class="field-row">
+        <div class="field"><label>Estágio da meta</label>
+          <select id="f-target-stage">${STAGES.map(st=>`<option value="${st}">${st}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Folha final (0–200)</label><input type="number" id="f-target-sheet" placeholder="Ex: 60"></div>
+      </div>
+      <div class="field"><label>Data final da meta</label><input type="date" id="f-target-date"></div>
+    </div>
+
+    <div class="error-msg" id="add-error"></div>
+    <button class="btn btn-primary btn-block" id="btn-save-student">Cadastrar aluno</button>
+  </div>`; 
+}
+
+function renderAdminEvolution(){
+  const list = DATA.students;
+  if(list.length===0) return `<div class="screen"><p class="muted center">Cadastre um aluno para ver a evolução.</p></div>`;
+  const selectedId = SELECTED_STUDENT_ID && list.find(s=>s.id===SELECTED_STUDENT_ID) ? SELECTED_STUDENT_ID : list[0].id;
+  const student = list.find(s=>s.id===selectedId);
+  const hist = student.weeklyHistory;
+  const maxSheets = Math.max(10, ...hist.map(h=>h.sheets));
+  const s = stats(student);
+
+  return `
+  <div class="screen">
+    <div class="field">
+      <label>Selecionar aluno</label>
+      <select id="f-evolution-student">
+        ${list.map(st=>`<option value="${st.id}" ${st.id===selectedId?'selected':''}>${st.avatar} ${esc(st.name)}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="section-title">Folhas por semana</div>
+    <div class="card">
+      ${hist.length===0 ? `<span class="muted" style="font-size:13px;">Sem registros semanais ainda.</span>` : `
+      <div class="bars-wrap">
+        ${hist.map(h=>`
+          <div class="bar-col">
+            <span class="mono" style="font-size:10px;color:var(--text-muted);">${h.sheets}</span>
+            <div class="bar-fill" style="height:${(h.sheets/maxSheets*100)}%;"></div>
+            <span class="bar-label">S${h.week}</span>
+          </div>`).join('')}
+      </div>`}
+    </div>
+
+    <div class="section-title">Panorama dos blocos</div>
+    <div class="card">
+      <div class="blocks-grid">
+        ${student.blocks.map(b=>{
+          let cls='block-btn', ic='⚪';
+          if(b.status==='pending_correction'){ cls+=' pending'; ic='🟡'; }
+          if(b.status==='corrected'){ cls+=' corrected'; ic='🟢'; }
+          return `
+          <div class="block-tile-wrap">
+            <div class="${cls}" style="cursor:default;"><span>${esc(b.label)}</span><span class="status-ic">${ic}</span></div>
+            ${b.forgotten ? `<span class="forgot-flag active" style="cursor:default;">📌</span>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${s.percent}%</div><div class="stat-label">Progresso da meta</div></div>
+      <div class="stat-card"><div class="stat-num">${Math.round(s.correctionRatio*100)}%</div><div class="stat-label">Correções em dia</div></div>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   EVENT HANDLERS
+   ========================================================= */
+function attachHandlers(){
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  // Landing
+  if($('#btn-enter-code')){
+    $('#btn-enter-code').onclick = handleStudentLogin;
+    $('#student-code-input').addEventListener('keydown', e=>{ if(e.key==='Enter') handleStudentLogin(); });
+  }
+  if($('#btn-go-admin')) $('#btn-go-admin').onclick = ()=>{ ADMIN_LOGIN_STAGE=true; LOGIN_ERROR=''; render(); };
+  if($('#btn-back-landing')) $('#btn-back-landing').onclick = ()=>{ ADMIN_LOGIN_STAGE=false; LOGIN_ERROR=''; render(); };
+  if($('#btn-enter-admin')){
+    $('#btn-enter-admin').onclick = handleAdminLogin;
+    $('#admin-pass-input').addEventListener('keydown', e=>{ if(e.key==='Enter') handleAdminLogin(); });
+  }
+
+  // Logout
+  if($('#btn-logout')) $('#btn-logout').onclick = ()=>{
+    SESSION={role:null,studentId:null}; ADMIN_LOGIN_STAGE=false; ADMIN_VIEW='overview'; STUDENT_VIEW='journey'; LOGIN_ERROR=''; render();
+  };
+
+  // Student nav
+  $$('[data-nav]').forEach(btn=> btn.onclick = ()=>{ STUDENT_VIEW = btn.getAttribute('data-nav'); render(); });
+
+  // Admin nav
+  $$('[data-adminnav]').forEach(btn=> btn.onclick = ()=>{
+    ADMIN_VIEW = btn.getAttribute('data-adminnav');
+    if(ADMIN_VIEW==='students') SEARCH_TERM='';
+    render();
+  });
+
+  // Admin students list
+  if($('#admin-search')) $('#admin-search').oninput = (e)=>{ SEARCH_TERM = e.target.value; render(); };
+  $$('[data-open-student]').forEach(row=> row.onclick = ()=>{
+    SELECTED_STUDENT_ID = row.getAttribute('data-open-student');
+    CALENDAR_MONTH = null; EDIT_LABELS_MODE = false; EDITING_FORGOT_INDEX = null; DELETE_CONFIRM_ID = null;
+    ADMIN_VIEW='detail'; render();
+  });
+  if($('#btn-back-students')) $('#btn-back-students').onclick = ()=>{ EDIT_LABELS_MODE=false; ADMIN_VIEW='students'; render(); };
+
+  // Admin detail: blocks
+  $$('[data-toggle-block]').forEach(btn=> btn.onclick = ()=> toggleBlock(parseInt(btn.getAttribute('data-toggle-block'))));
+  $$('[data-toggle-forgot]').forEach(btn=> btn.onclick = ()=>{
+    const idx = parseInt(btn.getAttribute('data-toggle-forgot'));
+    EDITING_FORGOT_INDEX = (EDITING_FORGOT_INDEX === idx) ? null : idx;
+    render();
+  });
+  if($('#btn-cancel-forgot')) $('#btn-cancel-forgot').onclick = ()=>{ EDITING_FORGOT_INDEX = null; render(); };
+  if($('#btn-save-forgot')) $('#btn-save-forgot').onclick = saveForgottenNote;
+  if($('#btn-remove-forgot')) $('#btn-remove-forgot').onclick = removeForgottenNote;
+  if($('#btn-register-week')) $('#btn-register-week').onclick = registerWeek;
+  if($('#btn-delete-student')) $('#btn-delete-student').onclick = ()=>{ DELETE_CONFIRM_ID = SELECTED_STUDENT_ID; render(); };
+  if($('#btn-cancel-delete')) $('#btn-cancel-delete').onclick = ()=>{ DELETE_CONFIRM_ID = null; render(); };
+  if($('#btn-confirm-delete')) $('#btn-confirm-delete').onclick = deleteStudent;
+  $$('[data-reward-choice]').forEach(btn=> btn.onclick = ()=>{
+    const [idx, candy] = btn.getAttribute('data-reward-choice').split(':');
+    setRewardCandy(parseInt(idx), candy);
+  });
+
+  // Admin detail: números personalizados dos blocos
+  if($('#btn-edit-labels')) $('#btn-edit-labels').onclick = ()=>{ EDIT_LABELS_MODE=true; render(); };
+  if($('#btn-cancel-labels')) $('#btn-cancel-labels').onclick = ()=>{ EDIT_LABELS_MODE=false; render(); };
+  if($('#btn-save-labels')) $('#btn-save-labels').onclick = saveBlockLabels;
+
+  // Admin detail: calendário de constância
+  $$('[data-cal-day]').forEach(cell=> cell.onclick = ()=> toggleStudyDay(cell.getAttribute('data-cal-day')));
+  if($('#btn-cal-prev')) $('#btn-cal-prev').onclick = ()=>{ shiftCalendarMonth(-1); render(); };
+  if($('#btn-cal-next')) $('#btn-cal-next').onclick = ()=>{ shiftCalendarMonth(1); render(); };
+
+  // Admin add
+  if($('#avatar-picker')){
+    $$('.avatar-opt').forEach(btn=> btn.onclick = ()=>{
+      $$('.avatar-opt').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+    });
+  }
+  if($('#btn-save-student')) $('#btn-save-student').onclick = saveNewStudent;
+
+  // Admin evolution
+  if($('#f-evolution-student')) $('#f-evolution-student').onchange = (e)=>{ SELECTED_STUDENT_ID = e.target.value; render(); };
+}
+
+function handleStudentLogin(){
+  const code = document.getElementById('student-code-input').value.trim();
+  const student = DATA.students.find(s=>s.code===code);
+  if(!student){ LOGIN_ERROR = 'Código não encontrado. Confira com seu orientador.'; render(); return; }
+  LOGIN_ERROR=''; SESSION = { role:'student', studentId: student.id }; STUDENT_VIEW='journey'; render();
+}
+function handleAdminLogin(){
+  const pass = document.getElementById('admin-pass-input').value.trim();
+  if(pass !== ADMIN_PASSCODE){ LOGIN_ERROR = 'Código incorreto.'; render(); return; }
+  LOGIN_ERROR=''; ADMIN_LOGIN_STAGE=false; SESSION = { role:'admin', studentId:null }; ADMIN_VIEW='overview'; render();
+}
+
+async function toggleBlock(index){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  const block = student.blocks.find(b=>b.index===index);
+  const today = todayISO();
+  if(block.status==='not_done'){
+    block.status='pending_correction'; block.doneDate=today; block.correctedDate=null; block.onTime=null;
+  } else if(block.status==='pending_correction'){
+    block.status='corrected'; block.correctedDate=today;
+    block.onTime = block.doneDate ? daysBetween(block.doneDate, today) <= 14 : true;
+    block.forgotten=false; block.forgottenDate=null; block.forgottenNote='';
+  } else {
+    block.status='not_done'; block.doneDate=null; block.correctedDate=null; block.onTime=null;
+    block.forgotten=false; block.forgottenDate=null; block.forgottenNote='';
+  }
+  touch(student);
+  await saveData();
+  render();
+}
+async function saveForgottenNote(){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  const block = student.blocks.find(b=>b.index===EDITING_FORGOT_INDEX);
+  const val = document.getElementById('input-forgot-note').value.trim();
+  if(val===''){
+    block.forgotten = false; block.forgottenNote = ''; block.forgottenDate = null;
+  } else {
+    block.forgotten = true; block.forgottenNote = val; block.forgottenDate = todayISO();
+  }
+  touch(student);
+  await saveData();
+  EDITING_FORGOT_INDEX = null;
+  showToast('Aviso salvo!');
+}
+async function removeForgottenNote(){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  const block = student.blocks.find(b=>b.index===EDITING_FORGOT_INDEX);
+  block.forgotten = false; block.forgottenNote = ''; block.forgottenDate = null;
+  touch(student);
+  await saveData();
+  EDITING_FORGOT_INDEX = null;
+  showToast('Aviso removido.');
+}
+async function registerWeek(){
+  const input = document.getElementById('input-weekly-sheets');
+  const val = Number(input.value);
+  if(!val && val!==0){ return; }
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  student.weeklyHistory.push({ week: student.weeklyHistory.length+1, sheets: val, date: todayISO() });
+  touch(student);
+  await saveData();
+  showToast('Semana registrada!');
+}
+async function setRewardCandy(index, candy){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  if(!student.rewards) student.rewards = {};
+  student.rewards[index] = (student.rewards[index] === candy) ? undefined : candy;
+  if(student.rewards[index] === undefined) delete student.rewards[index];
+  touch(student);
+  await saveData();
+  render();
+}
+async function saveBlockLabels(){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  document.querySelectorAll('[data-block-label-input]').forEach(input=>{
+    const idx = parseInt(input.getAttribute('data-block-label-input'));
+    const block = student.blocks.find(b=>b.index===idx);
+    const val = input.value.trim();
+    if(block && val) block.label = val;
+  });
+  touch(student);
+  await saveData();
+  EDIT_LABELS_MODE = false;
+  showToast('Números atualizados!');
+}
+function shiftCalendarMonth(delta){
+  const cur = CALENDAR_MONTH || { year:new Date().getFullYear(), month:new Date().getMonth() };
+  let m = cur.month + delta, y = cur.year;
+  if(m<0){ m=11; y--; } else if(m>11){ m=0; y++; }
+  CALENDAR_MONTH = { year:y, month:m };
+}
+async function toggleStudyDay(iso){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  if(!student.studyDays) student.studyDays = [];
+  const idx = student.studyDays.indexOf(iso);
+  if(idx>=0) student.studyDays.splice(idx,1); else student.studyDays.push(iso);
+  touch(student);
+  await saveData();
+  render();
+}
+async function deleteStudent(){
+  DATA.students = DATA.students.filter(s=>s.id!==SELECTED_STUDENT_ID);
+  await saveData();
+  DELETE_CONFIRM_ID = null;
+  ADMIN_VIEW='students'; render();
+}
+async function saveNewStudent(){
+  const name = document.getElementById('f-name').value.trim();
+  const code = document.getElementById('f-code').value.trim();
+  const avatar = document.querySelector('.avatar-opt.sel')?.getAttribute('data-avatar') || AVATARS[0];
+  const startStage = document.getElementById('f-start-stage').value;
+  const startSheet = Number(document.getElementById('f-start-sheet').value);
+  const startDate = document.getElementById('f-start-date').value;
+  const targetStage = document.getElementById('f-target-stage').value;
+  const targetSheet = Number(document.getElementById('f-target-sheet').value);
+  const targetDate = document.getElementById('f-target-date').value;
+  const errEl = document.getElementById('add-error');
+
+  if(!name || !code || !startDate || !targetDate || isNaN(startSheet) || isNaN(targetSheet)){
+    errEl.textContent = 'Preencha todos os campos obrigatórios.'; return;
+  }
+  if(DATA.students.some(s=>s.code===code)){
+    errEl.textContent = 'Este código já está em uso por outro aluno.'; return;
+  }
+  const { total, blocks } = buildBlocks(startStage, startSheet, targetStage, targetSheet);
+  const nowIso = new Date().toISOString();
+  const newStudent = {
+    id: uid(), code, name, avatar,
+    startStage, startSheet, startDate,
+    targetStage, targetSheet, targetStart:startDate, targetEnd:targetDate,
+    totalBlocks: total, blocks,
+    weeklyHistory: [], studyDays: [], rewards: {},
+    createdAt: nowIso, updatedAt: nowIso
+  };
+  DATA.students.push(newStudent);
+  await saveData();
+  showToast('Aluno cadastrado!');
+  SELECTED_STUDENT_ID = newStudent.id;
+  CALENDAR_MONTH = null; EDIT_LABELS_MODE = false; EDITING_FORGOT_INDEX = null; DELETE_CONFIRM_ID = null;
+  ADMIN_VIEW = 'detail';
+  render();
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+(async function init(){
+  // carregar dados (localStorage ou Firestore) e renderizar
+  await loadData();
+  render();
+})();
+</script>
+</body>
+</html>
