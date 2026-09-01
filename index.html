@@ -312,7 +312,13 @@ input,select{font-family:inherit;}
   display:flex;align-items:center;justify-content:center;color:var(--text-faint);z-index:2;
 }
 .forgot-flag.active{background:var(--forgot);border-color:var(--forgot);color:#3A1400;box-shadow:0 0 0 3px #FF8A4C33;}
-
+.remove-block-flag{
+  position:absolute;top:-7px;left:-7px;width:21px;height:21px;border-radius:50%;
+  background:var(--bg-surface);border:1px solid var(--border);font-size:10px;
+  display:flex;align-items:center;justify-content:center;color:var(--text-faint);z-index:2;
+}
+.remove-block-flag:active{background:var(--danger);border-color:var(--danger);color:#fff;}
+ 
 /* ---------- Aviso de material esquecido (aluno) ---------- */
 .forgot-banner{
   display:flex;gap:12px;align-items:flex-start;
@@ -337,16 +343,24 @@ input,select{font-family:inherit;}
   display:flex;align-items:center;justify-content:center;
 }
 .cal-cell.empty{background:transparent;border:none;}
-.cal-cell.marked{background:var(--mint);border-color:var(--mint);color:#06301F;font-weight:700;}
+.cal-cell.marked-kumon{background:var(--mint);border-color:var(--mint);color:#06301F;font-weight:700;}
+.cal-cell.marked-teste{background:var(--peri);border-color:var(--peri);color:#1A1550;font-weight:700;}
 .cal-cell.today{box-shadow:0 0 0 2px var(--peri) inset;}
-
+.cal-legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;}
+.cal-legend span{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);}
+.cal-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+ 
 /* ---------- Admin list rows ---------- */
 .student-row{
   display:flex;align-items:center;gap:12px;padding:13px;border-radius:14px;background:var(--bg-surface);
   border:1px solid var(--border);margin-bottom:10px;
+color:var(--text);font:inherit;text-align:left;width:100%;cursor:pointer;  
 }
 .student-row .info{flex:1;min-width:0;}
-.student-row .prog-line{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.student-row .prog-line{display:flex;align-items:center;gap:8px;margin-top:7px;}
+.student-row .name-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.student-row .name-row .name{font-weight:700;font-size:14.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.student-row .meta-row{display:flex;align-items:center;gap:8px;margin-top:3px;}
 .mini-track{flex:1;height:7px;border-radius:8px;background:var(--bg-surface-2);overflow:hidden;}
 .mini-fill{height:100%;background:linear-gradient(90deg,var(--mint),#5AC8FF);}
 .search-input{
@@ -428,6 +442,7 @@ let ADMIN_LOGIN_STAGE = false;   // showing passcode screen
 let TOAST = null;
 let CALENDAR_MONTH = null;       // {year, month}
 let EDIT_LABELS_MODE = false;
+let EDIT_STUDENT_MODE = false;   // editando qualquer informação de um aluno
 let EDITING_FORGOT_INDEX = null;
 let DELETE_CONFIRM_ID = null;
 
@@ -521,6 +536,31 @@ function buildBlocks(startStage, startSheet, targetStage, targetSheet){
   }
   return { total, blocks };
 }
+function updateStudentTarget(student, newTargetStage, newTargetSheet, newTargetEnd){
+  // Recalcula a meta mantendo o progresso já feito: os blocos existentes não são
+  // tocados (status, datas, número personalizado, aviso de material esquecido
+  // continuam intactos). Só blocos do FINAL da trilha são adicionados ou removidos,
+  // conforme a meta cresce ou diminui.
+  const startPoint = stagePoint(student.startStage, student.startSheet);
+  const newTargetPoint = stagePoint(newTargetStage, newTargetSheet);
+  const newDir = newTargetPoint >= startPoint ? 1 : -1;
+  const newTotal = Math.max(1, Math.abs(newTargetPoint - startPoint));
+  const oldTotal = student.blocks.length;
+
+    if(newTotal > oldTotal){
+    for(let i=oldTotal+1; i<=newTotal; i++){
+      const point = startPoint + newDir*i;
+      student.blocks.push({ index:i, label: blockLabelForPoint(point), status:'not_done', doneDate:null, correctedDate:null, onTime:null, forgotten:false, forgottenDate:null, forgottenNote:'' });
+    }
+  } else if(newTotal < oldTotal){
+    student.blocks = student.blocks.slice(0, newTotal);
+  }
+
+    student.totalBlocks = newTotal;
+  student.targetStage = newTargetStage;
+  student.targetSheet = Number(newTargetSheet);
+  student.targetEnd = newTargetEnd;
+}
 function stats(student){
   const blocks = student.blocks;
   const total = student.totalBlocks;
@@ -582,13 +622,24 @@ async function loadData(){
     const res = await storage.get(STORAGE_KEY);
     if(res && res.value){
       DATA = JSON.parse(res.value);
+            migrateAttendance();
       return;
     }
   }catch(e){}
   DATA = seedDemoData();
   await saveData();
 }
-async function saveData(){
+function migrateAttendance(){
+  // Compatibilidade com dados salvos antes da marcação de dia de Kumon vs. dia de teste:
+  // studyDays (array simples) vira attendance (mapa data -> tipo), tudo como 'kumon'.
+  (DATA.students || []).forEach(student=>{
+    if(!student.attendance){
+      student.attendance = {};
+      (student.studyDays || []).forEach(d=>{ student.attendance[d] = 'kumon'; });
+    }
+  });
+}
+  async function saveData(){
   try{
     await storage.set(STORAGE_KEY, JSON.stringify(DATA));
   }catch(e){ console.error('Erro ao salvar dados', e); }
@@ -620,13 +671,16 @@ function seedDemoData(){
     });
     const rewards = {};
     (rewardsPattern || []).forEach((candy, idx)=>{ rewards[idx] = candy; });
+    const attendance = {};
+    (kumonDays || []).forEach(d=>{ attendance[d] = 'kumon'; });    
+    (testDays || []).forEach(d=>{ attendance[d] = 'teste'; });
     return {
       id: uid(), code, name, avatar,
       startStage, startSheet:Number(startSheet), startDate,
       targetStage, targetSheet:Number(targetSheet), targetStart:startDate, targetEnd:endDate,
       totalBlocks: total, blocks,
       weeklyHistory: history || [],
-      studyDays: studyDays || [],
+      attendance,
       rewards,
       createdAt: daysAgo(60),
       updatedAt: daysAgo(updatedDaysAgo || 0)
@@ -639,7 +693,8 @@ function seedDemoData(){
       startStage:'C', startSheet:40, targetStage:'D', targetSheet:80,
       startDate:daysAgo(58), endDate:daysAhead(32),
       doneCount:14, pendingCount:1, updatedDaysAgo:0, rewardsPattern:['bombom','fini','bombom'],
-      studyDays:[...consecutiveDates(0,12), ...consecutiveDates(22,15)],
+      kumonDays:[...consecutiveDates(1,11), ...consecutiveDates(22,15)],
+      testDays:[daysAgo(0)],    
       history:[ {week:1,sheets:32,date:daysAgo(28)}, {week:2,sheets:38,date:daysAgo(21)}, {week:3,sheets:41,date:daysAgo(14)}, {week:4,sheets:35,date:daysAgo(7)}, {week:5,sheets:42,date:daysAgo(1)} ]
     }),
     buildStudent({
@@ -647,7 +702,7 @@ function seedDemoData(){
       startStage:'E', startSheet:100, targetStage:'F', targetSheet:60,
       startDate:daysAgo(50), endDate:daysAhead(40),
       doneCount:11, pendingCount:2, updatedDaysAgo:2, rewardsPattern:['fini','fini','bombom'],
-      studyDays:[...consecutiveDates(0,6), ...consecutiveDates(16,19)],
+      kumonDays:[...consecutiveDates(0,6), ...consecutiveDates(16,19)],
       history:[ {week:1,sheets:28,date:daysAgo(28)}, {week:2,sheets:30,date:daysAgo(21)}, {week:3,sheets:26,date:daysAgo(14)}, {week:4,sheets:33,date:daysAgo(7)}, {week:5,sheets:31,date:daysAgo(1)} ]
     }),
     buildStudent({
