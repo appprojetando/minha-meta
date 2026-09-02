@@ -694,8 +694,9 @@ function seedDemoData(){
       startDate:daysAgo(58), endDate:daysAhead(32),
       doneCount:14, pendingCount:1, updatedDaysAgo:0, rewardsPattern:['bombom','fini','bombom'],
       kumonDays:[...consecutiveDates(1,11), ...consecutiveDates(22,15)],
+      presencialDays:[daysAgo(3), daysAgo(8)],       
       testDays:[daysAgo(0)],    
-      history:[ {week:1,sheets:32,date:daysAgo(28)}, {week:2,sheets:38,date:daysAgo(21)}, {week:3,sheets:41,date:daysAgo(14)}, {week:4,sheets:35,date:daysAgo(7)}, {week:5,sheets:42,date:daysAgo(1)} ]
+      history:[ {startDate:daysAgo(34),endDate:daysAgo(28),sheets:32}, {startDate:daysAgo(27),endDate:daysAgo(21),sheets:38}, {startDate:daysAgo(20),endDate:daysAgo(14),sheets:41}, {startDate:daysAgo(13),endDate:daysAgo(7),sheets:35}, {startDate:daysAgo(7),endDate:daysAgo(1),sheets:42} ]
     }),
     buildStudent({
       name:'Ana', avatar:'🦋', code:'2222',
@@ -703,23 +704,25 @@ function seedDemoData(){
       startDate:daysAgo(50), endDate:daysAhead(40),
       doneCount:11, pendingCount:2, updatedDaysAgo:2, rewardsPattern:['fini','fini','bombom'],
       kumonDays:[...consecutiveDates(0,6), ...consecutiveDates(16,19)],
-      history:[ {week:1,sheets:28,date:daysAgo(28)}, {week:2,sheets:30,date:daysAgo(21)}, {week:3,sheets:26,date:daysAgo(14)}, {week:4,sheets:33,date:daysAgo(7)}, {week:5,sheets:31,date:daysAgo(1)} ]
+      presencialDays:[daysAgo(2), daysAgo(5)],
+      history:[ {startDate:daysAgo(34),endDate:daysAgo(28),sheets:28}, {startDate:daysAgo(27),endDate:daysAgo(21),sheets:30}, {startDate:daysAgo(20),endDate:daysAgo(14),sheets:26}, {startDate:daysAgo(13),endDate:daysAgo(7),sheets:33}, {startDate:daysAgo(7),endDate:daysAgo(1),sheets:31} ]
     }),
     buildStudent({
       name:'Pedro', avatar:'🦉', code:'3333',
       startStage:'A', startSheet:0, targetStage:'A', targetSheet:200,
       startDate:daysAgo(70), endDate:daysAhead(20),
       doneCount:19, pendingCount:1, updatedDaysAgo:0, rewardsPattern:['bombom','bombom','fini'],
-      studyDays: consecutiveDates(0,21),
-      history:[ {week:1,sheets:36,date:daysAgo(28)}, {week:2,sheets:40,date:daysAgo(21)}, {week:3,sheets:44,date:daysAgo(14)}, {week:4,sheets:39,date:daysAgo(7)}, {week:5,sheets:45,date:daysAgo(1)} ]
+      kumonDays: consecutiveDates(0,21),
+      history:[ {startDate:daysAgo(34),endDate:daysAgo(28),sheets:36}, {startDate:daysAgo(27),endDate:daysAgo(21),sheets:40}, {startDate:daysAgo(20),endDate:daysAgo(14),sheets:44}, {startDate:daysAgo(13),endDate:daysAgo(7),sheets:39}, {startDate:daysAgo(7),endDate:daysAgo(1),sheets:45} ]
     }),
     buildStudent({
       name:'Beatriz', avatar:'🐼', code:'4444',
       startStage:'G', startSheet:100, targetStage:'G', targetSheet:180,
       startDate:daysAgo(40), endDate:daysAhead(50),
       doneCount:5, pendingCount:3, updatedDaysAgo:5, forgottenIndices:[6], forgottenNote:'165, 168',
-      studyDays:[...consecutiveDates(0,2), ...consecutiveDates(12,9)],
-      history:[ {week:1,sheets:18,date:daysAgo(21)}, {week:2,sheets:22,date:daysAgo(14)}, {week:3,sheets:16,date:daysAgo(7)}, {week:4,sheets:24,date:daysAgo(1)} ]
+      kumonDays:[...consecutiveDates(1,2), ...consecutiveDates(12,9)],
+      testDays:[daysAgo(0)],
+      history:[ {startDate:daysAgo(27),endDate:daysAgo(21),sheets:18}, {startDate:daysAgo(20),endDate:daysAgo(14),sheets:22}, {startDate:daysAgo(13),endDate:daysAgo(7),sheets:16}, {startDate:daysAgo(7),endDate:daysAgo(1),sheets:24} ]
     }),
   ];
   return { students };
@@ -1068,6 +1071,7 @@ function renderAdminApp(){
   else if(ADMIN_VIEW==='detail') body = renderAdminDetail();
   else if(ADMIN_VIEW==='add') body = renderAdminAdd();
   else if(ADMIN_VIEW==='evolution') body = renderAdminEvolution();
+  else if(ADMIN_VIEW==='hall') body = renderAdminHall();
 
   return `
     <div class="top-header">
@@ -1082,12 +1086,49 @@ function renderAdminApp(){
   `;
 }
 function renderAdminNav(){
-  const items = [ ['overview','🏠','Visão geral'], ['students','👥','Alunos'], ['add','➕','Cadastrar'], ['evolution','📊','Evolução'] ];
+    const items = [ ['overview','🏠','Visão geral'], ['students','👥','Alunos'], ['hall','🏆','Hall'], ['add','➕','Cadastrar'], ['evolution','📊','Evolução'] ];
   return `<div class="bottom-nav">
     ${items.map(([id,ic,label])=>`
       <button class="nav-btn ${ADMIN_VIEW===id || (ADMIN_VIEW==='detail' && id==='students') ?'active':''}" data-adminnav="${id}" aria-label="${label}">
         <span class="ic">${ic}</span><span>${label}</span>
       </button>`).join('')}
+  </div>`;
+}
+function renderAdminHall(){
+  const list = DATA.students;
+  if(list.length===0) return `<div class="screen"><p class="muted center" style="margin-top:30px;">Cadastre alunos para ver o Hall da Evolução.</p></div>`;
+  const byStreak = [...list].sort((a,b)=>streakStats(b).total-streakStats(a).total);
+  const byCorrection = [...list].sort((a,b)=> stats(b).correctionRatio - stats(a).correctionRatio || stats(b).done - stats(a).done);
+ 
+  const streakRows = byStreak.map((st,i)=>`
+    <div class="hall-row" data-open-student="${st.id}" style="cursor:pointer;">
+      <span class="hall-rank">${i+1}</span>
+      <span class="hall-avatar">${st.avatar}</span>
+      <span class="hall-name">${esc(st.name)}</span>
+      <span class="hall-metric" style="color:var(--amber);">🔥 ${streakStats(st).total}</span>
+    </div>`).join('');
+ 
+  const corrRows = byCorrection.map((st,i)=>{
+    const r = stats(st);
+    const pct = Math.round(r.correctionRatio*100);
+    return `
+    <div class="hall-row" data-open-student="${st.id}" style="cursor:pointer;">
+      <span class="hall-rank">${i+1}</span>
+      <span class="hall-avatar">${st.avatar}</span>
+      <span class="hall-name">${esc(st.name)}</span>
+      <span class="hall-metric" style="color:var(--mint);">🧠 ${pct}%</span>
+    </div>`;
+  }).join('');
+ 
+  return `
+  <div class="screen">
+    <div class="growth-msg">✨ Acompanhe a constância e as correções de todos os alunos. Toque em um aluno para abrir o perfil dele.</div>
+ 
+    <div class="section-title">🎯 Constância</div>
+    <div class="card">${streakRows}</div>
+ 
+    <div class="section-title">🧠 Correções em dia</div>
+    <div class="card">${corrRows}</div>
   </div>`;
 }
 
