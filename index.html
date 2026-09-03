@@ -49,6 +49,8 @@
   --amber-dim:#FFB6482e;
   --peri:#8C93FF;
   --peri-dim:#8C93FF2e;
+  --sky:#5AC8FF;
+  --sky-dim:#5AC8FF2e;
   --forgot:#FF8A4C;
   --forgot-dim:#FF8A4C2e;
   --gray-node:#3A4270;
@@ -344,11 +346,20 @@ input,select{font-family:inherit;}
 }
 .cal-cell.empty{background:transparent;border:none;}
 .cal-cell.marked-kumon{background:var(--mint);border-color:var(--mint);color:#06301F;font-weight:700;}
+.cal-cell.marked-presencial{background:var(--sky);border-color:var(--sky);color:#062A40;font-weight:700;}
 .cal-cell.marked-teste{background:var(--peri);border-color:var(--peri);color:#1A1550;font-weight:700;}
 .cal-cell.today{box-shadow:0 0 0 2px var(--peri) inset;}
 .cal-legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;}
 .cal-legend span{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);}
 .cal-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.cal-summary{margin-bottom:14px;}
+.cal-summary-main{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;}
+.cal-summary-pct{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--mint);}
+.cal-summary-label{font-size:12px;color:var(--text-muted);}
+.cal-summary-track{width:100%;height:8px;border-radius:8px;background:var(--bg-surface-2);overflow:hidden;margin-bottom:8px;}
+.cal-summary-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--mint),var(--sky));transition:width .4s ease;}
+.cal-summary-breakdown{display:flex;gap:14px;flex-wrap:wrap;}
+.cal-summary-breakdown span{font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
  
 /* ---------- Admin list rows ---------- */
 .student-row{
@@ -396,6 +407,18 @@ color:var(--text);font:inherit;text-align:left;width:100%;cursor:pointer;
   background:var(--bg-surface);border:1px solid var(--border);color:var(--text-muted);
 }
 .reward-chip.active{background:var(--mint-dim);border-color:#37E2A066;color:var(--mint);}
+
+/* ---------- Histórico de metas (trimestres) ---------- */
+.meta-row{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;
+  background:var(--bg-surface-2);border:1px solid var(--border);margin-bottom:8px;font-size:13px;
+}
+.meta-row .meta-range{flex:1;min-width:0;color:var(--text);}
+.meta-row .meta-extra{font-size:11px;color:var(--text-faint);margin-top:2px;}
+.meta-badge{padding:3px 9px;border-radius:8px;font-size:10.5px;font-weight:700;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.meta-badge.planned{color:var(--peri);background:var(--peri-dim);border:1px solid #8C93FF44;}
+.meta-badge.active{color:var(--mint);background:var(--mint-dim);border:1px solid #37E2A044;}
+.meta-badge.completed{color:var(--text-muted);background:var(--bg-surface-3);border:1px solid var(--border);}
 .avatar-picker{display:flex;flex-wrap:wrap;gap:8px;}
 .avatar-opt{
   width:42px;height:42px;border-radius:11px;background:var(--bg-surface-2);border:2px solid transparent;
@@ -445,7 +468,9 @@ let EDIT_LABELS_MODE = false;
 let EDIT_STUDENT_MODE = false;   // editando qualquer informação de um aluno
 let EDITING_FORGOT_INDEX = null;
 let DELETE_CONFIRM_ID = null;
-
+let PLAN_META_MODE = false;      // formulário de "planejar próxima meta" aberto
+let END_TRIMESTER_CONFIRM = null; // id do aluno aguardando confirmação de encerrar trimestre
+  
 /* ---------- storage wrapper usando Firebase (com fallback para localStorage) ---------- */
 const storage = {
   async get(key){
@@ -498,6 +523,7 @@ const storage = {
 /* ---------- helpers ---------- */
 const uid = () => 'id_' + Math.random().toString(36).slice(2,10);
 const todayISO = () => new Date().toISOString().slice(0,10);
+const daysAgoISO = (n) => { const d = new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); };  
 const fmtDate = (iso) => { if(!iso) return '—'; const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); };
 const fmtDateTime = (iso) => {
   if(!iso) return '—';
@@ -561,6 +587,20 @@ function updateStudentTarget(student, newTargetStage, newTargetSheet, newTargetE
   student.targetSheet = Number(newTargetSheet);
   student.targetEnd = newTargetEnd;
 }
+function archiveCurrentMeta(student){
+  // Guarda um retrato da meta que está sendo encerrada no histórico de trimestres.
+  if(!student.metaHistory) student.metaHistory = [];
+  const s = stats(student);
+  student.metaHistory.push({
+    id: uid(),
+    startStage: student.startStage, startSheet: student.startSheet, startDate: student.startDate,
+    targetStage: student.targetStage, targetSheet: student.targetSheet, targetEnd: student.targetEnd,
+    status: 'completed',
+    archivedAt: todayISO(),
+    blocksCompleted: s.corrected,
+    blocksTotal: s.total
+  });
+}
 function stats(student){
   const blocks = student.blocks;
   const total = student.totalBlocks;
@@ -577,19 +617,19 @@ function stats(student){
 function weeklyDelta(student){
   const h = student.weeklyHistory;
   if(h.length===0) return { thisWeek:0, lastWeek:0, delta:0 };
-  const thisWeek = h[h.length-1].sheets;
+  const thisWeek = h[0].sheets;
   const lastWeek = h.length>1 ? h[h.length-2].sheets : 0;
   return { thisWeek, lastWeek, delta: thisWeek-lastWeek };
 }
 function streakStats(student){
-  const set = new Set(student.studyDays || []);
-  return { total: set.size };
+  const attendance = student.attendance || {};
+  return { total: Object.keys(attendance).length };
 }
 function isRecentlyActive(student){
-  const days = student.studyDays || [];
+  const dates = Object.keys(student.attendance || {});
   if(days.length===0) return false;
   const today = todayISO();
-  return days.some(d => daysBetween(d, today) <= 14);
+  return dates.some(d => daysBetween(d, today) <= 14);
 }
 const BLOCKS_PER_REWARD = 3;
 function rewardStats(student){
@@ -623,6 +663,7 @@ async function loadData(){
     if(res && res.value){
       DATA = JSON.parse(res.value);
             migrateAttendance();
+            migrateWeeklyHistory();
       return;
     }
   }catch(e){}
@@ -630,13 +671,25 @@ async function loadData(){
   await saveData();
 }
 function migrateAttendance(){
-  // Compatibilidade com dados salvos antes da marcação de dia de Kumon vs. dia de teste:
+    // Compatibilidade com dados salvos antes da marcação de 3 tipos (Kumon / presencial / teste):
   // studyDays (array simples) vira attendance (mapa data -> tipo), tudo como 'kumon'.
   (DATA.students || []).forEach(student=>{
     if(!student.attendance){
       student.attendance = {};
       (student.studyDays || []).forEach(d=>{ student.attendance[d] = 'kumon'; });
     }
+  });
+}
+function migrateWeeklyHistory(){
+  // Compatibilidade com registros antigos {week, date, sheets} -> {startDate, endDate, sheets}
+  (DATA.students || []).forEach(student=>{
+    (student.weeklyHistory || []).forEach(h=>{
+      if(!h.startDate || !h.endDate){
+        const d = h.date || todayISO();
+        h.startDate = h.startDate || d;
+        h.endDate = h.endDate || d;
+      }
+    });
   });
 }
   async function saveData(){
@@ -653,7 +706,7 @@ function seedDemoData(){
     const arr=[]; for(let k=0;k<count;k++) arr.push(daysAgo(endOffsetDaysAgo+k)); return arr;
   };
 
-  function buildStudent({name, avatar, code, startStage, startSheet, targetStage, targetSheet, startDate, endDate, doneCount, pendingCount, studyDays, history, updatedDaysAgo, rewardsPattern, forgottenIndices, forgottenNote}){
+    function buildStudent({name, avatar, code, startStage, startSheet, targetStage, targetSheet, startDate, endDate, doneCount, pendingCount, kumonDays, presencialDays, testDays, history, updatedDaysAgo, rewardsPattern, forgottenIndices, forgottenNote, pastMeta, plannedMeta}){
     const { total, blocks } = buildBlocks(startStage, startSheet, targetStage, targetSheet);
     let i=0;
     for(; i<doneCount && i<total; i++){
@@ -672,8 +725,12 @@ function seedDemoData(){
     const rewards = {};
     (rewardsPattern || []).forEach((candy, idx)=>{ rewards[idx] = candy; });
     const attendance = {};
-    (kumonDays || []).forEach(d=>{ attendance[d] = 'kumon'; });    
+    (kumonDays || []).forEach(d=>{ attendance[d] = 'kumon'; });
+    (presencialDays || []).forEach(d=>{ attendance[d] = 'presencial'; });
     (testDays || []).forEach(d=>{ attendance[d] = 'teste'; });
+    const metaHistory = [];
+    if(pastMeta) metaHistory.push({ id: uid(), status:'completed', archivedAt: daysAgo(pastMeta.archivedDaysAgo), ...pastMeta.info });
+    if(plannedMeta) metaHistory.push({ id: uid(), status:'planned', plannedAt: daysAgo(3), ...plannedMeta });      
     return {
       id: uid(), code, name, avatar,
       startStage, startSheet:Number(startSheet), startDate,
@@ -682,6 +739,7 @@ function seedDemoData(){
       weeklyHistory: history || [],
       attendance,
       rewards,
+      metaHistory,
       createdAt: daysAgo(60),
       updatedAt: daysAgo(updatedDaysAgo || 0)
     };
@@ -714,6 +772,8 @@ function seedDemoData(){
       doneCount:19, pendingCount:1, updatedDaysAgo:0, rewardsPattern:['bombom','bombom','fini'],
       kumonDays: consecutiveDates(0,21),
       history:[ {startDate:daysAgo(34),endDate:daysAgo(28),sheets:36}, {startDate:daysAgo(27),endDate:daysAgo(21),sheets:40}, {startDate:daysAgo(20),endDate:daysAgo(14),sheets:44}, {startDate:daysAgo(13),endDate:daysAgo(7),sheets:39}, {startDate:daysAgo(7),endDate:daysAgo(1),sheets:45} ]
+      pastMeta:{ archivedDaysAgo:71, info:{ startStage:'7A', startSheet:0, startDate:daysAgo(160), targetStage:'A', targetSheet:0, targetEnd:daysAgo(71), blocksCompleted:20, blocksTotal:20 } },
+      plannedMeta:{ targetStage:'B', targetSheet:100, targetEnd:daysAhead(120) }   
     }),
     buildStudent({
       name:'Beatriz', avatar:'🐼', code:'4444',
