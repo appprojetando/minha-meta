@@ -13,6 +13,7 @@
 <!-- === FIREBASE: já inserido com a sua configuração (modo compat) === -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script>
   // Sua firebaseConfig (inserida conforme você enviou)
   const firebaseConfig = {
@@ -29,10 +30,13 @@
   try {
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
+    var auth = firebase.auth();
+    try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { console.warn('Não foi possível configurar persistência da autenticação:', e); }
     console.info('Firebase inicializado com sucesso.');
   } catch (e) {
     console.warn('Falha ao inicializar Firebase (continua com localStorage):', e);
     var db = null;
+    var auth = null;
   }
 </script>
 <!-- === fim Firebase === -->
@@ -450,7 +454,6 @@ input,select{font-family:inherit;}
    ========================================================= */
 
 const STORAGE_KEY = 'kumon_level_up_v1';
-const ADMIN_PASSCODE = '2580'; // altere se quiser
 const AVATARS = ['🚀','🦁','🐯','🦊','🐧','🦉','🐼','🦄','🐝','🦋','🐢','🐬'];
 const STAGES = ['7A','6A','5A','4A','3A','2A','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
 
@@ -470,56 +473,71 @@ let EDITING_FORGOT_INDEX = null;
 let DELETE_CONFIRM_ID = null;
 let PLAN_META_MODE = false;      // formulário de "planejar próxima meta" aberto
 let END_TRIMESTER_CONFIRM = null; // id do aluno aguardando confirmação de encerrar trimestre
+let AVAILABLE_BACKUPS = [];      // lista de backups automáticos carregada da tela de Backups
+let BACKUPS_LOADING = false;
+let PENDING_RESTORE = null;      // {source:'file'|'auto', label, data} aguardando confirmação
+let DATA_SOURCE = null;           // 'firebase' | 'local' | 'firebase_missing' | 'error'
+let FIREBASE_LAST_ERROR = null;
+let SAVE_LAST_STATUS = null;      // 'firebase' | 'local' | 'failed'
+let SAVE_FAILURE_PENDING = false;
+let ADMIN_LOGIN_ATTEMPTS = 0;
+let ADMIN_LOGIN_LOCK_UNTIL = 0;
+let ADMIN_LOGIN_LOCK_TIMER = null
 
 /* ---------- storage wrapper usando Firebase (com fallback para localStorage) ---------- */
 const storage = {
   async get(key){
-    // tenta buscar do Firestore se inicializado
     if(window.firebase && typeof db !== 'undefined' && db){
       try{
         const doc = await db.collection('app_state').doc(key).get();
+        FIREBASE_LAST_ERROR = null;
         if(doc.exists){
-          // o valor é salvo como string (JSON) - compatível com uso anterior
-          return { value: doc.data().value };
-        } else {
-          return { value: null };
+          return { value: doc.data().value, source:'firebase', exists:true, error:false };
         }
+        return { value: null, source:'firebase', exists:false, error:false };
       }catch(e){
+        FIREBASE_LAST_ERROR = e;
         console.warn('firebase.get error', e);
+        try{
+          const v = localStorage.getItem(key);
+          return { value: v, source:'local', exists:!!v, error:true, firebaseUnavailable:true, firebaseError:e };
+        }catch(localErr){
+          console.warn('storage.get fallback error', localErr);
+          return { value:null, source:'error', exists:false, error:true, firebaseUnavailable:true, firebaseError:e, localError:localErr };
+        }
       }
     }
-    // fallback: localStorage
     try{
       const v = localStorage.getItem(key);
-      return { value: v };
+      return { value:v, source:'local', exists:!!v, error:true, firebaseUnavailable:true };
     }catch(e){
-      console.warn('storage.get error', e); return { value: null };
+      console.warn('storage.get error', e);
+      return { value:null, source:'error', exists:false, error:true, firebaseUnavailable:true, localError:e };
     }
   },
   async set(key, value){
-    // tenta salvar no Firestore se inicializado
     if(window.firebase && typeof db !== 'undefined' && db){
       try{
-        // salva um documento com id = key e campo value = string JSON
         await db.collection('app_state').doc(key).set({
-          value: value,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          value:value,
+          updatedAt:firebase.firestore.FieldValue.serverTimestamp()
         });
-        return true;
+        FIREBASE_LAST_ERROR = null;
+        return { ok:true, source:'firebase' };
       }catch(e){
+        FIREBASE_LAST_ERROR = e;
         console.warn('firebase.set error', e);
       }
     }
-    // fallback: localStorage
     try{
       localStorage.setItem(key, value);
-      return true;
+      return { ok:true, source:'local', error:true };
     }catch(e){
-      console.warn('storage.set error', e); return false;
+      console.warn('storage.set error', e);
+      return { ok:false, source:'none', error:true, errorObject:e };
     }
   }
 };
-
 /* ---------- helpers ---------- */
 const uid = () => 'id_' + Math.random().toString(36).slice(2,10);
 const todayISO = () => new Date().toISOString().slice(0,10);
@@ -534,6 +552,7 @@ const fmtDateTime = (iso) => {
 };
 const daysBetween = (a,b) => Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000);
 const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
+const isValidSheet = (value) => Number.isFinite(Number(value)) && Number.isInteger(Number(value)) && Number(value)>=0 && Number(value)<=200;
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function touch(student){ student.updatedAt = new Date().toISOString(); }
 
@@ -652,23 +671,153 @@ function renderRewardDots(student){
   return `<div class="reward-dots">${dots}</div>`;
 }
 function showToast(msg){
+  if(SAVE_FAILURE_PENDING){
+    msg = '⚠️ Firebase indisponível: a alteração ficou somente neste dispositivo.';
+    SAVE_FAILURE_PENDING = false;
+  }
   TOAST = msg; render();
-  setTimeout(()=>{ TOAST=null; render(); }, 1800);
+  setTimeout(()=>{ TOAST=null; render(); }, 3000);
 }
 
 /* ---------- persistência usando localStorage / Firestore ---------- */
-async function loadData(){
+const BACKUP_COLLECTION = 'app_backups';
+const BACKUP_RETENTION_DAYS = 90;
+
+async function saveDailyBackup(){
+  if(!(window.firebase && typeof db !== 'undefined' && db) || !DATA) return false;
   try{
-    const res = await storage.get(STORAGE_KEY);
+    await db.collection(BACKUP_COLLECTION).doc(todayISO()).set({
+      value:JSON.stringify(DATA),
+      savedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    return true;
+  }catch(e){
+    console.warn('saveDailyBackup error', e);
+    return false;
+  }
+}
+async function cleanupOldBackups(){
+  if(!(window.firebase && typeof db !== 'undefined' && db)) return;
+  const cutoff = daysAgoISO(BACKUP_RETENTION_DAYS);
+  try{
+    while(true){
+      const snap = await db.collection(BACKUP_COLLECTION)
+        .where(firebase.firestore.FieldPath.documentId(), '<', cutoff)
+        .limit(400).get();
+      if(snap.empty) break;
+      const batch = db.batch();
+      snap.docs.forEach(doc=>batch.delete(doc.ref));
+      await batch.commit();
+      if(snap.size < 400) break;
+    }
+  }catch(e){ console.warn('cleanupOldBackups error', e); }
+}
+async function saveManualSnapshot(dataObj, tag){
+  if(!(window.firebase && typeof db !== 'undefined' && db)) return false;
+  try{
+    await db.collection('app_snapshots').doc(`snap_${Date.now()}_${tag||'manual'}`).set({
+      value:JSON.stringify(dataObj),
+      savedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    return true;
+  }catch(e){ console.warn('saveManualSnapshot error', e); return false; }
+}
+async function getLatestBackup(){
+  if(!(window.firebase && typeof db !== 'undefined' && db)) return null;
+  try{
+    const snap = await db.collection(BACKUP_COLLECTION)
+      .orderBy(firebase.firestore.FieldPath.documentId(), 'desc').limit(1).get();
+    if(!snap.empty){
+      const d=snap.docs[0].data();
+      return {id:snap.docs[0].id, data:JSON.parse(d.value), savedAt:d.savedAt};
+    }
+  }catch(e){ console.warn('getLatestBackup error', e); }
+  return null;
+}
+async function listRecentBackups(limitN){
+  if(!(window.firebase && typeof db !== 'undefined' && db)) return [];
+  try{
+    const snap=await db.collection(BACKUP_COLLECTION)
+      .orderBy(firebase.firestore.FieldPath.documentId(), 'desc').limit(limitN||30).get();
+    return snap.docs.map(doc=>({id:doc.id,savedAt:doc.data().savedAt}));
+  }catch(e){ console.warn('listRecentBackups error', e); return []; }
+}
+async function getBackupById(id){
+  if(!(window.firebase && typeof db !== 'undefined' && db)) return null;
+  try{
+    const doc=await db.collection(BACKUP_COLLECTION).doc(id).get();
+    if(doc.exists) return JSON.parse(doc.data().value);
+  }catch(e){ console.warn('getBackupById error', e); }
+  return null;
+}
+
+async function loadData(){
+  let firebaseMissing=false;
+  try{
+    const res=await storage.get(STORAGE_KEY);
     if(res && res.value){
-      DATA = JSON.parse(res.value);
+      DATA=JSON.parse(res.value);
+      DATA_SOURCE = res.source==='firebase' ? 'firebase' : 'local';
+      firebaseMissing = res.source!=='firebase' && !!res.firebaseUnavailable;
       migrateAttendance();
       migrateWeeklyHistory();
+      const cleaned = cleanupExpiredForgottenReminders();
+      if(cleaned){ await saveData(); }
+      if(firebaseMissing){
+        LOGIN_ERROR='Firebase indisponível. Os dados locais foram carregados temporariamente.';
+      }
       return;
     }
-  }catch(e){}
-  DATA = seedDemoData();
-  await saveData();
+    if(res && res.source==='firebase' && res.exists===false){
+      firebaseMissing=false;
+      DATA_SOURCE='firebase_missing';
+    }else if(res && res.firebaseUnavailable){
+      firebaseMissing=true;
+    }
+  }catch(e){
+    console.warn('Falha ao carregar dados principais', e);
+    firebaseMissing=true;
+  }
+
+  if(firebaseMissing){
+    try{
+      const backup=await getLatestBackup();
+      if(backup){
+        DATA=backup.data; DATA_SOURCE='firebase';
+        migrateAttendance(); migrateWeeklyHistory(); cleanupExpiredForgottenReminders();
+        showToast('Dados principais indisponíveis: restaurado do último backup automático.');
+        return;
+      }
+    }catch(e){ console.warn('Falha ao tentar recuperar backup automático', e); }
+    DATA={students:[]};
+    DATA_SOURCE='error';
+    LOGIN_ERROR='Não foi possível acessar o banco de dados. Verifique a conexão e as regras do Firebase.';
+    return;
+  }
+
+  // Somente quando o Firestore respondeu normalmente e o documento realmente não existe,
+  // criamos os dados de demonstração da primeira execução.
+  DATA=seedDemoData();
+  DATA_SOURCE='firebase_missing';
+  const saved=await saveData();
+  if(!saved.ok) LOGIN_ERROR='Não foi possível inicializar o banco de dados no Firebase.';
+}
+
+function cleanupExpiredForgottenReminders(){
+  if(!DATA || !Array.isArray(DATA.students)) return false;
+  const today=todayISO();
+  let changed=false;
+  DATA.students.forEach(student=>{
+    (student.blocks||[]).forEach(block=>{
+      if(block.forgotten && block.forgottenDate && daysBetween(block.forgottenDate,today)>7){
+        block.forgotten=false;
+        block.forgottenDate=null;
+        block.forgottenNote='';
+        changed=true;
+      }
+    });
+  });
+  return changed;
 }
 function migrateAttendance(){
   // Compatibilidade com dados salvos antes da marcação de 3 tipos (Kumon / presencial / teste):
@@ -693,9 +842,15 @@ function migrateWeeklyHistory(){
   });
 }
 async function saveData(){
-  try{
-    await storage.set(STORAGE_KEY, JSON.stringify(DATA));
-  }catch(e){ console.error('Erro ao salvar dados', e); }
+  const result=await storage.set(STORAGE_KEY, JSON.stringify(DATA));
+  SAVE_LAST_STATUS=result && result.ok ? result.source : 'failed';
+  SAVE_FAILURE_PENDING = !result || !result.ok || result.source!=='firebase';
+
+  if(result && result.ok && result.source==='firebase'){
+    await saveDailyBackup();
+    await cleanupOldBackups();
+  }
+  return result || {ok:false,source:'none'};
 }
 function seedDemoData(){
   const today = new Date();
@@ -794,6 +949,7 @@ function seedDemoData(){
 function render(){
   const app = document.getElementById('app');
   if(!DATA){ app.innerHTML = renderLoading(); return; }
+  cleanupExpiredForgottenReminders();
 
   let html = '';
   if(SESSION.role === 'student'){
@@ -831,9 +987,10 @@ function renderAdminLogin(){
   <div class="landing-wrap" role="main">
     <div class="logo-mark" style="background:linear-gradient(135deg,var(--peri),#5AC8FF);">🧑‍🏫</div>
     <div class="wordmark">Área do <span>Orientador</span></div>
-    <p class="tagline">Digite o código de acesso administrativo.</p>
+    <p class="tagline">Entre com seu e-mail e senha de acesso.</p>
     <div class="code-box">
-      <input id="admin-pass-input" type="password" class="code-input" inputmode="numeric" maxlength="8" placeholder="• • • •" autocomplete="off" aria-label="Código do orientador">
+      <input id="admin-email-input" type="email" class="code-input" placeholder="seu@email.com" autocomplete="username" aria-label="E-mail do orientador" style="letter-spacing:normal;font-size:16px;">
+      <input id="admin-pass-input" type="password" class="code-input" placeholder="Senha" autocomplete="current-password" aria-label="Senha do orientador" style="letter-spacing:normal;font-size:16px;">
       <button class="btn btn-primary btn-block" id="btn-enter-admin">Entrar</button>
       <div class="error-msg">${esc(LOGIN_ERROR)}</div>
     </div>
@@ -1288,6 +1445,7 @@ function renderAdminApp(){
   else if(ADMIN_VIEW==='add') body = renderAdminAdd();
   else if(ADMIN_VIEW==='evolution') body = renderAdminEvolution();
   else if(ADMIN_VIEW==='hall') body = renderAdminHall();
+  else if(ADMIN_VIEW==='backup') body = renderAdminBackup();
 
   return `
     <div class="top-header">
@@ -1295,7 +1453,10 @@ function renderAdminApp(){
         <div class="greeting-name">🧑‍🏫 Painel do Orientador</div>
         <div class="faint" style="font-size:12px;">${DATA.students.length} aluno${DATA.students.length===1?'':'s'} cadastrado${DATA.students.length===1?'':'s'}</div>
       </div>
-      <button class="icon-btn" id="btn-logout" aria-label="Sair">⎋</button>
+      <div class="row" style="gap:6px;">
+        <button class="icon-btn" id="btn-open-backup" aria-label="Backups">💾</button>
+        <button class="icon-btn" id="btn-logout" aria-label="Sair">⎋</button>
+      </div>
     </div>
     ${body}
     ${renderAdminNav()}
@@ -1345,6 +1506,59 @@ function renderAdminHall(){
 
     <div class="section-title">🧠 Correções em dia</div>
     <div class="card">${corrRows}</div>
+  </div>`;
+}
+
+function fmtBackupId(id){
+  // ids automáticos são datas 'AAAA-MM-DD'; ids manuais/snapshot têm outro formato
+  if(/^\d{4}-\d{2}-\d{2}$/.test(id)) return fmtDate(id) + (id===todayISO() ? ' (hoje)' : '');
+  return 'Snapshot manual';
+}
+function renderAdminBackup(){
+  if(PENDING_RESTORE){
+    return `
+    <div class="screen">
+      <div class="card" style="border-color:#FF6B6B55;">
+        <div class="eyebrow" style="color:var(--danger);">⚠️ Confirmar restauração</div>
+        <p style="font-size:14px;line-height:1.5;">
+          Tem certeza que quer restaurar o backup <b>${esc(PENDING_RESTORE.label)}</b>?<br><br>
+          Isso vai <b>substituir todos os dados atuais</b> (de todos os alunos) pelos dados desse backup.
+          Antes de aplicar, o estado atual também será guardado como um snapshot de segurança —
+          então, se algo der errado, ainda dá para voltar atrás.
+        </p>
+        <div class="row" style="gap:10px;margin-top:12px;">
+          <button class="btn btn-ghost btn-block" id="btn-cancel-restore">Cancelar</button>
+          <button class="btn btn-danger btn-block" id="btn-confirm-restore" style="border-color:var(--danger);">Sim, restaurar</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const rows = AVAILABLE_BACKUPS.map(b=>`
+    <div class="row" style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:13.5px;">🗂️ ${esc(fmtBackupId(b.id))}</span>
+      <button class="btn btn-outline btn-sm" data-restore-auto="${esc(b.id)}">Restaurar</button>
+    </div>`).join('');
+
+  return `
+  <div class="screen">
+    <div class="growth-msg">💾 Seus dados são salvos automaticamente todos os dias, além do que você já vê no app. Use esta tela para baixar uma cópia no seu computador ou restaurar um backup caso algo se perca.</div>
+
+    <div class="section-title">Backup manual (no seu computador)</div>
+    <div class="card">
+      <p class="muted" style="font-size:13px;margin:0 0 12px;">Baixa um arquivo .json com todos os dados de todos os alunos, agora mesmo. Guarde esse arquivo em um lugar seguro (computador, e-mail, Drive...).</p>
+      <button class="btn btn-primary btn-block" id="btn-download-backup">⬇️ Baixar backup agora (.json)</button>
+      <div class="divider"></div>
+      <p class="muted" style="font-size:13px;margin:0 0 12px;">Tem um arquivo de backup salvo no computador? Restaure a partir dele:</p>
+      <button class="btn btn-ghost btn-block" id="btn-restore-file">⬆️ Restaurar de um arquivo do computador</button>
+      <input type="file" id="input-restore-file" accept="application/json,.json" style="display:none;">
+    </div>
+
+    <div class="section-title">Backups automáticos (na nuvem)</div>
+    <div class="card">
+      <p class="muted" style="font-size:13px;margin:0 0 10px;">A cada alteração salva no app, uma cópia do dia é guardada aqui também. Você pode voltar para qualquer um desses dias.</p>
+      ${BACKUPS_LOADING ? `<span class="muted" style="font-size:13px;">Carregando lista de backups…</span>` : (rows || `<span class="muted" style="font-size:13px;">Nenhum backup automático encontrado ainda.</span>`)}
+    </div>
   </div>`;
 }
 
@@ -1690,12 +1904,23 @@ function renderAdminDetail(){
 }
 
 function renderAdminAdd(){ 
+  const trimester = DATA.currentTrimester || {};
   return `
   <div class="screen">
     <h3 style="margin:0 0 4px;">Cadastrar aluno</h3>
     <p class="faint" style="font-size:12.5px;margin:0 0 18px;">Preencha os dados do aluno, o ponto de partida e a meta trimestral.</p>
 
-    <div class="section-title" style="margin-top:0;">Dados do aluno</div>
+    <div class="section-title" style="margin-top:0;">Trimestre atual</div>
+    <div class="card">
+      <p class="muted" style="font-size:12.5px;margin:0 0 12px;">Essas datas costumam ser as mesmas para todos os alunos. Defina aqui uma vez e elas já vêm preenchidas (mas continuam editáveis) no cadastro de cada aluno novo.</p>
+      <div class="field-row">
+        <div class="field"><label>Início do trimestre</label><input type="date" id="f-trimester-start" value="${esc(trimester.startDate || todayISO())}"></div>
+        <div class="field"><label>Fim do trimestre</label><input type="date" id="f-trimester-end" value="${esc(trimester.endDate || '')}"></div>
+      </div>
+      <button class="btn btn-outline btn-block btn-sm" id="btn-save-trimester">Salvar como padrão para novos alunos</button>
+    </div>
+
+    <div class="section-title">Dados do aluno</div>
     <div class="card">
       <div class="field"><label>Nome</label><input id="f-name" placeholder="Nome do aluno"></div>
       <div class="field"><label>Código individual de acesso</label><input id="f-code" inputmode="numeric" placeholder="Ex: 5678"></div>
@@ -1716,7 +1941,7 @@ function renderAdminAdd(){
         </div>
         <div class="field"><label>Folha inicial (0–200)</label><input type="number" id="f-start-sheet" placeholder="Ex: 140"></div>
       </div>
-      <div class="field"><label>Data de início</label><input type="date" id="f-start-date" value="${todayISO()}"></div>
+      <div class="field"><label>Data de início</label><input type="date" id="f-start-date" value="${esc(trimester.startDate || todayISO())}"></div>
     </div>
 
     <div class="section-title">Meta trimestral</div>
@@ -1727,7 +1952,7 @@ function renderAdminAdd(){
         </div>
         <div class="field"><label>Folha final (0–200)</label><input type="number" id="f-target-sheet" placeholder="Ex: 60"></div>
       </div>
-      <div class="field"><label>Data final da meta</label><input type="date" id="f-target-date"></div>
+      <div class="field"><label>Data final da meta</label><input type="date" id="f-target-date" value="${esc(trimester.endDate || '')}"></div>
     </div>
 
     <div class="error-msg" id="add-error"></div>
@@ -1805,11 +2030,13 @@ function attachHandlers(){
   if($('#btn-back-landing')) $('#btn-back-landing').onclick = ()=>{ ADMIN_LOGIN_STAGE=false; LOGIN_ERROR=''; render(); };
   if($('#btn-enter-admin')){
     $('#btn-enter-admin').onclick = handleAdminLogin;
+    $('#admin-email-input').addEventListener('keydown', e=>{ if(e.key==='Enter') handleAdminLogin(); });
     $('#admin-pass-input').addEventListener('keydown', e=>{ if(e.key==='Enter') handleAdminLogin(); });
   }
 
   // Logout
-  if($('#btn-logout')) $('#btn-logout').onclick = ()=>{
+  if($('#btn-logout')) $('#btn-logout').onclick = async ()=>{
+    try{ if(auth && SESSION.role==='admin') await auth.signOut(); }catch(e){ console.warn('Erro ao sair do Firebase Authentication', e); }
     SESSION={role:null,studentId:null}; ADMIN_LOGIN_STAGE=false; ADMIN_VIEW='overview'; STUDENT_VIEW='journey'; LOGIN_ERROR=''; render();
   };
 
@@ -1887,21 +2114,87 @@ function attachHandlers(){
     });
   }
   if($('#btn-save-student')) $('#btn-save-student').onclick = saveNewStudent;
+  if($('#btn-save-trimester')) $('#btn-save-trimester').onclick = saveTrimesterDefaults;
 
   // Admin evolution
   if($('#f-evolution-student')) $('#f-evolution-student').onchange = (e)=>{ SELECTED_STUDENT_ID = e.target.value; render(); };
+
+  // Backups
+  if($('#btn-open-backup')) $('#btn-open-backup').onclick = ()=>{ ADMIN_VIEW='backup'; PENDING_RESTORE=null; render(); loadBackupsList(); };
+  if($('#btn-download-backup')) $('#btn-download-backup').onclick = downloadBackupNow;
+  if($('#btn-restore-file')) $('#btn-restore-file').onclick = triggerFileRestore;
+  if($('#input-restore-file')) $('#input-restore-file').addEventListener('change', handleRestoreFileSelected);
+  $$('[data-restore-auto]').forEach(btn=> btn.onclick = ()=> stageAutoRestore(btn.getAttribute('data-restore-auto')));
+  if($('#btn-confirm-restore')) $('#btn-confirm-restore').onclick = confirmPendingRestore;
+  if($('#btn-cancel-restore')) $('#btn-cancel-restore').onclick = cancelPendingRestore;
 }
 
 function handleStudentLogin(){
-  const code = document.getElementById('student-code-input').value.trim();
-  const student = DATA.students.find(s=>s.code===code);
-  if(!student){ LOGIN_ERROR = 'Código não encontrado. Confira com seu orientador.'; render(); return; }
-  LOGIN_ERROR=''; SESSION = { role:'student', studentId: student.id }; STUDENT_VIEW='journey'; render();
+  const code=document.getElementById('student-code-input').value.trim();
+  if(!/^\d+$/.test(code)){
+    LOGIN_ERROR='Código deve conter apenas números.';
+    render(); return;
+  }
+  const student=DATA.students.find(s=>s.code===code);
+  if(!student){ LOGIN_ERROR='Código não encontrado. Confira com seu orientador.'; render(); return; }
+  LOGIN_ERROR=''; SESSION={role:'student',studentId:student.id}; STUDENT_VIEW='journey'; render();
 }
-function handleAdminLogin(){
-  const pass = document.getElementById('admin-pass-input').value.trim();
-  if(pass !== ADMIN_PASSCODE){ LOGIN_ERROR = 'Código incorreto.'; render(); return; }
-  LOGIN_ERROR=''; ADMIN_LOGIN_STAGE=false; SESSION = { role:'admin', studentId:null }; ADMIN_VIEW='overview'; render();
+async function handleAdminLogin(){
+  const now=Date.now();
+  if(now<ADMIN_LOGIN_LOCK_UNTIL){
+    const secs=Math.ceil((ADMIN_LOGIN_LOCK_UNTIL-now)/1000);
+    LOGIN_ERROR=`Acesso bloqueado. Tente novamente em ${secs}s.`;
+    render();
+    if(ADMIN_LOGIN_LOCK_TIMER) clearTimeout(ADMIN_LOGIN_LOCK_TIMER);
+    ADMIN_LOGIN_LOCK_TIMER=setTimeout(()=>{ LOGIN_ERROR=''; render(); }, Math.max(500, ADMIN_LOGIN_LOCK_UNTIL-now+50));
+    return;
+  }
+
+  const email=(document.getElementById('admin-email-input')?.value || '').trim();
+  const pass=(document.getElementById('admin-pass-input')?.value || '');
+  if(!email || !/^\S+@\S+\.\S+$/.test(email)){
+    LOGIN_ERROR='Digite um e-mail válido.';
+    render();
+    return;
+  }
+  if(!pass){
+    LOGIN_ERROR='Digite sua senha.';
+    render();
+    return;
+  }
+  if(!auth){
+    LOGIN_ERROR='O serviço de autenticação não está disponível. Verifique a conexão e o Firebase.';
+    render();
+    return;
+  }
+
+  try{
+    try{ await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); }catch(e){}
+    await auth.signInWithEmailAndPassword(email,pass);
+    ADMIN_LOGIN_ATTEMPTS=0;
+    ADMIN_LOGIN_LOCK_UNTIL=0;
+    LOGIN_ERROR='';
+    ADMIN_LOGIN_STAGE=false;
+    SESSION={role:'admin',studentId:null};
+    ADMIN_VIEW='overview';
+    render();
+  }catch(e){
+    console.warn('Falha no login do orientador', e);
+    ADMIN_LOGIN_ATTEMPTS++;
+    if(ADMIN_LOGIN_ATTEMPTS>=3){
+      ADMIN_LOGIN_ATTEMPTS=0;
+      ADMIN_LOGIN_LOCK_UNTIL=Date.now()+10000;
+      LOGIN_ERROR='3 tentativas incorretas. Acesso bloqueado por 10 segundos.';
+      render();
+      ADMIN_LOGIN_LOCK_TIMER=setTimeout(()=>{ LOGIN_ERROR=''; render(); }, 10050);
+    }else{
+      const code=e && e.code ? e.code : '';
+      if(code==='auth/invalid-email') LOGIN_ERROR='E-mail inválido.';
+      else if(code==='auth/too-many-requests') LOGIN_ERROR='Muitas tentativas. Aguarde e tente novamente.';
+      else LOGIN_ERROR=`E-mail ou senha incorretos. Tentativa ${ADMIN_LOGIN_ATTEMPTS} de 3.`;
+      render();
+    }
+  }
 }
 
 async function toggleBlock(index){
@@ -1975,7 +2268,7 @@ async function registerWeek(){
 
   if(!startDate || !endDate){ if(errEl) errEl.textContent = 'Informe as duas datas do período.'; return; }
   if(startDate > endDate){ if(errEl) errEl.textContent = 'A data "De" deve ser antes (ou igual) à data "Até".'; return; }
-  if(sheetsInput.value==='' || isNaN(val)){ if(errEl) errEl.textContent = 'Informe a quantidade de folhas.'; return; }
+  if(sheetsInput.value==='' || !isValidSheet(val)){ if(errEl) errEl.textContent = 'A quantidade de folhas deve estar entre 0 e 200.'; return; }
 
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   student.weeklyHistory.push({ startDate, endDate, sheets: val });
@@ -2021,8 +2314,8 @@ async function saveStudentEdit(){
   const targetSheetRaw = document.getElementById('f-edit-target-sheet').value;
   const targetDate = document.getElementById('f-edit-target-date').value;
 
-  if(!name || !code || startSheetRaw==='' || !startDate || targetSheetRaw==='' || !targetDate){
-    if(errEl) errEl.textContent = 'Preencha todos os campos obrigatórios.';
+  if(!name || !/^\d+$/.test(code) || startSheetRaw==='' || !startDate || targetSheetRaw==='' || !targetDate || !isValidSheet(startSheetRaw) || !isValidSheet(targetSheetRaw)){
+    if(errEl) errEl.textContent = 'Preencha os campos corretamente. As folhas devem estar entre 0 e 200.';
     return;
   }
   if(DATA.students.some(s=>s.code===code && s.id!==student.id)){
@@ -2064,7 +2357,7 @@ async function savePlannedMeta(){
   const sheetRaw = document.getElementById('f-plan-sheet').value;
   const date = document.getElementById('f-plan-date').value;
 
-  if(sheetRaw==='' || isNaN(Number(sheetRaw)) || !date){
+  if(sheetRaw==='' || !isValidSheet(sheetRaw) || !date){
     if(errEl) errEl.textContent = 'Preencha o estágio, a folha e a data prevista.';
     return;
   }
@@ -2148,6 +2441,16 @@ async function deleteStudent(){
   DELETE_CONFIRM_ID = null;
   ADMIN_VIEW='students'; render();
 }
+async function saveTrimesterDefaults(){
+  const start = document.getElementById('f-trimester-start').value;
+  const end = document.getElementById('f-trimester-end').value;
+  if(!start || !end){ showToast('Preencha as duas datas do trimestre.'); return; }
+  if(start > end){ showToast('A data de início deve ser antes da data de fim.'); return; }
+  DATA.currentTrimester = { startDate: start, endDate: end };
+  await saveData();
+  showToast('Datas do trimestre salvas! Já valem para os próximos alunos cadastrados.');
+  render();
+}
 async function saveNewStudent(){
   const name = document.getElementById('f-name').value.trim();
   const code = document.getElementById('f-code').value.trim();
@@ -2160,9 +2463,10 @@ async function saveNewStudent(){
   const targetDate = document.getElementById('f-target-date').value;
   const errEl = document.getElementById('add-error');
 
-  if(!name || !code || !startDate || !targetDate || isNaN(startSheet) || isNaN(targetSheet)){
-    errEl.textContent = 'Preencha todos os campos obrigatórios.'; return;
+  if(!name || !/^\d+$/.test(code) || !startDate || !targetDate || !isValidSheet(startSheet) || !isValidSheet(targetSheet)){
+    errEl.textContent = 'Preencha os campos corretamente. As folhas devem estar entre 0 e 200.'; return;
   }
+
   if(DATA.students.some(s=>s.code===code)){
     errEl.textContent = 'Este código já está em uso por outro aluno.'; return;
   }
@@ -2186,12 +2490,99 @@ async function saveNewStudent(){
 }
 
 /* =========================================================
+   BACKUP / RESTAURAÇÃO
+   ========================================================= */
+function downloadBackupNow(){
+  try{
+    const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `minha-meta-backup-${todayISO()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Backup baixado!');
+  }catch(e){
+    console.error('Erro ao baixar backup', e);
+    showToast('Não foi possível baixar o backup.');
+  }
+}
+function triggerFileRestore(){
+  const input = document.getElementById('input-restore-file');
+  if(input) input.click();
+}
+function handleRestoreFileSelected(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(!parsed || !Array.isArray(parsed.students)) throw new Error('formato inválido');
+      PENDING_RESTORE = { source:'file', label: `arquivo "${file.name}" (${parsed.students.length} aluno(s))`, data: parsed };
+      render();
+    }catch(err){
+      showToast('Arquivo inválido. Verifique se é um backup do MINHA META.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+async function stageAutoRestore(id){
+  showToast('Carregando backup…');
+  const data = await getBackupById(id);
+  if(!data || !Array.isArray(data.students)){
+    showToast('Não foi possível carregar esse backup.');
+    return;
+  }
+  PENDING_RESTORE = { source:'auto', label: fmtBackupId(id), data };
+  render();
+}
+async function confirmPendingRestore(){
+  if(!PENDING_RESTORE) return;
+  await saveManualSnapshot(DATA, 'antes-de-restaurar');
+  DATA = PENDING_RESTORE.data;
+  migrateAttendance();
+  migrateWeeklyHistory();
+  await saveData();
+  PENDING_RESTORE = null;
+  showToast('Dados restaurados com sucesso!');
+  render();
+}
+function cancelPendingRestore(){
+  PENDING_RESTORE = null;
+  render();
+}
+async function loadBackupsList(){
+  BACKUPS_LOADING = true; render();
+  AVAILABLE_BACKUPS = await listRecentBackups(30);
+  BACKUPS_LOADING = false; render();
+}
+
+/* =========================================================
    INIT
    ========================================================= */
 (async function init(){
-  // carregar dados (localStorage ou Firestore) e renderizar
   await loadData();
   render();
+  if(auth){
+    auth.onAuthStateChanged(user=>{
+      if(user){
+        SESSION={role:'admin',studentId:null};
+        ADMIN_LOGIN_STAGE=false;
+        LOGIN_ERROR='';
+        render();
+      }else if(SESSION.role==='admin'){
+        SESSION={role:null,studentId:null};
+        ADMIN_LOGIN_STAGE=false;
+        ADMIN_VIEW='overview';
+        LOGIN_ERROR='';
+        render();
+      }
+    });
+  }
 })();
 </script>
 </body>
