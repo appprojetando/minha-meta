@@ -436,6 +436,55 @@ input,select{font-family:inherit;}
   font-size:13.5px;z-index:100;box-shadow:0 10px 24px -8px #000a;animation:toastin .25s ease;
 }
 @keyframes toastin{from{opacity:0;transform:translate(-50%,10px);}to{opacity:1;transform:translate(-50%,0);}}
+.theme-toggle{
+  width:38px;height:38px;border-radius:11px;border:1px solid var(--border);
+  background:var(--bg-surface-2);color:var(--text);display:flex;align-items:center;justify-content:center;
+  font-size:17px;padding:0;box-shadow:0 6px 16px -10px #0008;
+}
+.theme-toggle:active{transform:scale(.96);}
+
+/* ---------- Modo claro/escuro ---------- */
+body.theme-light{
+  --bg-deep:#F5F7FB;
+  --bg-surface:#FFFFFF;
+  --bg-surface-2:#EEF2F8;
+  --bg-surface-3:rgba(30,42,72,.07);
+  --mint:#16B978;
+  --mint-dim:rgba(22,185,120,.12);
+  --amber:#C77A00;
+  --amber-dim:rgba(199,122,0,.12);
+  --peri:#6269D9;
+  --peri-dim:rgba(98,105,217,.12);
+  --sky:#168CC5;
+  --sky-dim:rgba(22,140,197,.12);
+  --forgot:#D96324;
+  --forgot-dim:rgba(217,99,36,.12);
+  --gray-node:#AAB4C7;
+  --text:#17213B;
+  --text-muted:#59657D;
+  --text-faint:#7B879D;
+  --border:rgba(23,33,59,.12);
+  --danger:#D84444;
+}
+body.theme-light{
+  background:
+    radial-gradient(circle at 15% 0%, #E2F8EF 0%, transparent 45%),
+    radial-gradient(circle at 90% 8%, #E8ECFF 0%, transparent 40%),
+    var(--bg-deep);
+}
+body.theme-light .bottom-nav{background:rgba(255,255,255,.90);}
+body.theme-light .btn-primary{color:#06301F;}
+body.theme-light .goal-banner{background:linear-gradient(135deg,rgba(98,105,217,.10),rgba(22,185,120,.10));}
+body.theme-light .forgot-flag,
+body.theme-light .remove-block-flag{background:var(--bg-surface);}
+.theme-card-title{font-weight:700;font-size:14px;margin-bottom:10px;}
+.theme-options{display:flex;gap:10px;}
+.theme-option{
+  flex:1;border:1px solid var(--border);background:var(--bg-surface-2);
+  color:var(--text);border-radius:11px;padding:11px 10px;font-weight:600;font-size:13px;
+}
+.theme-option.active{border-color:var(--mint);background:var(--mint-dim);color:var(--mint);}
+.theme-hint{font-size:11.5px;color:var(--text-faint);margin-top:8px;}
 /* small responsive tweaks */
 @media (max-width:420px){ .blocks-grid{grid-template-columns:repeat(3,1fr);} .avatar-circle{width:40px;height:40px;} }
 </style>
@@ -480,9 +529,12 @@ let DATA_SOURCE = null;           // 'firebase' | 'local' | 'firebase_missing' |
 let FIREBASE_LAST_ERROR = null;
 let SAVE_LAST_STATUS = null;      // 'firebase' | 'local' | 'failed'
 let SAVE_FAILURE_PENDING = false;
+let THEME = 'dark';
+const THEME_STORAGE_KEY = 'minha-meta-theme';
 let ADMIN_LOGIN_ATTEMPTS = 0;
 let ADMIN_LOGIN_LOCK_UNTIL = 0;
-let ADMIN_LOGIN_LOCK_TIMER = null
+let ADMIN_LOGIN_LOCK_TIMER = null;
+let EDITING_WEEK_HISTORY_ID = null;
 
 /* ---------- storage wrapper usando Firebase (com fallback para localStorage) ---------- */
 const storage = {
@@ -555,6 +607,28 @@ const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
 const isValidSheet = (value) => Number.isFinite(Number(value)) && Number.isInteger(Number(value)) && Number(value)>=0 && Number(value)<=200;
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function touch(student){ student.updatedAt = new Date().toISOString(); }
+function loadTheme(){
+  try{
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    THEME = saved === 'light' ? 'light' : 'dark';
+  }catch(e){ THEME = 'dark'; }
+}
+function applyTheme(){
+  document.body.classList.toggle('theme-light', THEME === 'light');
+  document.body.setAttribute('data-theme', THEME);
+}
+function setTheme(theme){
+  THEME = theme === 'light' ? 'light' : 'dark';
+  try{ localStorage.setItem(THEME_STORAGE_KEY, THEME); }catch(e){}
+  applyTheme();
+  render();
+}
+function renderThemeToggle(){
+  const nextTheme = THEME==='dark' ? 'light' : 'dark';
+  const icon = THEME==='dark' ? '☀️' : '🌙';
+  const label = THEME==='dark' ? 'Ativar modo claro' : 'Ativar modo escuro';
+  return `<button class="theme-toggle" data-theme-toggle="${nextTheme}" aria-label="${label}" title="${label}">${icon}</button>`;
+}
 
 /* ---------- estrutura de estágios e blocos ---------- */
 const BLOCKS_PER_STAGE = 20;
@@ -830,13 +904,21 @@ function migrateAttendance(){
   });
 }
 function migrateWeeklyHistory(){
-  // Compatibilidade com registros antigos {week, date, sheets} -> {startDate, endDate, sheets}
+  // Compatibilidade com registros antigos {week, date, sheets} -> {startDate, endDate, sheets}.
+  // Cada registro também ganha um id estável e uma observação opcional em texto.
   (DATA.students || []).forEach(student=>{
     (student.weeklyHistory || []).forEach(h=>{
       if(!h.startDate || !h.endDate){
         const d = h.date || todayISO();
         h.startDate = h.startDate || d;
         h.endDate = h.endDate || d;
+      }
+      if(!h.id) h.id = uid();
+      if(h.note === undefined || h.note === null) h.note = '';
+      // Registros antigos continuam numéricos para não quebrar os cálculos do app.
+      if(typeof h.sheets === 'string' && h.sheets.trim() !== ''){
+        const parsed = Number(h.sheets);
+        if(Number.isFinite(parsed)) h.sheets = parsed;
       }
     });
   });
@@ -970,7 +1052,8 @@ function renderLoading(){
 /* ---------- Landing ---------- */
 function renderLanding(){
   return `
-  <div class="landing-wrap" role="main">
+  <div class="landing-wrap" role="main" style="position:relative;">
+    <div style="position:absolute;top:18px;right:18px;">${renderThemeToggle()}</div>
     <div class="logo-mark">🚀</div>
     <div class="wordmark">MINHA <span>META</span></div>
     <p class="tagline">De onde eu comecei → onde estou → onde quero chegar.</p>
@@ -984,7 +1067,8 @@ function renderLanding(){
 }
 function renderAdminLogin(){
   return `
-  <div class="landing-wrap" role="main">
+  <div class="landing-wrap" role="main" style="position:relative;">
+    <div style="position:absolute;top:18px;right:18px;">${renderThemeToggle()}</div>
     <div class="logo-mark" style="background:linear-gradient(135deg,var(--peri),#5AC8FF);">🧑‍🏫</div>
     <div class="wordmark">Área do <span>Orientador</span></div>
     <p class="tagline">Entre com seu e-mail e senha de acesso.</p>
@@ -1019,6 +1103,7 @@ function renderStudentApp(){
           <div class="faint" style="font-size:12px;">Estágio ${esc(student.targetStage)}</div>
         </div>
       </div>
+      ${renderThemeToggle()}
     </div>
     ${body}
     ${renderStudentNav()}
@@ -1374,6 +1459,26 @@ function renderTrimesterSectionStudent(student){
     </div>`;
 }
 
+function renderWeeklyHistoryStudent(student){
+  const history = (student.weeklyHistory || []).slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||''));
+  return `
+    <div class="section-title">📚 Histórico de estudos</div>
+    <div class="card">
+      ${history.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro ainda.</span>` :
+        history.map(h=>`
+          <div style="padding:10px 0;${history[history.length-1]===h?'':'border-bottom:1px solid var(--border);'}">
+            <div class="row" style="align-items:flex-start;gap:12px;">
+              <div>
+                <div style="font-weight:600;font-size:13px;">${fmtDate(h.startDate)} – ${fmtDate(h.endDate)}</div>
+                ${h.note ? `<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>` : ''}
+              </div>
+              <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap;">${esc(h.sheets)} folhas</span>
+            </div>
+          </div>`).join('')
+      }
+    </div>`;
+}
+
 function renderStudentProfile(student){
   const s = stats(student);
   const streak = streakStats(student);
@@ -1418,6 +1523,8 @@ function renderStudentProfile(student){
 
     ${renderMonthComparisonSimple(student)}
 
+    ${renderWeeklyHistoryStudent(student)}
+
     ${renderTrimesterSectionStudent(student)}
 
     <div class="section-title">🏅 Conquistas</div>
@@ -1428,6 +1535,7 @@ function renderStudentProfile(student){
           <span class="blabel">${esc(b.label)}</span>
         </div>`).join('')}
     </div>
+
 
     <button class="btn btn-ghost btn-block" style="margin-top:22px;" id="btn-logout">Sair</button>
   </div>`;
@@ -1446,6 +1554,7 @@ function renderAdminApp(){
   else if(ADMIN_VIEW==='evolution') body = renderAdminEvolution();
   else if(ADMIN_VIEW==='hall') body = renderAdminHall();
   else if(ADMIN_VIEW==='backup') body = renderAdminBackup();
+  else if(ADMIN_VIEW==='profile') body = renderAdminProfile();
 
   return `
     <div class="top-header">
@@ -1454,13 +1563,27 @@ function renderAdminApp(){
         <div class="faint" style="font-size:12px;">${DATA.students.length} aluno${DATA.students.length===1?'':'s'} cadastrado${DATA.students.length===1?'':'s'}</div>
       </div>
       <div class="row" style="gap:6px;">
+        ${renderThemeToggle()}
         <button class="icon-btn" id="btn-open-backup" aria-label="Backups">💾</button>
         <button class="icon-btn" id="btn-logout" aria-label="Sair">⎋</button>
       </div>
     </div>
     ${body}
-    ${renderAdminNav()}
+    ${ADMIN_VIEW==='profile' ? '' : renderAdminNav()}
   `;
+}
+function renderAdminProfile(){
+  const email = auth && auth.currentUser ? (auth.currentUser.email || 'Usuário autenticado') : 'Usuário autenticado';
+  return `
+    <div class="screen" role="region" aria-label="Perfil do orientador">
+      <div class="card center">
+        <div class="avatar-circle" style="width:64px;height:64px;font-size:30px;margin:0 auto 10px;">🧑‍🏫</div>
+        <div class="display" style="font-size:19px;font-weight:700;">Perfil do Orientador</div>
+        <div class="faint" style="font-size:12px;margin-top:5px;">${esc(email)}</div>
+      </div>
+
+      <button class="btn btn-ghost btn-block" id="btn-admin-profile-back">← Voltar ao painel</button>
+    </div>`;
 }
 function renderAdminNav(){
   const items = [ ['overview','🏠','Visão geral'], ['students','👥','Alunos'], ['hall','🏆','Hall'], ['add','➕','Cadastrar'], ['evolution','📊','Evolução'] ];
@@ -1852,7 +1975,11 @@ function renderAdminDetail(){
       </div>
       <div class="field">
         <label>Folhas realizadas no período</label>
-        <input type="number" min="0" id="input-weekly-sheets" placeholder="Ex: 35">
+        <input type="number" min="0" max="200" id="input-weekly-sheets" placeholder="Ex: 35">
+      </div>
+      <div class="field">
+        <label>Observação / texto (opcional)</label>
+        <input type="text" id="input-weekly-note" maxlength="120" placeholder="Ex: recesso, prova, férias...">
       </div>
       <div class="error-msg" id="week-error"></div>
       <button class="btn btn-primary btn-block" id="btn-register-week">Registrar período</button>
@@ -1893,11 +2020,35 @@ function renderAdminDetail(){
     <div class="section-title">Histórico</div>
     <div class="card">
       ${student.weeklyHistory.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro ainda.</span>` :
-        student.weeklyHistory.slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||'')).map(h=>`
-          <div class="row" style="padding:8px 0;border-bottom:1px solid var(--border);">
-            <span class="muted" style="font-size:13px;">${fmtDate(h.startDate)} – ${fmtDate(h.endDate)}</span>
-            <span class="mono" style="font-size:13px;font-weight:700;">${h.sheets} folhas</span>
-          </div>`).join('')
+        student.weeklyHistory.slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||'')).map(h=>{
+          if(EDITING_WEEK_HISTORY_ID===h.id){
+            return `
+            <div style="padding:10px 0;">
+              <div class="field-row">
+                <div class="field"><label>De</label><input type="date" id="edit-week-start-${h.id}" value="${esc(h.startDate||'')}"></div>
+                <div class="field"><label>Até</label><input type="date" id="edit-week-end-${h.id}" value="${esc(h.endDate||'')}"></div>
+              </div>
+              <div class="field"><label>Folhas (0–200)</label><input type="number" min="0" max="200" id="edit-week-sheets-${h.id}" value="${esc(h.sheets)}"></div>
+              <div class="field"><label>Observação / texto</label><input type="text" maxlength="120" id="edit-week-note-${h.id}" value="${esc(h.note||'')}" placeholder="Ex: recesso, prova, férias..."></div>
+              <div class="error-msg" id="edit-week-error-${h.id}"></div>
+              <div class="field-row">
+                <button class="btn btn-ghost btn-block btn-sm" data-cancel-edit-week="${h.id}">Cancelar</button>
+                <button class="btn btn-primary btn-block btn-sm" data-save-edit-week="${h.id}">Salvar</button>
+              </div>
+            </div>`;
+          }
+          return `
+          <div class="row" style="padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
+            <div style="flex:1;min-width:0;">
+              <div class="row" style="justify-content:flex-start;gap:12px;">
+                <span class="muted" style="font-size:13px;">${fmtDate(h.startDate)} – ${fmtDate(h.endDate)}</span>
+                <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap;">${esc(h.sheets)} folhas</span>
+              </div>
+              ${h.note ? `<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>` : ''}
+            </div>
+            <button class="btn btn-ghost btn-sm" data-edit-week="${h.id}" title="Editar histórico">✏️</button>
+          </div>`;
+        }).join('')
       }
     </div>
   </div>`;
@@ -2028,6 +2179,9 @@ function attachHandlers(){
   }
   if($('#btn-go-admin')) $('#btn-go-admin').onclick = ()=>{ ADMIN_LOGIN_STAGE=true; LOGIN_ERROR=''; render(); };
   if($('#btn-back-landing')) $('#btn-back-landing').onclick = ()=>{ ADMIN_LOGIN_STAGE=false; LOGIN_ERROR=''; render(); };
+
+  // Tema
+  $$('[data-theme-toggle]').forEach(btn=> btn.onclick = ()=> setTheme(btn.getAttribute('data-theme-toggle')));
   if($('#btn-enter-admin')){
     $('#btn-enter-admin').onclick = handleAdminLogin;
     $('#admin-email-input').addEventListener('keydown', e=>{ if(e.key==='Enter') handleAdminLogin(); });
@@ -2042,6 +2196,9 @@ function attachHandlers(){
 
   // Student nav
   $$('[data-nav]').forEach(btn=> btn.onclick = ()=>{ STUDENT_VIEW = btn.getAttribute('data-nav'); render(); });
+
+  if($('#btn-admin-profile')) $('#btn-admin-profile').onclick = ()=>{ ADMIN_VIEW='profile'; render(); };
+  if($('#btn-admin-profile-back')) $('#btn-admin-profile-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
 
   // Admin nav
   $$('[data-adminnav]').forEach(btn=> btn.onclick = ()=>{
@@ -2072,6 +2229,9 @@ function attachHandlers(){
   if($('#btn-save-forgot')) $('#btn-save-forgot').onclick = saveForgottenNote;
   if($('#btn-remove-forgot')) $('#btn-remove-forgot').onclick = removeForgottenNote;
   if($('#btn-register-week')) $('#btn-register-week').onclick = registerWeek;
+  $$('[data-edit-week]').forEach(btn=> btn.onclick = ()=>{ EDITING_WEEK_HISTORY_ID = btn.getAttribute('data-edit-week'); render(); });
+  $$('[data-cancel-edit-week]').forEach(btn=> btn.onclick = ()=>{ EDITING_WEEK_HISTORY_ID = null; render(); });
+  $$('[data-save-edit-week]').forEach(btn=> btn.onclick = ()=> saveWeeklyHistoryEdit(btn.getAttribute('data-save-edit-week')));
   if($('#btn-delete-student')) $('#btn-delete-student').onclick = ()=>{ DELETE_CONFIRM_ID = SELECTED_STUDENT_ID; render(); };
   if($('#btn-cancel-delete')) $('#btn-cancel-delete').onclick = ()=>{ DELETE_CONFIRM_ID = null; render(); };
   if($('#btn-confirm-delete')) $('#btn-confirm-delete').onclick = deleteStudent;
@@ -2261,21 +2421,51 @@ async function registerWeek(){
   const startInput = document.getElementById('input-week-start');
   const endInput = document.getElementById('input-week-end');
   const sheetsInput = document.getElementById('input-weekly-sheets');
+  const noteInput = document.getElementById('input-weekly-note');
   const errEl = document.getElementById('week-error');
   const startDate = startInput.value;
   const endDate = endInput.value;
   const val = Number(sheetsInput.value);
+  const note = (noteInput?.value || '').trim();
 
   if(!startDate || !endDate){ if(errEl) errEl.textContent = 'Informe as duas datas do período.'; return; }
   if(startDate > endDate){ if(errEl) errEl.textContent = 'A data "De" deve ser antes (ou igual) à data "Até".'; return; }
   if(sheetsInput.value==='' || !isValidSheet(val)){ if(errEl) errEl.textContent = 'A quantidade de folhas deve estar entre 0 e 200.'; return; }
 
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
-  student.weeklyHistory.push({ startDate, endDate, sheets: val });
+  if(!student) return;
+  student.weeklyHistory.push({ id:uid(), startDate, endDate, sheets: val, note });
   touch(student);
   await saveData();
   showToast('Período registrado!');
 }
+async function saveWeeklyHistoryEdit(id){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  const entry = student && (student.weeklyHistory || []).find(h=>h.id===id);
+  const errEl = document.getElementById(`edit-week-error-${id}`);
+  if(!entry){ EDITING_WEEK_HISTORY_ID=null; render(); return; }
+
+  const startDate = document.getElementById(`edit-week-start-${id}`)?.value || '';
+  const endDate = document.getElementById(`edit-week-end-${id}`)?.value || '';
+  const sheetsRaw = document.getElementById(`edit-week-sheets-${id}`)?.value ?? '';
+  const note = (document.getElementById(`edit-week-note-${id}`)?.value || '').trim();
+  const sheets = Number(sheetsRaw);
+
+  if(!startDate || !endDate){ if(errEl) errEl.textContent='Informe as duas datas do período.'; return; }
+  if(startDate > endDate){ if(errEl) errEl.textContent='A data "De" deve ser antes (ou igual) à data "Até".'; return; }
+  if(sheetsRaw==='' || !isValidSheet(sheets)){ if(errEl) errEl.textContent='A quantidade de folhas deve estar entre 0 e 200.'; return; }
+
+  entry.startDate = startDate;
+  entry.endDate = endDate;
+  entry.sheets = sheets;
+  entry.note = note;
+  touch(student);
+  await saveData();
+  EDITING_WEEK_HISTORY_ID=null;
+  showToast('Histórico atualizado!');
+  render();
+}
+
 async function setRewardCandy(index, candy){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   if(!student.rewards) student.rewards = {};
@@ -2565,6 +2755,8 @@ async function loadBackupsList(){
    INIT
    ========================================================= */
 (async function init(){
+  loadTheme();
+  applyTheme();
   await loadData();
   render();
   if(auth){
