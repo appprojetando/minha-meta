@@ -272,6 +272,20 @@ input,select{font-family:inherit;}
 @keyframes pulseglow{0%,100%{box-shadow:0 0 0 0 #8C93FF22;}50%{box-shadow:0 0 26px 4px #8C93FF33;}}
 .goal-banner .star{font-size:34px;display:block;margin-bottom:6px;}
 
+/* ---------- Relatório do mês ---------- */
+.report-winner{text-align:center;padding:18px 10px;}
+.report-winner .avatars{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px 0 6px;}
+.report-winner .w{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.report-winner .w .av{width:84px;height:84px;border-radius:24px;background:var(--bg-surface-2);display:flex;align-items:center;justify-content:center;font-size:44px;}
+.report-winner .w .nm{font-weight:700;font-size:16px;}
+@media print{
+  .bottom-nav,.top-header,.no-print,.theme-toggle{display:none !important;}
+  html,body{background:#fff !important;color:#111 !important;}
+  .card,.report-winner .w .av,.hall-avatar{background:#fff !important;border:1px solid #bbb !important;box-shadow:none !important;}
+  .muted,.faint,.eyebrow,.section-title{color:#333 !important;}
+  .screen{padding:0 !important;}
+}
+
 /* ---------- Hall ---------- */
 .hall-row{
   display:flex;align-items:center;gap:12px;padding:12px 10px;border-radius:12px;margin-bottom:6px;
@@ -508,6 +522,7 @@ const STAGES = ['7A','6A','5A','4A','3A','2A','A','B','C','D','E','F','G','H','I
 
 let DATA = null;                 // { students:[...] }
 let SESSION = { role:null, studentId:null }; // role: 'student' | 'admin'
+let REPORT_MONTH = '';           // AAAA-MM do relatório mensal (vazio = mês atual)
 let ADMIN_VIEW = 'overview';     // overview | students | detail | add | evolution
 let STUDENT_VIEW = 'journey';    // journey | hall | profile
 let SELECTED_STUDENT_ID = null;
@@ -1553,6 +1568,7 @@ function renderAdminApp(){
   else if(ADMIN_VIEW==='add') body = renderAdminAdd();
   else if(ADMIN_VIEW==='evolution') body = renderAdminEvolution();
   else if(ADMIN_VIEW==='hall') body = renderAdminHall();
+  else if(ADMIN_VIEW==='report') body = renderAdminReport();
   else if(ADMIN_VIEW==='backup') body = renderAdminBackup();
   else if(ADMIN_VIEW==='profile') body = renderAdminProfile();
 
@@ -1594,6 +1610,108 @@ function renderAdminNav(){
       </button>`).join('')}
   </div>`;
 }
+function monthSheets(student, ym){
+  // Folhas feitas no mês (AAAA-MM). Períodos que cruzam dois meses são divididos pelos dias de cada mês.
+  const [y,m] = ym.split('-').map(Number);
+  const mStart = ym+'-01';
+  const mEnd = ym+'-'+String(new Date(y, m, 0).getDate()).padStart(2,'0');
+  let total = 0;
+  (student.weeklyHistory || []).forEach(h=>{
+    const a = h.startDate || h.endDate, b = h.endDate || h.startDate;
+    if(!a || !b) return;
+    const from = a > mStart ? a : mStart, to = b < mEnd ? b : mEnd;
+    if(from > to) return;
+    total += Number(h.sheets || 0) * (daysBetween(from,to)+1) / (daysBetween(a,b)+1);
+  });
+  return Math.round(total);
+}
+function renderSheetsRanking(){
+  const ym = todayISO().slice(0,7);
+  const [y,m] = ym.split('-').map(Number);
+  const monthLabel = new Date(y, m-1, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+  const rows = DATA.students
+    .map(st=>({ st, sheets: monthSheets(st, ym) }))
+    .sort((a,b)=> b.sheets - a.sheets || a.st.name.localeCompare(b.st.name, 'pt-BR', {sensitivity:'base'}));
+  const medals = ['🥇','🥈','🥉'];
+  return `
+    <div class="section-title">📄 Folhas do mês</div>
+    <p class="faint" style="font-size:11.5px;margin:-6px 0 10px;text-transform:capitalize;">${esc(monthLabel)}</p>
+    <div class="card">
+      ${rows.map((r,i)=>`
+      <div class="hall-row" data-open-student="${r.st.id}" style="cursor:pointer;">
+        <span class="hall-rank">${r.sheets>0 && i<3 ? medals[i] : i+1}</span>
+        <span class="hall-avatar">${r.st.avatar}</span>
+        <div>
+          <div class="hall-name">${esc(r.st.name)}</div>
+          <div class="faint" style="font-size:11px;">Estágio ${esc(r.st.targetStage)}</div>
+        </div>
+        <span class="hall-metric" style="color:var(--peri);">📄 ${r.sheets}</span>
+      </div>`).join('')}
+    </div>`;
+}
+function monthKudos(student, ym){
+  // dias com presença marcada (Kumon, presencial ou teste) no mês, igual ao Histórico mensal do aluno
+  return Object.keys(student.attendance || {}).filter(d=>d.startsWith(ym)).length;
+}
+function shiftMonth(ym, d){
+  const [y,m] = ym.split('-').map(Number);
+  const dt = new Date(y, m-1+d, 1);
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+}
+function renderAdminReport(){
+  const nowYm = todayISO().slice(0,7);
+  const ym = REPORT_MONTH || nowYm;
+  const [y,m] = ym.split('-').map(Number);
+  const monthLabel = new Date(y, m-1, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+  const rows = DATA.students.map(st=>({ st, days: monthKudos(st, ym), sheets: monthSheets(st, ym) }));
+  const byDays = rows.slice().sort((a,b)=> b.days-a.days || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
+  const bySheets = rows.slice().sort((a,b)=> b.sheets-a.sheets || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
+  const winnerCard = (title, list, key, unit, color)=>{
+    const max = list.length ? list[0][key] : 0;
+    const winners = max>0 ? list.filter(r=>r[key]===max) : [];
+    return `
+    <div class="section-title">${title}</div>
+    <div class="card report-winner">
+      ${winners.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro neste mês.</span>` : `
+        <div class="avatars">${winners.map(r=>`<div class="w"><div class="av">${r.st.avatar}</div><div class="nm">${esc(r.st.name)}</div></div>`).join('')}</div>
+        <div class="mono" style="font-weight:700;font-size:18px;color:${color};">${max} ${unit}</div>
+        ${winners.length>1 ? `<div class="faint" style="font-size:11.5px;margin-top:4px;">Empate</div>` : ''}`}
+    </div>`;
+  };
+  const table = (list, key, icon, color)=> list.map((r,i)=>`
+    <div class="hall-row">
+      <span class="hall-rank">${i+1}</span>
+      <span class="hall-avatar">${r.st.avatar}</span>
+      <span class="hall-name">${esc(r.st.name)}</span>
+      <span class="hall-metric" style="color:${color};">${icon} ${r[key]}</span>
+    </div>`).join('');
+
+  return `
+  <div class="screen">
+    <div class="row no-print" style="margin-bottom:14px;">
+      <button class="btn btn-ghost btn-sm" data-report-month="-1" aria-label="Mês anterior">‹</button>
+      <span style="font-weight:700;font-size:15px;text-transform:capitalize;">${esc(monthLabel)}</span>
+      <button class="btn btn-ghost btn-sm" data-report-month="1" aria-label="Próximo mês" ${ym>=nowYm?'disabled style="opacity:.4;"':''}>›</button>
+    </div>
+    <div class="center" style="margin-bottom:6px;">
+      <div class="display" style="font-size:20px;font-weight:700;">🏆 Destaques de <span style="text-transform:capitalize;">${esc(monthLabel)}</span></div>
+    </div>
+
+    ${winnerCard('🎯 Mais dias no Kumon', byDays, 'days', 'dias', 'var(--amber)')}
+    ${winnerCard('📄 Mais folhas feitas', bySheets, 'sheets', 'folhas', 'var(--peri)')}
+
+    <div class="section-title">Dias no Kumon — todos os alunos</div>
+    <div class="card">${table(byDays,'days','🔥','var(--amber)')}</div>
+
+    <div class="section-title">Folhas feitas — todos os alunos</div>
+    <div class="card">${table(bySheets,'sheets','📄','var(--peri)')}</div>
+
+    <div class="no-print" style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+      <button class="btn btn-primary btn-block" id="btn-report-print">🖨️ Imprimir / salvar em PDF</button>
+      <button class="btn btn-ghost btn-block" id="btn-report-back">← Voltar ao Hall</button>
+    </div>
+  </div>`;
+}
 function renderAdminHall(){
   const list = DATA.students;
   if(list.length===0) return `<div class="screen"><p class="muted center" style="margin-top:30px;">Cadastre alunos para ver o Hall da Evolução.</p></div>`;
@@ -1622,7 +1740,11 @@ function renderAdminHall(){
 
   return `
   <div class="screen">
-    <div class="growth-msg">✨ Acompanhe a constância e as correções de todos os alunos. Toque em um aluno para abrir o perfil dele.</div>
+    <div class="growth-msg">✨ Acompanhe as folhas, a constância e as correções de todos os alunos. Toque em um aluno para abrir o perfil dele.</div>
+
+    <button class="btn btn-outline btn-block" id="btn-open-report" style="margin-bottom:14px;">📋 Relatório do mês (para o mural)</button>
+
+    ${renderSheetsRanking()}
 
     <div class="section-title">🎯 Constância</div>
     <div class="card">${streakRows}</div>
@@ -1685,6 +1807,11 @@ function renderAdminBackup(){
   </div>`;
 }
 
+function prizeMark(student){
+  const n = rewardStats(student).pending;
+  if(n<=0) return '';
+  return `<span title="${n} prêmio${n===1?'':'s'} para entregar" aria-label="${n} prêmio${n===1?'':'s'} para entregar" style="margin-left:6px;font-size:13px;">🍬${n>1?`<span class="mono" style="font-size:11px;margin-left:1px;color:var(--amber);">${n}</span>`:''}</span>`;
+}
 function renderAdminOverview(){
   const list = DATA.students;
   const totalStudents = list.length;
@@ -1719,7 +1846,7 @@ function renderAdminOverview(){
         const p = stats(s).percent;
         return `<div style="margin-bottom:12px;">
           <div class="row" style="margin-bottom:5px;">
-            <span style="font-size:13px;font-weight:600;">${s.avatar} ${esc(s.name)}</span>
+            <span style="font-size:13px;font-weight:600;">${s.avatar} ${esc(s.name)}${prizeMark(s)}</span>
             <span class="mono" style="font-size:12.5px;color:var(--mint);">${p}%</span>
           </div>
           <div class="mini-track"><div class="mini-fill" style="width:${p}%;"></div></div>
@@ -1729,15 +1856,13 @@ function renderAdminOverview(){
   </div>`;
 }
 
-function renderAdminStudents(){
+function studentsListHtml(){
   const term = SEARCH_TERM.toLowerCase();
   const list = DATA.students
     .filter(s=>s.name.toLowerCase().includes(term))
     .slice()
     .sort((a,b)=> a.name.localeCompare(b.name, 'pt-BR', {sensitivity:'base'}));
   return `
-  <div class="screen">
-    <input class="search-input" id="admin-search" placeholder="🔍 Buscar aluno…" value="${esc(SEARCH_TERM)}" aria-label="Buscar aluno">
     ${list.length===0 ? `<p class="muted center" style="margin-top:30px;">Nenhum aluno encontrado.</p>` : ''}
     ${list.map(s=>{
       const st = stats(s);
@@ -1746,7 +1871,7 @@ function renderAdminStudents(){
         <div class="hall-avatar" style="width:44px;height:44px;font-size:20px;flex-shrink:0;">${s.avatar}</div>
         <div class="info">
           <div class="name-row">
-            <span class="name">${esc(s.name)}</span>
+            <span class="name">${esc(s.name)}${prizeMark(s)}</span>
             <span class="badge badge-peri" style="flex-shrink:0;">${esc(s.targetStage)}</span>
           </div>
           <div class="prog-line">
@@ -1758,7 +1883,13 @@ function renderAdminStudents(){
           </div>
         </div>
       </button>`;
-    }).join('')}
+    }).join('')}`;
+}
+function renderAdminStudents(){
+  return `
+  <div class="screen">
+    <input class="search-input" id="admin-search" placeholder="🔍 Buscar aluno…" value="${esc(SEARCH_TERM)}" aria-label="Buscar aluno" autocomplete="off">
+    <div id="admin-students-list">${studentsListHtml()}</div>
   </div>`;
 }
 
@@ -2199,6 +2330,14 @@ function attachHandlers(){
 
   if($('#btn-admin-profile')) $('#btn-admin-profile').onclick = ()=>{ ADMIN_VIEW='profile'; render(); };
   if($('#btn-admin-profile-back')) $('#btn-admin-profile-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
+  if($('#btn-open-report')) $('#btn-open-report').onclick = ()=>{ REPORT_MONTH=''; ADMIN_VIEW='report'; render(); };
+  if($('#btn-report-back')) $('#btn-report-back').onclick = ()=>{ ADMIN_VIEW='hall'; render(); };
+  if($('#btn-report-print')) $('#btn-report-print').onclick = ()=>{ window.print(); };
+  $$('[data-report-month]').forEach(btn=> btn.onclick = ()=>{
+    if(btn.disabled) return;
+    REPORT_MONTH = shiftMonth(REPORT_MONTH || todayISO().slice(0,7), Number(btn.getAttribute('data-report-month')));
+    render();
+  });
 
   // Admin nav
   $$('[data-adminnav]').forEach(btn=> btn.onclick = ()=>{
@@ -2208,12 +2347,18 @@ function attachHandlers(){
   });
 
   // Admin students list
-  if($('#admin-search')) $('#admin-search').oninput = (e)=>{ SEARCH_TERM = e.target.value; render(); };
-  $$('[data-open-student]').forEach(row=> row.onclick = ()=>{
+  const openStudentFromRow = (row)=> row.onclick = ()=>{
     SELECTED_STUDENT_ID = row.getAttribute('data-open-student');
     CALENDAR_MONTH = null; EDIT_LABELS_MODE = false; EDIT_STUDENT_MODE = false; EDITING_FORGOT_INDEX = null; DELETE_CONFIRM_ID = null; PLAN_META_MODE = false; END_TRIMESTER_CONFIRM = null;
     ADMIN_VIEW='detail'; render();
-  });
+  };
+  if($('#admin-search')) $('#admin-search').oninput = (e)=>{
+    // atualiza só a lista: redesenhar a tela inteira fazia o campo perder o foco a cada letra
+    SEARCH_TERM = e.target.value;
+    const box = document.getElementById('admin-students-list');
+    if(box){ box.innerHTML = studentsListHtml(); box.querySelectorAll('[data-open-student]').forEach(openStudentFromRow); }
+  };
+  $$('[data-open-student]').forEach(openStudentFromRow);
   if($('#btn-back-students')) $('#btn-back-students').onclick = ()=>{ EDIT_LABELS_MODE=false; EDIT_STUDENT_MODE=false; ADMIN_VIEW='students'; render(); };
 
   // Admin detail: blocks
