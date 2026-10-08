@@ -288,13 +288,21 @@ input,select{font-family:inherit;}
 
 /* ---------- Hall ---------- */
 .hall-row{
-  display:flex;align-items:center;gap:12px;padding:12px 10px;border-radius:12px;margin-bottom:6px;
+  display:flex;align-items:center;gap:12px;padding:10px 8px;border-bottom:1px solid var(--border);
 }
-.hall-row.me{background:#8C93FF14;border:1px solid #8C93FF33;}
-.hall-rank{width:22px;text-align:center;font-family:'JetBrains Mono',monospace;color:var(--text-faint);font-size:13px;flex-shrink:0;}
+.hall-row:last-child{border-bottom:none;}
+.hall-row.me{background:#8C93FF14;border:1px solid #8C93FF33;border-radius:12px;margin-bottom:6px;}
+.hall-row.top3{background:var(--bg-surface-2);border-radius:10px;}
+.hall-rank{width:26px;text-align:center;font-family:'JetBrains Mono',monospace;color:var(--text-faint);font-size:13px;flex-shrink:0;}
+.hall-rank.medal{font-size:17px;}
 .hall-avatar{width:36px;height:36px;border-radius:10px;background:var(--bg-surface-2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.hall-row.top3 .hall-avatar{background:var(--bg-surface);}
 .hall-name{font-weight:600;font-size:14px;}
+.hall-tie{font-size:10px;color:var(--text-faint);font-weight:500;margin-left:6px;}
 .hall-metric{margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;flex-shrink:0;}
+.hall-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.hall-tab{flex:1;padding:10px 6px;border-radius:12px;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-muted);font-size:12.5px;font-weight:600;text-align:center;cursor:pointer;}
+.hall-tab.active{background:var(--peri);color:#fff;border-color:var(--peri);}
 .growth-msg{
   background:var(--bg-surface-2);border:1px dashed var(--border);border-radius:12px;padding:12px 14px;
   font-size:13px;color:var(--text-muted);margin-bottom:16px;
@@ -523,6 +531,7 @@ const STAGES = ['7A','6A','5A','4A','3A','2A','A','B','C','D','E','F','G','H','I
 let DATA = null;                 // { students:[...] }
 let SESSION = { role:null, studentId:null }; // role: 'student' | 'admin'
 let REPORT_MONTH = '';           // AAAA-MM do relatório mensal (vazio = mês atual)
+let HALL_TAB = 'sheets';         // aba ativa do Hall: sheets | streak | correction
 let ADMIN_VIEW = 'overview';     // overview | students | detail | add | evolution
 let STUDENT_VIEW = 'journey';    // journey | hall | profile
 let SELECTED_STUDENT_ID = null;
@@ -728,6 +737,19 @@ function weeklyDelta(student){
   const thisWeek = h[0].sheets;
   const lastWeek = h.length>1 ? h[1].sheets : 0;
   return { thisWeek, lastWeek, delta: thisWeek-lastWeek };
+}
+function withCompetitionRank(sortedList, valueFn){
+  // Define a posição pelo valor (empate = mesma posição), não pela linha da lista.
+  let rank=0, prevVal=null;
+  return sortedList.map((item,idx)=>{
+    const v = valueFn(item);
+    if(prevVal===null || v!==prevVal){ rank = idx+1; prevVal = v; }
+    return { item, rank, tied: false };
+  }).map((row,idx,arr)=> ({ ...row, tied: arr.some((o,j)=> j!==idx && o.rank===row.rank) }));
+}
+function hallRankMark(rank){
+  const medals = {1:'🥇',2:'🥈',3:'🥉'};
+  return medals[rank] ? `<span class="hall-rank medal">${medals[rank]}</span>` : `<span class="hall-rank">${rank}</span>`;
 }
 function streakStats(student){
   const attendance = student.attendance || {};
@@ -1278,29 +1300,25 @@ function growthMessage(student){
 
 function renderHall(student){
   const list = DATA.students;
-  const byStreak = [...list].sort((a,b)=>streakStats(b).total-streakStats(a).total);
-  const byCorrection = [...list].sort((a,b)=> stats(b).correctionRatio - stats(a).correctionRatio || stats(b).done - stats(a).done);
+  const byStreak = [...list].sort((a,b)=>streakStats(b).total-streakStats(a).total || a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base'}));
+  const byCorrection = [...list].sort((a,b)=> stats(b).correctionRatio - stats(a).correctionRatio || stats(b).done - stats(a).done || a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base'}));
   const myStreak = streakStats(student);
 
-  const streakRows = byStreak.map((st,i)=>`
-    <div class="hall-row ${st.id===student.id?'me':''}">
-      <span class="hall-rank">${i+1}</span>
+  const streakRows = withCompetitionRank(byStreak, st=>streakStats(st).total).map(({item:st, rank, tied})=>`
+    <div class="hall-row ${st.id===student.id?'me':''} ${rank<=3?'top3':''}">
+      ${hallRankMark(rank)}
       <span class="hall-avatar">${st.avatar}</span>
-      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}</span>
+      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}${tied?'<span class="hall-tie">empate</span>':''}</span>
       <span class="hall-metric" style="color:var(--amber);">🔥 ${streakStats(st).total}</span>
     </div>`).join('');
 
-  const corrRows = byCorrection.map((st,i)=>{
-    const r = stats(st);
-    const pct = Math.round(r.correctionRatio*100);
-    return `
-    <div class="hall-row ${st.id===student.id?'me':''}">
-      <span class="hall-rank">${i+1}</span>
+  const corrRows = withCompetitionRank(byCorrection, st=>Math.round(stats(st).correctionRatio*100)).map(({item:st, rank, tied})=>`
+    <div class="hall-row ${st.id===student.id?'me':''} ${rank<=3?'top3':''}">
+      ${hallRankMark(rank)}
       <span class="hall-avatar">${st.avatar}</span>
-      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}</span>
-      <span class="hall-metric" style="color:var(--mint);">🧠 ${pct}%</span>
-    </div>`;
-  }).join('');
+      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}${tied?'<span class="hall-tie">empate</span>':''}</span>
+      <span class="hall-metric" style="color:var(--mint);">🧠 ${Math.round(stats(st).correctionRatio*100)}%</span>
+    </div>`).join('');
 
   return `
   <div class="screen">
@@ -1629,20 +1647,19 @@ function renderSheetsRanking(){
   const ym = todayISO().slice(0,7);
   const [y,m] = ym.split('-').map(Number);
   const monthLabel = new Date(y, m-1, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
-  const rows = DATA.students
+  const sorted = DATA.students
     .map(st=>({ st, sheets: monthSheets(st, ym) }))
     .sort((a,b)=> b.sheets - a.sheets || a.st.name.localeCompare(b.st.name, 'pt-BR', {sensitivity:'base'}));
-  const medals = ['🥇','🥈','🥉'];
+  const ranked = withCompetitionRank(sorted, r=>r.sheets);
   return `
-    <div class="section-title">📄 Folhas do mês</div>
-    <p class="faint" style="font-size:11.5px;margin:-6px 0 10px;text-transform:capitalize;">${esc(monthLabel)}</p>
+    <p class="faint" style="font-size:11.5px;margin:0 0 10px;text-transform:capitalize;">${esc(monthLabel)}</p>
     <div class="card">
-      ${rows.map((r,i)=>`
-      <div class="hall-row" data-open-student="${r.st.id}" style="cursor:pointer;">
-        <span class="hall-rank">${r.sheets>0 && i<3 ? medals[i] : i+1}</span>
+      ${ranked.map(({item:r, rank, tied})=>`
+      <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${r.st.id}" style="cursor:pointer;">
+        ${hallRankMark(rank)}
         <span class="hall-avatar">${r.st.avatar}</span>
         <div>
-          <div class="hall-name">${esc(r.st.name)}</div>
+          <div class="hall-name">${esc(r.st.name)}${tied?'<span class="hall-tie">empate</span>':''}</div>
           <div class="faint" style="font-size:11px;">Estágio ${esc(r.st.targetStage)}</div>
         </div>
         <span class="hall-metric" style="color:var(--peri);">📄 ${r.sheets}</span>
@@ -1678,11 +1695,11 @@ function renderAdminReport(){
         ${winners.length>1 ? `<div class="faint" style="font-size:11.5px;margin-top:4px;">Empate</div>` : ''}`}
     </div>`;
   };
-  const table = (list, key, icon, color)=> list.map((r,i)=>`
-    <div class="hall-row">
-      <span class="hall-rank">${i+1}</span>
+  const table = (list, key, icon, color)=> withCompetitionRank(list, r=>r[key]).map(({item:r, rank, tied})=>`
+    <div class="hall-row ${rank<=3?'top3':''}">
+      ${hallRankMark(rank)}
       <span class="hall-avatar">${r.st.avatar}</span>
-      <span class="hall-name">${esc(r.st.name)}</span>
+      <span class="hall-name">${esc(r.st.name)}${tied?'<span class="hall-tie">empate</span>':''}</span>
       <span class="hall-metric" style="color:${color};">${icon} ${r[key]}</span>
     </div>`).join('');
 
@@ -1715,43 +1732,45 @@ function renderAdminReport(){
 function renderAdminHall(){
   const list = DATA.students;
   if(list.length===0) return `<div class="screen"><p class="muted center" style="margin-top:30px;">Cadastre alunos para ver o Hall da Evolução.</p></div>`;
-  const byStreak = [...list].sort((a,b)=>streakStats(b).total-streakStats(a).total);
-  const byCorrection = [...list].sort((a,b)=> stats(b).correctionRatio - stats(a).correctionRatio || stats(b).done - stats(a).done);
-
-  const streakRows = byStreak.map((st,i)=>`
-    <div class="hall-row" data-open-student="${st.id}" style="cursor:pointer;">
-      <span class="hall-rank">${i+1}</span>
-      <span class="hall-avatar">${st.avatar}</span>
-      <span class="hall-name">${esc(st.name)}</span>
-      <span class="hall-metric" style="color:var(--amber);">🔥 ${streakStats(st).total}</span>
-    </div>`).join('');
-
-  const corrRows = byCorrection.map((st,i)=>{
-    const r = stats(st);
-    const pct = Math.round(r.correctionRatio*100);
-    return `
-    <div class="hall-row" data-open-student="${st.id}" style="cursor:pointer;">
-      <span class="hall-rank">${i+1}</span>
-      <span class="hall-avatar">${st.avatar}</span>
-      <span class="hall-name">${esc(st.name)}</span>
-      <span class="hall-metric" style="color:var(--mint);">🧠 ${pct}%</span>
-    </div>`;
-  }).join('');
-
   return `
   <div class="screen">
     <div class="growth-msg">✨ Acompanhe as folhas, a constância e as correções de todos os alunos. Toque em um aluno para abrir o perfil dele.</div>
 
     <button class="btn btn-outline btn-block" id="btn-open-report" style="margin-bottom:14px;">📋 Relatório do mês (para o mural)</button>
 
-    ${renderSheetsRanking()}
-
-    <div class="section-title">🎯 Constância</div>
-    <div class="card">${streakRows}</div>
-
-    <div class="section-title">🧠 Correções em dia</div>
-    <div class="card">${corrRows}</div>
+    <div class="hall-tabs">
+      <div class="hall-tab ${HALL_TAB==='sheets'?'active':''}" data-hall-tab="sheets">📄 Folhas</div>
+      <div class="hall-tab ${HALL_TAB==='streak'?'active':''}" data-hall-tab="streak">🔥 Constância</div>
+      <div class="hall-tab ${HALL_TAB==='correction'?'active':''}" data-hall-tab="correction">🧠 Correções</div>
+    </div>
+    <div id="hall-tab-body">${renderHallTabBody()}</div>
   </div>`;
+}
+function renderHallTabBody(){
+  const list = DATA.students;
+  if(HALL_TAB==='streak'){
+    const sorted = [...list].sort((a,b)=>streakStats(b).total-streakStats(a).total || a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base'}));
+    const ranked = withCompetitionRank(sorted, st=>streakStats(st).total);
+    return `<div class="card">${ranked.map(({item:st, rank, tied})=>`
+      <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${st.id}" style="cursor:pointer;">
+        ${hallRankMark(rank)}
+        <span class="hall-avatar">${st.avatar}</span>
+        <span class="hall-name">${esc(st.name)}${tied?'<span class="hall-tie">empate</span>':''}</span>
+        <span class="hall-metric" style="color:var(--amber);">🔥 ${streakStats(st).total}</span>
+      </div>`).join('')}</div>`;
+  }
+  if(HALL_TAB==='correction'){
+    const sorted = [...list].sort((a,b)=> stats(b).correctionRatio - stats(a).correctionRatio || stats(b).done - stats(a).done || a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base'}));
+    const ranked = withCompetitionRank(sorted, st=>Math.round(stats(st).correctionRatio*100));
+    return `<div class="card">${ranked.map(({item:st, rank, tied})=>`
+      <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${st.id}" style="cursor:pointer;">
+        ${hallRankMark(rank)}
+        <span class="hall-avatar">${st.avatar}</span>
+        <span class="hall-name">${esc(st.name)}${tied?'<span class="hall-tie">empate</span>':''}</span>
+        <span class="hall-metric" style="color:var(--mint);">🧠 ${Math.round(stats(st).correctionRatio*100)}%</span>
+      </div>`).join('')}</div>`;
+  }
+  return renderSheetsRanking();
 }
 
 function fmtBackupId(id){
@@ -1818,8 +1837,6 @@ function renderAdminOverview(){
   const active = list.filter(s=>isRecentlyActive(s)).length;
   const avgProgress = totalStudents ? Math.round(list.reduce((sum,s)=>sum+stats(s).percent,0)/totalStudents) : 0;
   const pendingTotal = list.reduce((sum,s)=>sum+stats(s).pending,0);
-  const alerts = list.filter(s=>stats(s).pending>=2);
-
   return `
   <div class="screen">
     <div class="stat-grid">
@@ -1829,24 +1846,14 @@ function renderAdminOverview(){
       <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${pendingTotal}</div><div class="stat-label">Correções pendentes</div></div>
     </div>
 
-    <div class="section-title">Atenção necessária</div>
-    <div class="card">
-      ${alerts.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum aluno com correções acumuladas. 🎉</span>` :
-        alerts.map(s=>`
-          <div class="row" style="padding:8px 0;border-bottom:1px solid var(--border);">
-            <span class="row" style="gap:8px;"><span class="hall-avatar">${s.avatar}</span>${esc(s.name)}</span>
-            <span class="badge badge-amber">${stats(s).pending} pendentes</span>
-          </div>`).join('')
-      }
-    </div>
-
     <div class="section-title">Alunos por progresso</div>
     <div class="card">
       ${list.slice().sort((a,b)=>stats(b).percent-stats(a).percent).map(s=>{
         const p = stats(s).percent;
-        return `<div style="margin-bottom:12px;">
+        const pending = stats(s).pending;
+        return `<div style="margin-bottom:12px;cursor:pointer;" data-open-student="${s.id}">
           <div class="row" style="margin-bottom:5px;">
-            <span style="font-size:13px;font-weight:600;">${s.avatar} ${esc(s.name)}${prizeMark(s)}</span>
+            <span style="font-size:13px;font-weight:600;">${s.avatar} ${esc(s.name)}${prizeMark(s)}${pending>=2?` <span class="badge badge-amber" style="margin-left:4px;">⚠️ ${pending} pendentes</span>`:''}</span>
             <span class="mono" style="font-size:12.5px;color:var(--mint);">${p}%</span>
           </div>
           <div class="mini-track"><div class="mini-fill" style="width:${p}%;"></div></div>
@@ -2331,6 +2338,13 @@ function attachHandlers(){
   if($('#btn-admin-profile')) $('#btn-admin-profile').onclick = ()=>{ ADMIN_VIEW='profile'; render(); };
   if($('#btn-admin-profile-back')) $('#btn-admin-profile-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
   if($('#btn-open-report')) $('#btn-open-report').onclick = ()=>{ REPORT_MONTH=''; ADMIN_VIEW='report'; render(); };
+  $$('[data-hall-tab]').forEach(tab=> tab.onclick = ()=>{
+    HALL_TAB = tab.getAttribute('data-hall-tab');
+    const tabsBox = tab.parentElement;
+    tabsBox.querySelectorAll('[data-hall-tab]').forEach(t=> t.classList.toggle('active', t===tab));
+    const body = document.getElementById('hall-tab-body');
+    if(body){ body.innerHTML = renderHallTabBody(); body.querySelectorAll('[data-open-student]').forEach(openStudentFromRow); }
+  });
   if($('#btn-report-back')) $('#btn-report-back').onclick = ()=>{ ADMIN_VIEW='hall'; render(); };
   if($('#btn-report-print')) $('#btn-report-print').onclick = ()=>{ window.print(); };
   $$('[data-report-month]').forEach(btn=> btn.onclick = ()=>{
