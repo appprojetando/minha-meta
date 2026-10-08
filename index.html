@@ -264,13 +264,18 @@ input,select{font-family:inherit;}
 
 /* ---------- Goal banner ---------- */
 .goal-banner{
+  position:relative;overflow:hidden;
   background:linear-gradient(135deg,#8C93FF22,#37E2A022);
   border:1px solid #8C93FF55;border-radius:var(--radius);
-  padding:20px;text-align:center;margin-bottom:14px;
+  padding:22px 16px;text-align:center;margin-bottom:14px;
   animation:pulseglow 2.4s ease-in-out infinite;
 }
 @keyframes pulseglow{0%,100%{box-shadow:0 0 0 0 #8C93FF22;}50%{box-shadow:0 0 26px 4px #8C93FF33;}}
-.goal-banner .star{font-size:34px;display:block;margin-bottom:6px;}
+.goal-banner .confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.goal-banner .confetti span{position:absolute;top:-24px;font-size:15px;animation:confetti-fall linear infinite;}
+@keyframes confetti-fall{0%{transform:translateY(-24px) rotate(0deg);opacity:1;}90%{opacity:1;}100%{transform:translateY(180px) rotate(360deg);opacity:0;}}
+.goal-banner .stars-row{font-size:30px;display:block;margin-bottom:6px;animation:starbounce 1s ease-in-out infinite;position:relative;}
+@keyframes starbounce{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-5px) scale(1.1);}}
 
 /* ---------- Relatório do mês ---------- */
 .report-winner{text-align:center;padding:18px 10px;}
@@ -739,11 +744,12 @@ function weeklyDelta(student){
   return { thisWeek, lastWeek, delta: thisWeek-lastWeek };
 }
 function withCompetitionRank(sortedList, valueFn){
-  // Define a posição pelo valor (empate = mesma posição), não pela linha da lista.
+  // Define a posição pelo valor (empate = mesma posição, 1°, 1°, 2°, 3°...), não pela linha da lista
+  // e sem pular posição depois de um empate.
   let rank=0, prevVal=null;
   return sortedList.map((item,idx)=>{
     const v = valueFn(item);
-    if(prevVal===null || v!==prevVal){ rank = idx+1; prevVal = v; }
+    if(prevVal===null || v!==prevVal){ rank += 1; prevVal = v; }
     return { item, rank, tied: false };
   }).map((row,idx,arr)=> ({ ...row, tied: arr.some((o,j)=> j!==idx && o.rank===row.rank) }));
 }
@@ -1168,8 +1174,11 @@ function renderJourney(student){
   <div class="screen" role="region" aria-label="Minha jornada">
     ${s.goalReached ? `
       <div class="goal-banner" role="status" aria-live="polite">
-        <span class="star">⭐</span>
-        <div class="display" style="font-size:18px;font-weight:700;">META CONCLUÍDA!</div>
+        <div class="confetti" aria-hidden="true">
+          ${['🎉','✨','🎊','⭐','🏆','🎉','✨','🎊','⭐','🏆','🎉','✨'].map((ic,i)=>`<span style="left:${(i*8.5+3)}%;animation-duration:${1.8+(i%4)*0.4}s;animation-delay:${(i%6)*0.3}s;">${ic}</span>`).join('')}
+        </div>
+        <span class="stars-row">🏆 ⭐ 🏆</span>
+        <div class="display" style="font-size:19px;font-weight:700;">META CONCLUÍDA! 🎉</div>
         <div class="muted" style="font-size:12.5px;margin-top:4px;">Você chegou ao estágio ${esc(student.targetStage)}-${esc(student.targetSheet)}. Incrível constância!</div>
       </div>` : ''}
 
@@ -1587,6 +1596,7 @@ function renderAdminApp(){
   else if(ADMIN_VIEW==='evolution') body = renderAdminEvolution();
   else if(ADMIN_VIEW==='hall') body = renderAdminHall();
   else if(ADMIN_VIEW==='report') body = renderAdminReport();
+  else if(ADMIN_VIEW==='trimbalance') body = renderAdminTrimesterBalance();
   else if(ADMIN_VIEW==='backup') body = renderAdminBackup();
   else if(ADMIN_VIEW==='profile') body = renderAdminProfile();
 
@@ -1628,20 +1638,33 @@ function renderAdminNav(){
       </button>`).join('')}
   </div>`;
 }
-function monthSheets(student, ym){
-  // Folhas feitas no mês (AAAA-MM). Períodos que cruzam dois meses são divididos pelos dias de cada mês.
-  const [y,m] = ym.split('-').map(Number);
-  const mStart = ym+'-01';
-  const mEnd = ym+'-'+String(new Date(y, m, 0).getDate()).padStart(2,'0');
+function sheetsInRange(student, rangeStart, rangeEnd){
+  // Folhas feitas em [rangeStart, rangeEnd]. Períodos que cruzam a borda são divididos pelos dias de cada lado.
   let total = 0;
   (student.weeklyHistory || []).forEach(h=>{
     const a = h.startDate || h.endDate, b = h.endDate || h.startDate;
     if(!a || !b) return;
-    const from = a > mStart ? a : mStart, to = b < mEnd ? b : mEnd;
+    const from = a > rangeStart ? a : rangeStart, to = b < rangeEnd ? b : rangeEnd;
     if(from > to) return;
     total += Number(h.sheets || 0) * (daysBetween(from,to)+1) / (daysBetween(a,b)+1);
   });
   return Math.round(total);
+}
+function monthSheets(student, ym){
+  // Folhas feitas no mês (AAAA-MM).
+  const [y,m] = ym.split('-').map(Number);
+  const mStart = ym+'-01';
+  const mEnd = ym+'-'+String(new Date(y, m, 0).getDate()).padStart(2,'0');
+  return sheetsInRange(student, mStart, mEnd);
+}
+function correctedInRange(student, rangeStart, rangeEnd){
+  return student.blocks.filter(b=> b.correctedDate && b.correctedDate>=rangeStart && b.correctedDate<=rangeEnd).length;
+}
+function attendanceInRange(student, rangeStart, rangeEnd){
+  return Object.keys(student.attendance || {}).filter(d=> d>=rangeStart && d<=rangeEnd).length;
+}
+function metasConcluidasInRange(student, rangeStart, rangeEnd){
+  return (student.metaHistory || []).filter(h=> h.status==='completed' && h.archivedAt && h.archivedAt>=rangeStart && h.archivedAt<=rangeEnd);
 }
 function renderSheetsRanking(){
   const ym = todayISO().slice(0,7);
@@ -1680,9 +1703,12 @@ function renderAdminReport(){
   const ym = REPORT_MONTH || nowYm;
   const [y,m] = ym.split('-').map(Number);
   const monthLabel = new Date(y, m-1, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
-  const rows = DATA.students.map(st=>({ st, days: monthKudos(st, ym), sheets: monthSheets(st, ym) }));
+  const mStart = ym+'-01';
+  const mEnd = ym+'-'+String(new Date(y, m, 0).getDate()).padStart(2,'0');
+  const rows = DATA.students.map(st=>({ st, days: monthKudos(st, ym), sheets: monthSheets(st, ym), corrected: correctedInRange(st, mStart, mEnd) }));
   const byDays = rows.slice().sort((a,b)=> b.days-a.days || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
   const bySheets = rows.slice().sort((a,b)=> b.sheets-a.sheets || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
+  const byCorrected = rows.slice().sort((a,b)=> b.corrected-a.corrected || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
   const winnerCard = (title, list, key, unit, color)=>{
     const max = list.length ? list[0][key] : 0;
     const winners = max>0 ? list.filter(r=>r[key]===max) : [];
@@ -1716,12 +1742,16 @@ function renderAdminReport(){
 
     ${winnerCard('🎯 Mais dias no Kumon', byDays, 'days', 'dias', 'var(--amber)')}
     ${winnerCard('📄 Mais folhas feitas', bySheets, 'sheets', 'folhas', 'var(--peri)')}
+    ${winnerCard('🧠 Mais correções feitas', byCorrected, 'corrected', 'correções', 'var(--mint)')}
 
     <div class="section-title">Dias no Kumon — todos os alunos</div>
     <div class="card">${table(byDays,'days','🔥','var(--amber)')}</div>
 
     <div class="section-title">Folhas feitas — todos os alunos</div>
     <div class="card">${table(bySheets,'sheets','📄','var(--peri)')}</div>
+
+    <div class="section-title">Correções feitas — todos os alunos</div>
+    <div class="card">${table(byCorrected,'corrected','🧠','var(--mint)')}</div>
 
     <div class="no-print" style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
       <button class="btn btn-primary btn-block" id="btn-report-print">🖨️ Imprimir / salvar em PDF</button>
@@ -1831,6 +1861,104 @@ function prizeMark(student){
   if(n<=0) return '';
   return `<span title="${n} prêmio${n===1?'':'s'} para entregar" aria-label="${n} prêmio${n===1?'':'s'} para entregar" style="margin-left:6px;font-size:13px;flex-shrink:0;">🍬${n>1?`<span class="mono" style="font-size:11px;margin-left:1px;color:var(--amber);">${n}</span>`:''}</span>`;
 }
+function renderAdminTrimesterBalance(){
+  const list = DATA.students;
+  const trimester = DATA.currentTrimester || {};
+  const start = trimester.startDate, end = trimester.endDate;
+  const backBtn = `<button class="btn btn-ghost btn-sm no-print" id="btn-balance-back">← Voltar</button>`;
+
+  if(!start || !end){
+    return `<div class="screen">
+      ${backBtn}
+      <p class="muted center" style="margin-top:30px;">Defina as datas do trimestre atual em Perfil → Trimestre atual para ver o balanço.</p>
+    </div>`;
+  }
+  if(list.length===0){
+    return `<div class="screen">${backBtn}<p class="muted center" style="margin-top:30px;">Cadastre alunos para ver o balanço do trimestre.</p></div>`;
+  }
+
+  const today = todayISO();
+  const totalDays = daysBetween(start,end)+1;
+  const elapsed = clamp(daysBetween(start, today<end?today:(today>end?end:today))+1, 0, totalDays);
+  const timePct = totalDays>0 ? Math.round(clamp(elapsed,0,totalDays)/totalDays*100) : 0;
+  const periodLabel = `${fmtDate(start)} – ${fmtDate(end)}`;
+
+  const rows = list.map(st=>({
+    st,
+    sheets: sheetsInRange(st, start, end),
+    days: attendanceInRange(st, start, end),
+    corrected: correctedInRange(st, start, end),
+    goalsDone: metasConcluidasInRange(st, start, end).length,
+  }));
+  const totalSheets = rows.reduce((sum,r)=>sum+r.sheets,0);
+  const totalCorrected = rows.reduce((sum,r)=>sum+r.corrected,0);
+  const totalGoals = rows.reduce((sum,r)=>sum+r.goalsDone,0);
+  const avgProgress = Math.round(list.reduce((sum,s)=>sum+stats(s).percent,0)/list.length);
+  const inactive = rows.filter(r=>r.sheets===0 && r.days===0);
+
+  const bySheets = rows.slice().sort((a,b)=> b.sheets-a.sheets || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
+  const byDays = rows.slice().sort((a,b)=> b.days-a.days || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
+
+  const winnerBlock = (title, rankedList, key, unit, color) => {
+    const max = rankedList.length ? rankedList[0][key] : 0;
+    const winners = max>0 ? rankedList.filter(r=>r[key]===max) : [];
+    return `
+    <div class="section-title">${title}</div>
+    <div class="card report-winner">
+      ${winners.length===0 ? `<span class="muted" style="font-size:13px;">Sem registros neste trimestre.</span>` : `
+        <div class="avatars">${winners.map(r=>`<div class="w"><div class="av">${r.st.avatar}</div><div class="nm">${esc(r.st.name)}</div></div>`).join('')}</div>
+        <div class="mono" style="font-weight:700;font-size:18px;color:${color};">${max} ${unit}</div>`}
+    </div>`;
+  };
+
+  const table = (rankedList, key, icon, color) => withCompetitionRank(rankedList, r=>r[key]).map(({item:r, rank})=>`
+    <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${r.st.id}" style="cursor:pointer;">
+      ${hallRankMark(rank)}
+      <span class="hall-avatar">${r.st.avatar}</span>
+      <span class="hall-name">${esc(r.st.name)}</span>
+      <span class="hall-metric" style="color:${color};">${icon} ${r[key]}</span>
+    </div>`).join('');
+
+  return `
+  <div class="screen">
+    <div class="no-print" style="margin-bottom:10px;">${backBtn}</div>
+
+    <div class="center" style="margin-bottom:4px;">
+      <div class="display" style="font-size:20px;font-weight:700;">📊 Balanço do trimestre</div>
+      <div class="faint" style="font-size:12px;margin-top:2px;">${esc(periodLabel)}</div>
+    </div>
+    <div class="mini-track" style="margin:12px 0 4px;"><div class="mini-fill" style="width:${timePct}%;"></div></div>
+    <p class="faint" style="font-size:11px;text-align:center;margin-bottom:18px;">${timePct}% do trimestre decorrido</p>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" style="color:var(--peri);">${totalSheets}</div><div class="stat-label">Folhas no trimestre</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--mint);">${totalCorrected}</div><div class="stat-label">Blocos corrigidos</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${totalGoals}</div><div class="stat-label">Metas concluídas</div></div>
+      <div class="stat-card"><div class="stat-num">${avgProgress}%</div><div class="stat-label">Progresso médio atual</div></div>
+    </div>
+
+    ${winnerBlock('📄 Quem mais fez folhas', bySheets, 'sheets', 'folhas', 'var(--peri)')}
+    ${winnerBlock('🔥 Quem mais foi ao Kumon', byDays, 'days', 'dias', 'var(--amber)')}
+
+    <div class="section-title">Ranking de folhas no trimestre</div>
+    <div class="card">${table(bySheets,'sheets','📄','var(--peri)')}</div>
+
+    <div class="section-title">Ranking de frequência no trimestre</div>
+    <div class="card">${table(byDays,'days','🔥','var(--amber)')}</div>
+
+    ${inactive.length===0 ? '' : `
+    <div class="section-title">⚠️ Sem movimento neste trimestre</div>
+    <div class="card">
+      ${inactive.map(r=>`
+      <div class="hall-row" data-open-student="${r.st.id}" style="cursor:pointer;">
+        <span class="hall-avatar">${r.st.avatar}</span>
+        <span class="hall-name">${esc(r.st.name)}</span>
+      </div>`).join('')}
+    </div>`}
+
+    <button class="btn btn-primary btn-block no-print" id="btn-balance-print" style="margin-top:6px;">🖨️ Imprimir / salvar em PDF</button>
+  </div>`;
+}
 function renderAdminOverview(){
   const list = DATA.students;
   const totalStudents = list.length;
@@ -1845,6 +1973,8 @@ function renderAdminOverview(){
       <div class="stat-card"><div class="stat-num" style="color:var(--mint);">${avgProgress}%</div><div class="stat-label">Progresso médio</div></div>
       <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${pendingTotal}</div><div class="stat-label">Correções pendentes</div></div>
     </div>
+
+    <button class="btn btn-outline btn-block" id="btn-open-trimbalance" style="margin:4px 0 16px;">📊 Balanço do trimestre</button>
 
     <div class="section-title">Alunos por progresso</div>
     <div class="card">
@@ -1878,8 +2008,9 @@ function studentsListHtml(){
         <div class="hall-avatar" style="width:44px;height:44px;font-size:20px;flex-shrink:0;">${s.avatar}</div>
         <div class="info">
           <div class="name-row">
-            <span class="name">${esc(s.name)}</span>
-            ${prizeMark(s)}
+            <div style="display:flex;align-items:center;min-width:0;flex:1;">
+              <span class="name">${esc(s.name)}</span>${prizeMark(s)}
+            </div>
             <span class="badge badge-peri" style="flex-shrink:0;">${esc(s.targetStage)}</span>
           </div>
           <div class="prog-line">
@@ -2339,6 +2470,9 @@ function attachHandlers(){
   if($('#btn-admin-profile')) $('#btn-admin-profile').onclick = ()=>{ ADMIN_VIEW='profile'; render(); };
   if($('#btn-admin-profile-back')) $('#btn-admin-profile-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
   if($('#btn-open-report')) $('#btn-open-report').onclick = ()=>{ REPORT_MONTH=''; ADMIN_VIEW='report'; render(); };
+  if($('#btn-open-trimbalance')) $('#btn-open-trimbalance').onclick = ()=>{ ADMIN_VIEW='trimbalance'; render(); };
+  if($('#btn-balance-back')) $('#btn-balance-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
+  if($('#btn-balance-print')) $('#btn-balance-print').onclick = ()=>{ window.print(); };
   $$('[data-hall-tab]').forEach(tab=> tab.onclick = ()=>{
     HALL_TAB = tab.getAttribute('data-hall-tab');
     const tabsBox = tab.parentElement;
