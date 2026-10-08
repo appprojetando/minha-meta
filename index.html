@@ -1308,7 +1308,7 @@ function renderHall(student){
     <div class="hall-row ${st.id===student.id?'me':''} ${rank<=3?'top3':''}">
       ${hallRankMark(rank)}
       <span class="hall-avatar">${st.avatar}</span>
-      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}${tied?'<span class="hall-tie">empate</span>':''}</span>
+      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}</span>
       <span class="hall-metric" style="color:var(--amber);">🔥 ${streakStats(st).total}</span>
     </div>`).join('');
 
@@ -1316,7 +1316,7 @@ function renderHall(student){
     <div class="hall-row ${st.id===student.id?'me':''} ${rank<=3?'top3':''}">
       ${hallRankMark(rank)}
       <span class="hall-avatar">${st.avatar}</span>
-      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}${tied?'<span class="hall-tie">empate</span>':''}</span>
+      <span class="hall-name">${esc(st.name)}${st.id===student.id?' (você)':''}</span>
       <span class="hall-metric" style="color:var(--mint);">🧠 ${Math.round(stats(st).correctionRatio*100)}%</span>
     </div>`).join('');
 
@@ -1659,7 +1659,7 @@ function renderSheetsRanking(){
         ${hallRankMark(rank)}
         <span class="hall-avatar">${r.st.avatar}</span>
         <div>
-          <div class="hall-name">${esc(r.st.name)}${tied?'<span class="hall-tie">empate</span>':''}</div>
+          <div class="hall-name">${esc(r.st.name)}</div>
           <div class="faint" style="font-size:11px;">Estágio ${esc(r.st.targetStage)}</div>
         </div>
         <span class="hall-metric" style="color:var(--peri);">📄 ${r.sheets}</span>
@@ -1699,7 +1699,7 @@ function renderAdminReport(){
     <div class="hall-row ${rank<=3?'top3':''}">
       ${hallRankMark(rank)}
       <span class="hall-avatar">${r.st.avatar}</span>
-      <span class="hall-name">${esc(r.st.name)}${tied?'<span class="hall-tie">empate</span>':''}</span>
+      <span class="hall-name">${esc(r.st.name)}</span>
       <span class="hall-metric" style="color:${color};">${icon} ${r[key]}</span>
     </div>`).join('');
 
@@ -1755,7 +1755,7 @@ function renderHallTabBody(){
       <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${st.id}" style="cursor:pointer;">
         ${hallRankMark(rank)}
         <span class="hall-avatar">${st.avatar}</span>
-        <span class="hall-name">${esc(st.name)}${tied?'<span class="hall-tie">empate</span>':''}</span>
+        <span class="hall-name">${esc(st.name)}</span>
         <span class="hall-metric" style="color:var(--amber);">🔥 ${streakStats(st).total}</span>
       </div>`).join('')}</div>`;
   }
@@ -1766,7 +1766,7 @@ function renderHallTabBody(){
       <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${st.id}" style="cursor:pointer;">
         ${hallRankMark(rank)}
         <span class="hall-avatar">${st.avatar}</span>
-        <span class="hall-name">${esc(st.name)}${tied?'<span class="hall-tie">empate</span>':''}</span>
+        <span class="hall-name">${esc(st.name)}</span>
         <span class="hall-metric" style="color:var(--mint);">🧠 ${Math.round(stats(st).correctionRatio*100)}%</span>
       </div>`).join('')}</div>`;
   }
@@ -1829,7 +1829,7 @@ function renderAdminBackup(){
 function prizeMark(student){
   const n = rewardStats(student).pending;
   if(n<=0) return '';
-  return `<span title="${n} prêmio${n===1?'':'s'} para entregar" aria-label="${n} prêmio${n===1?'':'s'} para entregar" style="margin-left:6px;font-size:13px;">🍬${n>1?`<span class="mono" style="font-size:11px;margin-left:1px;color:var(--amber);">${n}</span>`:''}</span>`;
+  return `<span title="${n} prêmio${n===1?'':'s'} para entregar" aria-label="${n} prêmio${n===1?'':'s'} para entregar" style="margin-left:6px;font-size:13px;flex-shrink:0;">🍬${n>1?`<span class="mono" style="font-size:11px;margin-left:1px;color:var(--amber);">${n}</span>`:''}</span>`;
 }
 function renderAdminOverview(){
   const list = DATA.students;
@@ -1853,7 +1853,7 @@ function renderAdminOverview(){
         const pending = stats(s).pending;
         return `<div style="margin-bottom:12px;cursor:pointer;" data-open-student="${s.id}">
           <div class="row" style="margin-bottom:5px;">
-            <span style="font-size:13px;font-weight:600;">${s.avatar} ${esc(s.name)}${prizeMark(s)}${pending>=2?` <span class="badge badge-amber" style="margin-left:4px;">⚠️ ${pending} pendentes</span>`:''}</span>
+            <span style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:0;">${s.avatar} ${esc(s.name)}${prizeMark(s)}${pending>=2?` <span class="badge badge-amber" style="margin-left:4px;flex-shrink:0;">⚠️ ${pending}</span>`:''}</span>
             <span class="mono" style="font-size:12.5px;color:var(--mint);">${p}%</span>
           </div>
           <div class="mini-track"><div class="mini-fill" style="width:${p}%;"></div></div>
@@ -1878,7 +1878,8 @@ function studentsListHtml(){
         <div class="hall-avatar" style="width:44px;height:44px;font-size:20px;flex-shrink:0;">${s.avatar}</div>
         <div class="info">
           <div class="name-row">
-            <span class="name">${esc(s.name)}${prizeMark(s)}</span>
+            <span class="name">${esc(s.name)}</span>
+            ${prizeMark(s)}
             <span class="badge badge-peri" style="flex-shrink:0;">${esc(s.targetStage)}</span>
           </div>
           <div class="prog-line">
