@@ -175,6 +175,12 @@ input,select{font-family:inherit;}
   border:1px solid var(--border);color:var(--text);outline:none;margin-bottom:12px;
 }
 .code-input:focus{border-color:#37E2A088;}
+.maint-card{width:100%;max-width:340px;margin-top:6px;padding:26px 22px;text-align:center;border-radius:20px;background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-surface-2) 100%);border:1px solid #FFB64855;}
+.maint-ic{font-size:40px;line-height:1;display:inline-block;animation:maintwiggle 2.6s ease-in-out infinite;}
+.maint-title{margin:12px 0 6px;font-size:20px;color:var(--amber);}
+.maint-text{margin:0;font-size:13.5px;line-height:1.55;color:var(--text-muted);}
+@keyframes maintwiggle{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(8deg);}}
+@media (prefers-reduced-motion:reduce){.maint-ic{animation:none;}}
 .landing-link{margin-top:26px;font-size:13px;color:var(--text-faint);text-decoration:underline;background:none;border:none;}
 .error-msg{color:var(--danger);font-size:13px;margin-top:8px;min-height:16px;}
 
@@ -271,11 +277,20 @@ input,select{font-family:inherit;}
   animation:pulseglow 2.4s ease-in-out infinite;
 }
 @keyframes pulseglow{0%,100%{box-shadow:0 0 0 0 #8C93FF22;}50%{box-shadow:0 0 26px 4px #8C93FF33;}}
-.goal-banner .confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-.goal-banner .confetti span{position:absolute;top:-24px;font-size:15px;animation:confetti-fall linear infinite;}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.confetti span{position:absolute;top:-24px;font-size:15px;animation:confetti-fall linear infinite;}
 @keyframes confetti-fall{0%{transform:translateY(-24px) rotate(0deg);opacity:1;}90%{opacity:1;}100%{transform:translateY(180px) rotate(360deg);opacity:0;}}
-.goal-banner .stars-row{font-size:30px;display:block;margin-bottom:6px;animation:starbounce 1s ease-in-out infinite;position:relative;}
+.stars-row{font-size:30px;display:block;margin-bottom:6px;animation:starbounce 1s ease-in-out infinite;position:relative;}
 @keyframes starbounce{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-5px) scale(1.1);}}
+
+/* ---------- Balanço do trimestre (ao encerrar a meta do aluno) ---------- */
+.tb-overlay{position:fixed;inset:0;background:#0A0E1AB0;display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;}
+.tb-card{position:relative;overflow:hidden;width:100%;max-width:360px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px 20px;text-align:center;box-shadow:0 20px 50px #00000055;}
+.tb-card.reached{border-color:#8C93FF66;background:linear-gradient(180deg,#8C93FF14,var(--bg-surface) 60%);}
+.tb-card .tb-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:16px 0 6px;}
+.tb-card .tb-stat{background:var(--bg-surface-2);border-radius:12px;padding:10px 4px;}
+.tb-card .tb-stat .n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;}
+.tb-card .tb-stat .l{font-size:10px;color:var(--text-muted);margin-top:2px;}
 
 /* ---------- Relatório do mês ---------- */
 .report-winner{text-align:center;padding:18px 10px;}
@@ -450,6 +465,162 @@ input,select{font-family:inherit;}
 .meta-badge.planned{color:var(--peri);background:var(--peri-dim);border:1px solid #8C93FF44;}
 .meta-badge.active{color:var(--mint);background:var(--mint-dim);border:1px solid #37E2A044;}
 .meta-badge.completed{color:var(--text-muted);background:var(--bg-surface-3);border:1px solid var(--border);}
+.theme-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.theme-chip{
+  display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;padding:8px 6px;border-radius:12px;
+  background:var(--bg-surface-2);border:2px solid transparent;color:var(--text);font-size:10.5px;font-weight:600;
+}
+.theme-chip .te{font-size:24px;}
+.theme-chip.sel{border-color:var(--peri);background:var(--peri-dim);}
+.mission-card{
+  position:relative;overflow:hidden;border-radius:var(--radius);padding:18px;margin-bottom:14px;text-align:center;
+  background:linear-gradient(135deg,var(--peri-dim),var(--mint-dim));border:1px solid #8C93FF55;
+}
+.mission-card.upcoming{text-align:left;padding:16px;background:linear-gradient(160deg,var(--bg-surface-2),var(--peri-dim));border:1px solid #8C93FF55;}
+.mc-head{display:flex;align-items:center;gap:12px;}
+.mc-emoji{width:52px;height:52px;border-radius:14px;background:var(--peri-dim);border:1px solid #8C93FF44;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+.mc-head-text{flex:1;min-width:0;}
+.mission-card.upcoming .m-tag, .mission-card.current .m-tag{margin-top:0;}
+.mission-card.upcoming .m-name, .mission-card.current .m-name{font-size:18px;margin:2px 0 0;line-height:1.2;}
+.mission-card.upcoming .m-msg, .mission-card.current .m-msg{margin-top:12px;}
+.mission-card.current{text-align:left;padding:16px;background:linear-gradient(160deg,var(--bg-surface-2),var(--mint-dim));border:1px solid #37E2A055;}
+.mission-card.current .mc-emoji{background:var(--mint-dim);border-color:#37E2A044;}
+.mission-card.current .m-tag{color:var(--mint);}
+.mode-switch{display:flex;gap:8px;margin-bottom:12px;}
+.mode-opt{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 8px;border-radius:12px;background:var(--bg-surface-2);border:2px solid transparent;color:var(--text);text-align:center;}
+.mode-opt .mo-ic{font-size:22px;}
+.mode-opt b{font-size:13px;}
+.mode-opt small{font-size:10.5px;color:var(--text-muted);line-height:1.25;}
+.mode-opt.sel{border-color:var(--peri);background:var(--peri-dim);}
+.mc-chip{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 9px;border-radius:999px;background:var(--amber-dim);color:var(--amber);border:1px solid #FFB64844;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.mc-route{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.mc-point{flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;}
+.mc-point.goal{background:var(--mint-dim);border-color:#37E2A055;}
+.mc-lbl{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
+.mc-val{display:block;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-top:2px;color:var(--text);}
+.mc-arrow{color:var(--peri);font-size:20px;flex-shrink:0;}
+.mc-dates{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;font-size:13.5px;}
+.mc-dates > div:not(.mc-line){text-align:center;}
+.mc-line{flex:1;height:2px;background:repeating-linear-gradient(90deg,#8C93FF77 0 6px,transparent 6px 12px);}
+.mc-actions{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+.mc-status{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px;border-radius:12px;font-size:13px;}
+.mc-status.ok{background:var(--mint-dim);border:1px solid #37E2A044;}
+.mc-status.warn{background:var(--amber-dim);border:1px solid #FFB64844;}
+.mc-status .mc-sic{font-size:20px;line-height:1.2;}
+.mc-status b{display:block;color:var(--text);}
+.mc-status small{display:block;margin-top:3px;font-size:12px;color:var(--text-muted);}
+.mc-status small.mc-quote{font-style:italic;margin-top:6px;}
+.mc-editor{margin-top:16px;padding:14px;border-radius:12px;background:var(--bg-surface);border:1px solid var(--border);}
+.mc-editor-title{font-weight:700;font-size:14px;}
+.mc-hint{font-size:12px;color:var(--text-muted);margin:4px 0 12px;line-height:1.4;}
+.mc-req{margin-left:6px;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700;background:var(--amber-dim);color:var(--amber);border:1px solid #FFB64844;}
+.mc-count{text-align:right;font-size:11px;color:var(--text-faint);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+
+.mc-art{position:relative;margin:-16px -16px 14px;line-height:0;border-bottom:1px solid #37E2A033;}
+.mc-art svg{display:block;width:100%;height:auto;}
+.mc-art-cap{position:absolute;left:12px;bottom:10px;line-height:1.2;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.88);color:#0B5C7A;font-weight:700;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+.mc-art .sun-rays{transform-origin:330px 42px;animation:mcspin 28s linear infinite;}
+.mc-art .wave1{animation:mcwave 7s linear infinite;}
+.mc-art .wave2{animation:mcwave 11s linear infinite reverse;}
+.mc-art .cloud{animation:mcdrift 18s ease-in-out infinite alternate;}
+.mc-art .palm{transform-origin:70px 138px;animation:mcsway 4.5s ease-in-out infinite alternate;}
+@keyframes mcspin{to{transform:rotate(360deg);}}
+@keyframes mcwave{from{transform:translateX(0);}to{transform:translateX(-200px);}}
+@keyframes mcdrift{from{transform:translateX(-12px);}to{transform:translateX(18px);}}
+@keyframes mcsway{from{transform:rotate(-1.6deg);}to{transform:rotate(1.6deg);}}
+@media (prefers-reduced-motion:reduce){.mc-art *{animation:none !important;}}
+
+.jc{padding:16px;}
+.jc-route{display:flex;align-items:stretch;gap:10px;}
+.jc-point{flex:1;min-width:0;background:var(--bg-surface-2);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.jc-point.goal{background:var(--mint-dim);border-color:#37E2A055;}
+.jc-point.goal .jc-val{color:var(--mint);}
+.jc-lbl{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
+.jc-val{display:block;font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;margin-top:4px;color:var(--text);}
+.jc-arrow{align-self:center;color:var(--peri);font-size:20px;flex-shrink:0;}
+.jc-time{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);}
+.jc-dates{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;}
+.jc-dates > div:first-child b, .jc-dates .jc-end b{display:block;font-size:14px;margin-top:2px;color:var(--text);}
+.jc-end{text-align:right;}
+.jc-count{text-align:center;padding:6px 14px;border-radius:14px;background:var(--amber-dim);border:1px solid #FFB64844;}
+.jc-count b{display:block;font-family:'Space Grotesk',sans-serif;font-size:24px;line-height:1.1;color:var(--amber);}
+.jc-count small{display:block;font-size:10.5px;color:var(--amber);font-weight:600;white-space:nowrap;}
+.jc-bar{height:6px;border-radius:20px;background:var(--bg-surface-2);border:1px solid var(--border);margin-top:12px;overflow:hidden;}
+.jc-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--peri),var(--amber));transition:width .4s ease;}
+
+.jc-prog{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);}
+.jc-prog-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;}
+.jc-pct{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--mint);line-height:1;}
+.jc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.jc-stat{text-align:center;padding:8px 4px;border-radius:12px;background:var(--bg-surface-2);border:1px solid var(--border);}
+.jc-stat b{display:block;font-size:14px;color:var(--text);}
+.jc-stat small{display:block;margin-top:2px;font-size:10.5px;color:var(--text-faint);letter-spacing:.04em;}
+
+/* trilha compacta */
+.tr-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 10px;}
+.tr-nextlbl{font-size:12px;color:var(--peri);font-family:'JetBrains Mono',monospace;}
+.tr-nextlbl b{color:var(--text);}
+.tr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;}
+.tr-chip{display:flex;align-items:center;justify-content:center;text-align:center;padding:6px 2px;border-radius:9px;background:var(--bg-surface-2);border:1px solid var(--border);color:var(--text-faint);font-family:'JetBrains Mono',monospace;min-height:40px;}
+.tr-num{font-size:11px;font-weight:700;line-height:1.1;}
+.tr-chip.ok{background:var(--mint-dim);border-color:#37E2A066;color:var(--mint);}
+.tr-chip.wait{background:var(--amber-dim);border-color:#FFB64866;color:var(--amber);}
+.tr-chip.next{border-color:var(--peri);box-shadow:0 0 0 2px #8C93FF40;color:var(--text);}
+.tr-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:11px;color:var(--text-faint);}
+.tr-legend .lg{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;background:var(--bg-surface-2);border:1px solid var(--border);}
+.tr-legend .lg.ok{background:var(--mint);border-color:var(--mint);}
+.tr-legend .lg.wait{background:var(--amber);border-color:var(--amber);}
+/* linha do tempo dos trimestres */
+.tl{position:relative;padding-left:22px;}
+.tl::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:repeating-linear-gradient(180deg,var(--border) 0 6px,transparent 6px 11px);}
+.tl-item{position:relative;margin-bottom:12px;}
+.tl-item:last-child{margin-bottom:0;}
+.tl-dot{position:absolute;left:-22px;top:14px;width:16px;height:16px;border-radius:50%;background:var(--bg-surface-3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;}
+.tl-item.current .tl-dot{background:var(--mint);border-color:var(--mint);box-shadow:0 0 0 4px #37E2A033;}
+.tl-item.next .tl-dot{background:var(--peri-dim);border-color:var(--peri);}
+.tl-item.reached .tl-dot{background:var(--amber-dim);border-color:var(--amber);}
+.tl-card{padding:12px;border-radius:14px;background:var(--bg-surface-2);border:1px solid var(--border);}
+.tl-item.current .tl-card{background:linear-gradient(160deg,var(--bg-surface-2),var(--mint-dim));border-color:#37E2A055;}
+.tl-item.next .tl-card{border-style:dashed;border-color:#8C93FF66;}
+.tl-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.tl-badge{padding:3px 9px;border-radius:8px;font-size:10.5px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.tl-badge.now{color:var(--mint);background:var(--mint-dim);border:1px solid #37E2A044;}
+.tl-badge.soon{color:var(--peri);background:var(--peri-dim);border:1px solid #8C93FF44;}
+.tl-badge.win{color:var(--amber);background:var(--amber-dim);border:1px solid #FFB64844;}
+.tl-badge.end{color:var(--text-muted);background:var(--bg-surface-3);border:1px solid var(--border);}
+.tl-pct{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--text);}
+.tl-route{display:flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--text-muted);}
+.tl-route b{color:var(--text);}
+.tl-route i{font-style:normal;color:var(--peri);font-size:14px;}
+.tl-dates{font-size:11.5px;color:var(--text-faint);margin-top:4px;}
+.tl-chips{display:flex;gap:8px;margin-top:8px;}
+.tl-chips span{padding:3px 9px;border-radius:999px;font-size:11px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-muted);}
+.mc-foot{font-size:11.5px;color:var(--text-faint);margin:14px 0 0;line-height:1.4;}
+.field textarea{width:100%;background:var(--bg-surface-2);border:1px solid var(--border);color:var(--text);padding:12px 13px;border-radius:10px;font-size:14.5px;outline:none;font-family:inherit;resize:vertical;}
+.field textarea:focus{border-color:#37E2A088;}
+.btn:disabled{opacity:.4;pointer-events:none;}
+.plan-card{padding:14px;border-radius:14px;background:var(--bg-surface-2);border:1px solid #8C93FF44;margin-bottom:10px;}
+.plan-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.plan-actions{display:flex;gap:6px;}
+.plan-route{display:flex;align-items:center;gap:10px;margin-top:12px;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
+.plan-route .arr{color:var(--peri);font-size:18px;}
+.plan-route .goal{color:var(--mint);}
+.plan-dates{font-size:12px;color:var(--text-muted);margin-top:4px;}
+.pc-resp{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:12.5px;}
+.pc-resp.wait{background:var(--bg-surface-3);border:1px dashed var(--border);color:var(--text-muted);}
+.pc-resp.ok{background:var(--mint-dim);border:1px solid #37E2A044;}
+.pc-resp.warn{background:var(--amber-dim);border:1px solid #FFB64844;}
+.pc-resp small{display:block;margin-top:3px;color:var(--text-muted);font-size:11.5px;}
+.pc-resp .pc-note{margin-top:6px;font-style:italic;color:var(--text);}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.emoji-opt{width:40px;height:40px;border-radius:10px;background:var(--bg-surface-2);border:2px solid transparent;font-size:20px;display:flex;align-items:center;justify-content:center;padding:0;}
+.emoji-opt.sel{border-color:var(--peri);background:var(--peri-dim);}
+.mission-card .m-emoji{font-size:44px;display:block;animation:mfloat 2.6s ease-in-out infinite;}
+@keyframes mfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.mission-card .m-tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--peri);margin-top:6px;}
+.mission-card .m-name{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;margin:4px 0;}
+.mission-card .m-msg{font-size:13px;color:var(--text-muted);line-height:1.45;}
+.mission-card .m-meta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px;}
 .avatar-picker{display:flex;flex-wrap:wrap;gap:8px;}
 .avatar-opt{
   width:42px;height:42px;border-radius:11px;background:var(--bg-surface-2);border:2px solid transparent;
@@ -469,6 +640,24 @@ input,select{font-family:inherit;}
   font-size:17px;padding:0;box-shadow:0 6px 16px -10px #0008;
 }
 .theme-toggle:active{transform:scale(.96);}
+
+/* ---------- Visualização (celular / tablet / computador) ---------- */
+.tt-wrap{display:inline-flex;align-items:center;gap:8px;}
+.view-select{height:38px;border-radius:11px;border:1px solid var(--border);background:var(--bg-surface-2);color:var(--text);font-size:12.5px;padding:0 8px;max-width:128px;}
+body[data-view="phone"] #app, body[data-view="phone"] .bottom-nav{max-width:430px;}
+body[data-view="phone"] .blocks-grid{grid-template-columns:repeat(3,1fr);}
+/* Tablet: uma coluna, mais larga e arejada (sem aumentar o tamanho dos elementos) */
+body[data-view="tablet"] #app, body[data-view="tablet"] .bottom-nav{max-width:700px;}
+body[data-view="tablet"] .screen{padding-left:28px;padding-right:28px;}
+body[data-view="tablet"] .blocks-grid{grid-template-columns:repeat(5,1fr);}
+/* Computador: duas colunas de cartões; títulos, avisos e missões ocupam a linha toda */
+body[data-view="desktop"] #app, body[data-view="desktop"] .bottom-nav{max-width:1040px;}
+body[data-view="desktop"] .screen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;align-items:start;padding-left:32px;padding-right:32px;}
+body[data-view="desktop"] .screen > *{grid-column:1 / -1;}
+body[data-view="desktop"] .screen > .card{grid-column:auto;}
+body[data-view="desktop"] .screen > .card.jc{grid-column:1 / -1;}
+@media print{.view-select{display:none !important;}}
+
 
 /* ---------- Modo claro/escuro ---------- */
 body.theme-light{
@@ -531,39 +720,108 @@ body.theme-light .remove-block-flag{background:var(--bg-surface);}
 
 const STORAGE_KEY = 'kumon_level_up_v1';
 const AVATARS = ['🚀','🦁','🐯','🦊','🐧','🦉','🐼','🦄','🐝','🦋','🐢','🐬'];
+
+/* === Tema único fixo ===
+   Emoji fixo: 🏖️
+   Só o orientador (admin) pode alterar nome e mensagem.
+*/
+const MISSION_THEME_DEFAULT = { emoji:'🏖️', name:'Missão de Férias', msg:'Sol, mar e Kumon: um pouquinho por dia e você aproveita as férias com a meta no bolso!' };
+
+let PLAN_THEME_DRAFT = null;   // rascunho do tema ao planejar a próxima meta (admin)
+let EDIT_THEME_DRAFT = null;   // rascunho do tema ao editar o aluno (admin)
+let PLAN_EDIT_ID = null;       // id da meta planejada que está sendo editada
+
+// Draft helpers (emoji fixo)
+const draftFromTheme = (t) => (t ? { emoji: t.emoji || MISSION_THEME_DEFAULT.emoji, name: t.name || '', message: t.message || '' } : { emoji: MISSION_THEME_DEFAULT.emoji, name: MISSION_THEME_DEFAULT.name, message: MISSION_THEME_DEFAULT.msg });
+
+let BULK_END_CONFIRM = null;  // data aguardando confirmação (fim da meta de todos)
+let PLAN_MODE_DRAFT = null;   // 'vacation' | 'normal' ao planejar a próxima meta
+let EDIT_MODE_DRAFT = null;   // 'vacation' | 'normal' ao editar o aluno
+const modeOfEntry = (e) => (e && e.mode) ? (e.mode==='normal' ? 'normal' : 'vacation') : (e && e.theme ? 'vacation' : 'normal');
+function renderModeSwitch(key, mode){
+  const opt = (m, ico, title, sub) => `<button type="button" class="mode-opt ${mode===m?'sel':''}" data-mode-switch="${key}:${m}" aria-pressed="${mode===m}"><span class="mo-ic">${ico}</span><b>${title}</b><small>${sub}</small></button>`;
+  return `<div class="mode-switch" role="group" aria-label="Modo da meta">
+    ${opt('vacation','🌴','Modo férias','Missão com tema para o aluno')}
+    ${opt('normal','📘','Modo normal','Meta comum, sem tema')}
+  </div>`;
+}
+function bindModeSwitch(key, setMode, boxId){
+  const btns = document.querySelectorAll(`[data-mode-switch^="${key}:"]`);
+  const box = document.getElementById(boxId);
+  btns.forEach(b=> b.onclick = ()=>{
+    const m = b.getAttribute('data-mode-switch').split(':')[1];
+    setMode(m);
+    btns.forEach(x=>{ const on = x===b; x.classList.toggle('sel', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    if(box) box.style.display = (m==='vacation') ? '' : 'none';
+  });
+}
+function renderThemeEditor(key, d){
+  // Editor simplificado: mostra emoji fixo e apenas campos de nome/mensagem para o orientador.
+  return `
+    <div class="field" style="text-align:center;">
+      <label>Emoji da missão</label>
+      <div style="font-size:42px; line-height:1; margin:8px 0 6px;">${esc(MISSION_THEME_DEFAULT.emoji)}</div>
+    </div>
+    <div class="field"><label>Nome da missão</label><input type="text" id="theme-${key}-name" maxlength="40" value="${esc(d.name||'')}"></div>
+    <div class="field"><label>Mensagem para o aluno</label><input type="text" id="theme-${key}-msg" maxlength="140" value="${esc(d.message||'')}"></div>`;
+}
+function bindThemeEditor(key, getDraft){
+  const d = getDraft();
+  const nameI = document.getElementById(`theme-${key}-name`);
+  if(!d || !nameI) return;
+  const msgI = document.getElementById(`theme-${key}-msg`);
+  nameI.oninput = ()=>{ d.name = nameI.value; };
+  msgI.oninput = ()=>{ d.message = msgI.value; };
+}
+
+/* ---------- storage/state ---------- */
 const STAGES = ['7A','6A','5A','4A','3A','2A','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
 
 let DATA = null;                 // { students:[...] }
 let SESSION = { role:null, studentId:null }; // role: 'student' | 'admin'
-let REPORT_MONTH = '';           // AAAA-MM do relatório mensal (vazio = mês atual)
 let HALL_TAB = 'sheets';         // aba ativa do Hall: sheets | streak | correction
-let ADMIN_VIEW = 'overview';     // overview | students | detail | add | evolution
-let STUDENT_VIEW = 'journey';    // journey | hall | profile
+let TB_MODAL = null;             // balanço do trimestre recém-encerrado, exibido para o orientador
+let HALL_PERIOD_MODE = 'month';
+let HALL_MONTH = '';
+let UNDO_TRIMESTER_CONFIRM = null;
+let ADMIN_VIEW = 'overview';
+let STUDENT_VIEW = 'journey';
 let SELECTED_STUDENT_ID = null;
 let SEARCH_TERM = '';
 let LOGIN_ERROR = '';
-let ADMIN_LOGIN_STAGE = false;   // showing passcode screen
+/* ===== MODO MANUTENÇÃO =====
+   true  = alunos veem o aviso de manutenção (o orientador continua entrando normalmente)
+   false = site normal para todos */
+const MAINTENANCE_MODE = true;
+const MAINTENANCE_TEXT = 'Estamos atualizando o site e cadastrando novas informações dos alunos. Volte em breve!';
+let ADMIN_LOGIN_STAGE = false;
 let TOAST = null;
-let CALENDAR_MONTH = null;       // {year, month}
+let CALENDAR_MONTH = null;
 let EDIT_LABELS_MODE = false;
-let EDIT_STUDENT_MODE = false;   // editando qualquer informação de um aluno
+let EDIT_STUDENT_MODE = false;
 let EDITING_FORGOT_INDEX = null;
 let DELETE_CONFIRM_ID = null;
-let PLAN_META_MODE = false;      // formulário de "planejar próxima meta" aberto
-let END_TRIMESTER_CONFIRM = null; // id do aluno aguardando confirmação de encerrar trimestre
-let AVAILABLE_BACKUPS = [];      // lista de backups automáticos carregada da tela de Backups
+let PLAN_META_MODE = false;
+let END_TRIMESTER_CONFIRM = null;
+let AVAILABLE_BACKUPS = [];
 let BACKUPS_LOADING = false;
-let PENDING_RESTORE = null;      // {source:'file'|'auto', label, data} aguardando confirmação
-let DATA_SOURCE = null;           // 'firebase' | 'local' | 'firebase_missing' | 'error'
+let PENDING_RESTORE = null;
+let DATA_SOURCE = null;
 let FIREBASE_LAST_ERROR = null;
-let SAVE_LAST_STATUS = null;      // 'firebase' | 'local' | 'failed'
+let SAVE_LAST_STATUS = null;
 let SAVE_FAILURE_PENDING = false;
 let THEME = 'dark';
 const THEME_STORAGE_KEY = 'minha-meta-theme';
+const VIEW_STORAGE_KEY = 'minha-meta-view';
+const VIEW_MODES = [['auto','🔄 Automático'],['phone','📱 Celular'],['tablet','📋 Tablet'],['desktop','💻 Computador']];
+let VIEW_MODE = 'auto';
 let ADMIN_LOGIN_ATTEMPTS = 0;
 let ADMIN_LOGIN_LOCK_UNTIL = 0;
 let ADMIN_LOGIN_LOCK_TIMER = null;
 let EDITING_WEEK_HISTORY_ID = null;
+
+/* ---------- Student proposal state (client-side UI) ---------- */
+let STUDENT_PROPOSAL_MODE = null; // id da meta planejada que o aluno está propondo (apenas enquanto edita a proposta)
 
 /* ---------- storage wrapper usando Firebase (com fallback para localStorage) ---------- */
 const storage = {
@@ -642,6 +900,19 @@ function loadTheme(){
     THEME = saved === 'light' ? 'light' : 'dark';
   }catch(e){ THEME = 'dark'; }
 }
+function loadViewMode(){
+  try{
+    const v = localStorage.getItem(VIEW_STORAGE_KEY);
+    VIEW_MODE = VIEW_MODES.some(m=>m[0]===v) ? v : 'auto';
+  }catch(e){ VIEW_MODE = 'auto'; }
+}
+function applyViewMode(){ document.body.setAttribute('data-view', VIEW_MODE); }
+function setViewMode(mode){
+  VIEW_MODE = VIEW_MODES.some(m=>m[0]===mode) ? mode : 'auto';
+  try{ localStorage.setItem(VIEW_STORAGE_KEY, VIEW_MODE); }catch(e){}
+  applyViewMode();
+  render();
+}
 function applyTheme(){
   document.body.classList.toggle('theme-light', THEME === 'light');
   document.body.setAttribute('data-theme', THEME);
@@ -656,7 +927,12 @@ function renderThemeToggle(){
   const nextTheme = THEME==='dark' ? 'light' : 'dark';
   const icon = THEME==='dark' ? '☀️' : '🌙';
   const label = THEME==='dark' ? 'Ativar modo claro' : 'Ativar modo escuro';
-  return `<button class="theme-toggle" data-theme-toggle="${nextTheme}" aria-label="${label}" title="${label}">${icon}</button>`;
+  return `<span class="tt-wrap">
+    <select class="view-select" data-view-select aria-label="Escolher visualização" title="Visualização">
+      ${VIEW_MODES.map(([id,name])=>`<option value="${id}" ${VIEW_MODE===id?'selected':''}>${name}</option>`).join('')}
+    </select>
+    <button class="theme-toggle" data-theme-toggle="${nextTheme}" aria-label="${label}" title="${label}">${icon}</button>
+  </span>`;
 }
 
 /* ---------- estrutura de estágios e blocos ---------- */
@@ -685,10 +961,6 @@ function buildBlocks(startStage, startSheet, targetStage, targetSheet){
   return { total, blocks };
 }
 function updateStudentTarget(student, newTargetStage, newTargetSheet, newTargetEnd){
-  // Recalcula a meta mantendo o progresso já feito: os blocos existentes não são
-  // tocados (status, datas, número personalizado, aviso de material esquecido
-  // continuam intactos). Só blocos do FINAL da trilha são adicionados ou removidos,
-  // conforme a meta cresce ou diminui.
   const startPoint = stagePoint(student.startStage, student.startSheet);
   const newTargetPoint = stagePoint(newTargetStage, newTargetSheet);
   const newDir = newTargetPoint >= startPoint ? 1 : -1;
@@ -710,18 +982,54 @@ function updateStudentTarget(student, newTargetStage, newTargetSheet, newTargetE
   student.targetEnd = newTargetEnd;
 }
 function archiveCurrentMeta(student){
-  // Guarda um retrato da meta que está sendo encerrada no histórico de trimestres.
   if(!student.metaHistory) student.metaHistory = [];
+  const undoSnapshot = JSON.parse(JSON.stringify(student));
   const s = stats(student);
-  student.metaHistory.push({
+  const reached = s.total>0 && s.done===s.total;
+  const periodStart = student.startDate, periodEnd = todayISO();
+  const entry = {
     id: uid(),
     startStage: student.startStage, startSheet: student.startSheet, startDate: student.startDate,
     targetStage: student.targetStage, targetSheet: student.targetSheet, targetEnd: student.targetEnd,
     status: 'completed',
     archivedAt: todayISO(),
-    blocksCompleted: s.corrected,
-    blocksTotal: s.total
-  });
+    archivedAtTime: new Date().toISOString(),
+    blocksCompleted: s.done,
+    blocksTotal: s.total,
+    reached,
+    balance: {
+      sheets: sheetsInRange(student, periodStart, periodEnd),
+      days: attendanceInRange(student, periodStart, periodEnd),
+      percent: s.percent
+    },
+    undoSnapshot
+  };
+  student.metaHistory.push(entry);
+  return entry;
+}
+async function undoTrimester(studentId, entryId){
+  const idx = DATA.students.findIndex(s=>s.id===studentId);
+  if(idx<0) return;
+  const entry = (DATA.students[idx].metaHistory || []).find(e=>e.id===entryId);
+  if(!entry || !entry.undoSnapshot){
+    UNDO_TRIMESTER_CONFIRM = null;
+    showToast('Não é possível desfazer esse encerramento (é de antes dessa opção existir).');
+    render();
+    return;
+  }
+  DATA.students[idx] = JSON.parse(JSON.stringify(entry.undoSnapshot));
+  TB_MODAL = null;
+  UNDO_TRIMESTER_CONFIRM = null;
+  EDIT_STUDENT_MODE = false;
+  const saved = await saveData();
+  if(saved && saved.ok && saved.source === 'firebase'){
+    showToast('Encerramento desfeito e salvo na nuvem.');
+  }else if(saved && saved.ok){
+    showToast('Encerramento desfeito neste dispositivo, mas não foi salvo no Firebase. Verifique a conexão antes de sair.');
+  }else{
+    showToast('Atenção: não foi possível confirmar o salvamento. Verifique o Firebase antes de sair.');
+  }
+  render();
 }
 function stats(student){
   const blocks = student.blocks;
@@ -731,7 +1039,7 @@ function stats(student){
   const pending = blocks.filter(b=>b.status==='pending_correction').length;
   const percent = total>0 ? Math.round((done/total)*100) : 0;
   const daysRemaining = daysBetween(todayISO(), student.targetEnd);
-  const goalReached = total>0 && corrected===total;
+  const goalReached = total>0 && done===total;
   const correctionRatio = done>0 ? corrected/done : 0;
   const sheetsCompleted = done*10;
   return { total, done, corrected, pending, percent, daysRemaining, goalReached, correctionRatio, sheetsCompleted };
@@ -744,14 +1052,45 @@ function weeklyDelta(student){
   return { thisWeek, lastWeek, delta: thisWeek-lastWeek };
 }
 function withCompetitionRank(sortedList, valueFn){
-  // Define a posição pelo valor (empate = mesma posição, 1°, 1°, 2°, 3°...), não pela linha da lista
-  // e sem pular posição depois de um empate.
   let rank=0, prevVal=null;
   return sortedList.map((item,idx)=>{
     const v = valueFn(item);
     if(prevVal===null || v!==prevVal){ rank += 1; prevVal = v; }
     return { item, rank, tied: false };
   }).map((row,idx,arr)=> ({ ...row, tied: arr.some((o,j)=> j!==idx && o.rank===row.rank) }));
+}
+function renderTbOverlay(data, closeBtnId, closeBtnExtraAttr){
+  const confettiHtml = data.reached ? `
+    <div class="confetti" aria-hidden="true">
+      ${['🎉','✨','🎊','⭐','🏆','🎉','✨','🎊','⭐','🏆','🎉','✨'].map((ic,i)=>`<span style="left:${(i*8.5+3)}%;animation-duration:${1.8+(i%4)*0.4}s;animation-delay:${(i%6)*0.3}s;">${ic}</span>`).join('')}
+    </div>` : '';
+  return `
+  <div class="tb-overlay" role="dialog" aria-modal="true" aria-label="Balanço do trimestre">
+    <div class="tb-card ${data.reached?'reached':''}">
+      ${confettiHtml}
+      ${data.reached ? `<span class="stars-row">🏆 ⭐ 🏆</span>` : `<span style="font-size:30px;display:block;margin-bottom:6px;">📊</span>`}
+      <div class="display" style="font-size:18px;font-weight:700;">${data.reached ? 'Meta batida! 🎉' : 'Trimestre encerrado'}</div>
+      <div class="row" style="justify-content:center;gap:8px;margin-top:8px;">
+        <span class="hall-avatar">${data.avatar}</span>
+        <span style="font-weight:600;font-size:14px;">${esc(data.name)}</span>
+      </div>
+      <div class="faint" style="font-size:11.5px;margin-top:4px;">${esc(data.stage)} · ${esc(data.periodLabel)}</div>
+      <div class="tb-stats">
+        <div class="tb-stat"><div class="n" style="color:var(--amber);">🔥 ${data.days}</div><div class="l">dias de constância</div></div>
+        <div class="tb-stat"><div class="n" style="color:var(--peri);">📄 ${data.sheets}</div><div class="l">folhas feitas</div></div>
+        <div class="tb-stat"><div class="n" style="color:var(--mint);">🎯 ${data.percent}%</div><div class="l">progresso da meta</div></div>
+      </div>
+      <button class="btn btn-primary btn-block" ${closeBtnId?`id="${closeBtnId}"`:''} ${closeBtnExtraAttr||''} style="margin-top:16px;">Entendi!</button>
+      ${data.allowUndo ? `<button class="btn btn-ghost btn-block btn-sm" data-undo-trimester-student="${data.studentId}" data-undo-trimester-id="${data.entryId}" style="margin-top:8px;">↩️ Desfazer encerramento</button>` : ''}
+    </div>
+  </div>`;
+}
+function getUnseenTrimesterBalance(student){
+  const completed = (student.metaHistory || []).filter(h=>h.status==='completed' && h.balance).sort((a,b)=> (b.archivedAtTime||b.archivedAt||'').localeCompare(a.archivedAtTime||a.archivedAt||''));
+  if(completed.length===0) return null;
+  const latest = completed[0];
+  if(student.lastSeenBalanceId === latest.id) return null;
+  return latest;
 }
 function hallRankMark(rank){
   const medals = {1:'🥇',2:'🥈',3:'🥉'};
@@ -937,8 +1276,6 @@ function cleanupExpiredForgottenReminders(){
   return changed;
 }
 function migrateAttendance(){
-  // Compatibilidade com dados salvos antes da marcação de 3 tipos (Kumon / presencial / teste):
-  // studyDays (array simples) vira attendance (mapa data -> tipo), tudo como 'kumon'.
   (DATA.students || []).forEach(student=>{
     if(!student.attendance){
       student.attendance = {};
@@ -947,8 +1284,6 @@ function migrateAttendance(){
   });
 }
 function migrateWeeklyHistory(){
-  // Compatibilidade com registros antigos {week, date, sheets} -> {startDate, endDate, sheets}.
-  // Cada registro também ganha um id estável e uma observação opcional em texto.
   (DATA.students || []).forEach(student=>{
     (student.weeklyHistory || []).forEach(h=>{
       if(!h.startDate || !h.endDate){
@@ -958,7 +1293,6 @@ function migrateWeeklyHistory(){
       }
       if(!h.id) h.id = uid();
       if(h.note === undefined || h.note === null) h.note = '';
-      // Registros antigos continuam numéricos para não quebrar os cálculos do app.
       if(typeof h.sheets === 'string' && h.sheets.trim() !== ''){
         const parsed = Number(h.sheets);
         if(Number.isFinite(parsed)) h.sheets = parsed;
@@ -1010,7 +1344,7 @@ function seedDemoData(){
     (testDays || []).forEach(d=>{ attendance[d] = 'teste'; });
     const metaHistory = [];
     if(pastMeta) metaHistory.push({ id: uid(), status:'completed', archivedAt: daysAgo(pastMeta.archivedDaysAgo), ...pastMeta.info });
-    if(plannedMeta) metaHistory.push({ id: uid(), status:'planned', plannedAt: daysAgo(3), ...plannedMeta });
+    if(plannedMeta) metaHistory.push({ id: uid(), status:'planned', plannedAt: daysAgo(3), targetStage:plannedMeta.targetStage, targetSheet:plannedMeta.targetSheet, targetEnd:plannedMeta.targetEnd, startStage: plannedMeta.startStage || undefined, startSheet: plannedMeta.startSheet || undefined, startDate: plannedMeta.startDate || undefined });
     return {
       id: uid(), code, name, avatar,
       startStage, startSheet:Number(startSheet), startDate,
@@ -1034,7 +1368,8 @@ function seedDemoData(){
       kumonDays:[...consecutiveDates(1,11), ...consecutiveDates(22,15)],
       presencialDays:[daysAgo(3), daysAgo(8)],
       testDays:[daysAgo(0)],
-      history:[ {startDate:daysAgo(34),endDate:daysAgo(28),sheets:32}, {startDate:daysAgo(27),endDate:daysAgo(21),sheets:38}, {startDate:daysAgo(20),endDate:daysAgo(14),sheets:41}, {startDate:daysAgo(13),endDate:daysAgo(7),sheets:35}, {startDate:daysAgo(7),endDate:daysAgo(1),sheets:42} ]
+      history:[ {startDate:daysAgo(34),endDate:daysAgo(28),sheets:32}, {startDate:daysAgo(27),endDate:daysAgo(21),sheets:38}, {startDate:daysAgo(20),endDate:daysAgo(14),sheets:41}, {startDate:daysAgo(13),endDate:daysAgo(7),sheets:35}, {startDate:daysAgo(7),endDate:daysAgo(1),sheets:42} ],
+      plannedMeta: { targetStage:'E', targetSheet:120, targetEnd: daysAhead(90), startStage:'C', startSheet:40, startDate: daysAhead(1) }
     }),
     buildStudent({
       name:'Ana', avatar:'🦋', code:'2222',
@@ -1076,6 +1411,7 @@ function render(){
   if(!DATA){ app.innerHTML = renderLoading(); return; }
   cleanupExpiredForgottenReminders();
 
+  if(MAINTENANCE_MODE && SESSION.role === 'student'){ SESSION = {role:null, studentId:null}; }
   let html = '';
   if(SESSION.role === 'student'){
     html = renderStudentApp();
@@ -1099,12 +1435,18 @@ function renderLanding(){
     <div style="position:absolute;top:18px;right:18px;">${renderThemeToggle()}</div>
     <div class="logo-mark">🚀</div>
     <div class="wordmark">MINHA <span>META</span></div>
+    ${MAINTENANCE_MODE ? `
+    <div class="maint-card" role="status">
+      <div class="maint-ic">🛠️</div>
+      <h2 class="maint-title">Site em manutenção</h2>
+      <p class="maint-text">${esc(MAINTENANCE_TEXT)}</p>
+    </div>` : `
     <p class="tagline">De onde eu comecei → onde estou → onde quero chegar.</p>
     <div class="code-box">
       <input id="student-code-input" class="code-input" inputmode="numeric" maxlength="6" placeholder="• • • •" autocomplete="off" aria-label="Código do aluno">
       <button class="btn btn-primary btn-block" id="btn-enter-code">Entrar</button>
       <div class="error-msg" id="login-error">${esc(LOGIN_ERROR)}</div>
-    </div>
+    </div>`}
     <button class="landing-link" id="btn-go-admin">Sou orientador</button>
   </div>`;
 }
@@ -1126,7 +1468,7 @@ function renderAdminLogin(){
 }
 
 /* =========================================================
-   ÁREA DO ALUNO (sem mudanças funcionais visíveis)
+   ÁREA DO ALUNO
    ========================================================= */
 
 function renderStudentApp(){
@@ -1136,6 +1478,8 @@ function renderStudentApp(){
   if(STUDENT_VIEW==='journey') body = renderJourney(student);
   else if(STUDENT_VIEW==='hall') body = renderHall(student);
   else body = renderStudentProfile(student);
+
+  const unseenBalance = getUnseenTrimesterBalance(student);
 
   return `
     <div class="top-header">
@@ -1150,6 +1494,13 @@ function renderStudentApp(){
     </div>
     ${body}
     ${renderStudentNav()}
+    ${unseenBalance ? renderTbOverlay({
+        name: student.name, avatar: student.avatar,
+        stage: `${unseenBalance.startStage}${unseenBalance.startSheet} → ${unseenBalance.targetStage}${unseenBalance.targetSheet}`,
+        periodLabel: `${fmtDate(unseenBalance.startDate)} – ${fmtDate(unseenBalance.archivedAt)}`,
+        days: unseenBalance.balance.days, sheets: unseenBalance.balance.sheets,
+        percent: unseenBalance.balance.percent, reached: unseenBalance.reached
+      }, null, `data-dismiss-balance="${unseenBalance.id}"`) : ''}
   `;
 }
 function renderStudentNav(){
@@ -1183,6 +1534,96 @@ function renderJourney(student){
       </div>` : ''}
 
     ${(() => {
+      const m = student.missionTheme;
+      if(!m) return '';
+      const today = todayISO();
+      const startsIn = student.startDate && student.startDate > today ? daysBetween(today, student.startDate) : 0;
+      const cstatus = startsIn>0 ? `Começa em ${startsIn} ${startsIn===1?'dia':'dias'}` : '';
+      return `
+      <div class="mission-card current" role="region" aria-label="Missão de férias em andamento">
+        ${startsIn===0 ? `<div class="mc-art" aria-hidden="false">
+          <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Praia ensolarada com coqueiro">
+            <defs>
+              <linearGradient id="mcSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4FB6F2"/><stop offset="1" stop-color="#CFF1FF"/></linearGradient>
+              <linearGradient id="mcSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#27A5DE"/><stop offset="1" stop-color="#6FD3F2"/></linearGradient>
+              <radialGradient id="mcGlow"><stop offset="0" stop-color="#FFE98A" stop-opacity=".9"/><stop offset="1" stop-color="#FFE98A" stop-opacity="0"/></radialGradient>
+            </defs>
+            <rect width="400" height="150" fill="url(#mcSky)"/>
+            <circle cx="330" cy="42" r="46" fill="url(#mcGlow)"/>
+            <g class="sun-rays" stroke="#FFD34D" stroke-width="3" stroke-linecap="round">
+              <line x1="330" y1="10" x2="330" y2="18"/><line x1="330" y1="66" x2="330" y2="74"/>
+              <line x1="298" y1="42" x2="306" y2="42"/><line x1="354" y1="42" x2="362" y2="42"/>
+              <line x1="307" y1="19" x2="313" y2="25"/><line x1="347" y1="59" x2="353" y2="65"/>
+              <line x1="353" y1="19" x2="347" y2="25"/><line x1="313" y1="59" x2="307" y2="65"/>
+            </g>
+            <circle cx="330" cy="42" r="19" fill="#FFD34D"/>
+            <g class="cloud" fill="#fff" opacity=".92"><ellipse cx="170" cy="34" rx="26" ry="9"/><ellipse cx="190" cy="28" rx="18" ry="9"/><ellipse cx="152" cy="30" rx="14" ry="7"/></g>
+            <g class="cloud" fill="#fff" opacity=".8" style="animation-duration:24s"><ellipse cx="250" cy="70" rx="20" ry="6"/><ellipse cx="264" cy="65" rx="12" ry="6"/></g>
+            <rect y="92" width="400" height="40" fill="url(#mcSea)"/>
+            <g class="wave1"><path d="M-200 100 q25 -9 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V112 H-200Z" fill="#fff" opacity=".35"/></g>
+            <g class="wave2"><path d="M-200 112 q25 -9 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V124 H-200Z" fill="#fff" opacity=".3"/></g>
+            <path d="M0 150 V124 Q90 108 200 122 T400 116 V150Z" fill="#F7D98F"/>
+            <path d="M0 150 V136 Q120 126 240 136 T400 132 V150Z" fill="#EBC574" opacity=".7"/>
+            <g class="palm">
+              <path d="M70 140 Q80 102 66 62" stroke="#8B5A2B" stroke-width="7" fill="none" stroke-linecap="round"/>
+              <g fill="#2FBF71"><path d="M66 62 Q40 28 6 54 Q40 44 66 62Z"/><path d="M66 62 Q52 22 24 20 Q50 34 66 62Z" fill="#23A862"/><path d="M66 62 Q84 24 114 30 Q86 40 66 62Z"/><path d="M66 62 Q100 44 126 72 Q96 60 66 62Z" fill="#23A862"/><path d="M66 62 Q64 34 70 12 Q78 38 66 62Z"/></g>
+              <circle cx="62" cy="66" r="4" fill="#7A4A1E"/><circle cx="71" cy="67" r="4" fill="#6A3F19"/>
+            </g>
+            <g transform="translate(250 126)"><path d="M0 14 L12 -2 L24 14Z" fill="#FF7A59"/><path d="M12 -2 V-12" stroke="#8B5A2B" stroke-width="2"/><path d="M12 -12 l12 4 l-12 4Z" fill="#FFD34D"/><rect x="-6" y="14" width="36" height="3" rx="1.5" fill="#fff" opacity=".7"/></g>
+            <g transform="translate(150 132)"><path d="M0 4 q8 -12 16 0 q-8 6 -16 0Z" fill="#FF8FA3"/><circle cx="8" cy="3" r="2" fill="#fff"/></g>
+          </svg>
+          <div class="mc-art-cap">Boas férias! Bora cumprir a meta 🌴</div>
+        </div>` : ''}
+        <div class="mc-head">
+          <span class="mc-emoji" aria-hidden="true">${esc(MISSION_THEME_DEFAULT.emoji)}</span>
+          <div class="mc-head-text">
+            <div class="m-tag">Modo férias · em andamento</div>
+            <div class="m-name">${esc(m.name || 'Missão de Férias')}</div>
+            ${cstatus ? `<span class="mc-chip">⏳ ${cstatus}</span>` : ''}
+          </div>
+        </div>
+        ${m.message ? `<div class="m-msg">${esc(m.message)}</div>` : ''}
+      </div>`;
+    })()}
+
+    ${(() => {
+      const nx = (student.metaHistory||[]).find(e=>e.status==='planned');
+      if(!nx) return '';
+      const today = todayISO();
+      const startsIn = nx.startDate && nx.startDate > today ? daysBetween(today, nx.startDate) : 0;
+      const left = nx.targetEnd ? daysBetween(today, nx.targetEnd) : null;
+      const status = startsIn>0 ? `Começa em ${startsIn} ${startsIn===1?'dia':'dias'}` : (left===null ? '' : (left>=0 ? `Faltam ${left} ${left===1?'dia':'dias'}` : 'Prazo finalizado'));
+      const isVac = modeOfEntry(nx) === 'vacation';
+      const mName = isVac ? ((nx.theme && nx.theme.name) || 'Missão de Férias') : 'Nova meta';
+      const mMsg = isVac ? ((nx.theme && nx.theme.message) || nx.message || MISSION_THEME_DEFAULT.msg) : 'Seu orientador planejou o próximo passo da sua evolução. Veja o caminho que vem por aí!';
+      const route = nx.startStage
+        ? `<div class="mc-route">
+             <div class="mc-point"><span class="mc-lbl">Ponto de partida</span><span class="mc-val">${esc(nx.startStage)}${esc(nx.startSheet)}</span></div>
+             <span class="mc-arrow" aria-hidden="true">➜</span>
+             <div class="mc-point goal"><span class="mc-lbl">Meta</span><span class="mc-val">${esc(nx.targetStage)}${esc(nx.targetSheet)}</span></div>
+           </div>`
+        : `<div class="mc-route"><div class="mc-point goal"><span class="mc-lbl">Meta</span><span class="mc-val">${esc(nx.targetStage)}${esc(nx.targetSheet)}</span></div></div>`;
+      const dates = `<div class="mc-dates">
+          ${nx.startDate ? `<div><span class="mc-lbl">Início</span><b>${fmtDate(nx.startDate)}</b></div><div class="mc-line"></div>` : ''}
+          <div><span class="mc-lbl">${nx.startDate ? 'Fim' : 'Prazo final'}</span><b>${fmtDate(nx.targetEnd)}</b></div>
+        </div>`;
+      return `
+      <div class="mission-card upcoming" role="region" aria-label="${isVac ? 'Próxima missão' : 'Próxima meta'}">
+        <div class="mc-head">
+          <span class="mc-emoji" aria-hidden="true">${isVac ? esc(MISSION_THEME_DEFAULT.emoji) : '🎯'}</span>
+          <div class="mc-head-text">
+            <div class="m-tag">${isVac ? 'Próxima missão' : 'Próxima meta'}</div>
+            <div class="m-name">${esc(mName)}</div>
+            ${status ? `<span class="mc-chip">⏳ ${status}</span>` : ''}
+          </div>
+        </div>
+        <div class="m-msg">${esc(mMsg)}</div>
+        ${route}
+        ${dates}
+      </div>`;
+    })()}
+
+    ${(() => {
       const forgottenBlocks = student.blocks.filter(b=>b.forgotten);
       if(forgottenBlocks.length===0) return '';
       return `
@@ -1198,36 +1639,52 @@ function renderJourney(student){
       </div>`;
     })()}
 
-    <div class="card">
-      <div class="row">
-        <div>
-          <div class="eyebrow">📍 Ponto de partida</div>
-          <div class="display" style="font-size:22px;font-weight:700;">${esc(student.startStage)}${esc(student.startSheet)}</div>
+    ${(() => {
+      const st = student.targetStart || student.startDate || '';
+      const en = student.targetEnd || '';
+      const today = todayISO();
+      const total = (st && en) ? Math.max(daysBetween(st, en), 1) : 0;
+      const elapsed = total ? clamp(daysBetween(st, today), 0, total) : 0;
+      const timePct = total ? Math.round(elapsed/total*100) : 0;
+      const notStarted = !!(st && st > today);
+      const startsIn = notStarted ? daysBetween(today, st) : 0;
+      const rem = Math.max(s.daysRemaining, 0);
+      const big = notStarted ? startsIn : rem;
+      const unit = notStarted ? (startsIn===1 ? 'dia para começar' : 'dias para começar') : (rem===1 ? 'dia restante' : 'dias restantes');
+      return `
+    <div class="card jc">
+      <div class="jc-route">
+        <div class="jc-point">
+          <span class="jc-lbl">📍 Ponto de partida</span>
+          <span class="jc-val">${esc(student.startStage)}${esc(student.startSheet)}</span>
         </div>
-        <div style="text-align:right;">
-          <div class="eyebrow" style="justify-content:flex-end;">🎯 Sua meta</div>
-          <div class="display" style="font-size:22px;font-weight:700;color:var(--mint);">${esc(student.targetStage)}${esc(student.targetSheet)}</div>
+        <span class="jc-arrow" aria-hidden="true">➜</span>
+        <div class="jc-point goal">
+          <span class="jc-lbl">🎯 Sua meta</span>
+          <span class="jc-val">${esc(student.targetStage)}${esc(student.targetSheet)}</span>
         </div>
       </div>
-      <div class="divider"></div>
-      <div class="row">
-        <span class="pill">🗓 ${fmtDate(student.targetStart)} → ${fmtDate(student.targetEnd)}</span>
-        <span class="pill" style="color:var(--peri);border-color:#8C93FF44;">⏰ ${s.daysRemaining>=0?s.daysRemaining:0} dias restantes</span>
+      <div class="jc-time">
+        <div class="jc-dates">
+          <div><span class="jc-lbl">Início</span><b>${st ? fmtDate(st) : '—'}</b></div>
+          <div class="jc-count"><b>${big}</b><small>${unit}</small></div>
+          <div class="jc-end"><span class="jc-lbl">Fim</span><b>${en ? fmtDate(en) : '—'}</b></div>
+        </div>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="row" style="margin-bottom:10px;">
-        <span class="eyebrow" style="margin:0;">📈 Progresso da meta</span>
-        <span class="progress-pct">${s.percent}%</span>
+      <div class="jc-prog">
+        <div class="jc-prog-head">
+          <span class="jc-lbl" style="font-size:10.5px;">📈 Progresso da meta</span>
+          <span class="jc-pct">${s.percent}%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${s.percent}%;"></div></div>
+        <div class="jc-stats">
+          <div class="jc-stat"><b>${s.done}/${s.total}</b><small>blocos</small></div>
+          <div class="jc-stat"><b>📄 ~${s.sheetsCompleted}</b><small>folhas</small></div>
+          <div class="jc-stat"><b>🟡 ${s.pending}</b><small>${s.pending===1?'pendente':'pendentes'}</small></div>
+        </div>
       </div>
-      <div class="progress-track"><div class="progress-fill" style="width:${s.percent}%;"></div></div>
-      <div class="row" style="margin-top:12px;">
-        <span class="muted" style="font-size:12.5px;">🟢 ${s.done}/${s.total} blocos</span>
-        <span class="muted" style="font-size:12.5px;">📄 ~${s.sheetsCompleted} folhas</span>
-        <span class="muted" style="font-size:12.5px;">🟡 ${s.pending} pendente${s.pending===1?'':'s'}</span>
-      </div>
-    </div>
+    </div>`;
+    })()}
 
     <div class="section-title">Trilha de evolução</div>
     <div class="card" style="padding-top:8px;">
@@ -1236,7 +1693,7 @@ function renderJourney(student){
 
     <div class="section-title">🍬 Prêmios</div>
     <div class="card">
-      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">A cada 3 blocos corrigidos 🟢 você ganha um doce — um bombom ou um Fini!</p>
+      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">3 blocos corrigidos, você ganha um doce.</p>
       ${renderRewardDots(student)}
       <div class="row">
         <span class="badge badge-peri">🍬 ${rw.earned} conquistado${rw.earned===1?'':'s'}</span>
@@ -1248,51 +1705,35 @@ function renderJourney(student){
       }).join('')}</div>` : ''}
     </div>
 
-    <div class="section-title">📚 Meu ritmo</div>
+    <div class="section-title">📅 Histórico mensal</div>
     <div class="card">
-      <div class="ritmo-cols">
-        <div class="ritmo-col">
-          <div class="ritmo-num">${wd.thisWeek}</div>
-          <div class="ritmo-label">Esta semana</div>
-        </div>
-        <div class="ritmo-col">
-          <div class="ritmo-num">${wd.lastWeek}</div>
-          <div class="ritmo-label">Semana passada</div>
-        </div>
-      </div>
-      <div class="center ritmo-delta" style="color:${deltaColor};">${deltaIcon} ${deltaSign}${wd.delta} folhas</div>
+      ${renderCalendar(student, true)}
     </div>
   </div>`;
 }
 
 function renderTrail(student){
-  const blocks = student.blocks;
-  const total = blocks.length;
+  const blocks = student.blocks || [];
+  if(blocks.length===0) return `<p class="muted" style="font-size:12.5px;margin:6px 0;">Os blocos da sua meta vão aparecer aqui.</p>`;
   const done = blocks.filter(b=>b.status!=='not_done').length;
-  const fillPct = total>0 ? clamp((done-1)/Math.max(total-1,1)*100,0,100) : 0;
-  const currentIndex = Math.max(0, done-1);
-
-  const nodes = blocks.map((b,i)=>{
-    let cls='trail-node';
-    if(b.status==='corrected'){ cls+=' done-corrected'; }
-    else if(b.status==='pending_correction'){ cls+=' done-pending'; }
-    if(i===currentIndex && b.status!=='not_done') cls+=' current';
-    return `<div class="${cls}" title="Bloco ${esc(b.label)}"></div>`;
+  const nextIdx = blocks.findIndex(b=>b.status==='not_done');
+  const chips = blocks.map((b,i)=>{
+    let cls='tr-chip';
+    if(b.status==='corrected'){ cls+=' ok'; }
+    else if(b.status==='pending_correction'){ cls+=' wait'; }
+    if(i===nextIdx) cls+=' next';
+    return `<div class="${cls}" title="Bloco ${esc(b.label)}"><span class="tr-num">${esc(b.label)}</span></div>`;
   }).join('');
-
   return `
-  <div class="trail-wrap">
-    <div class="trail-track" aria-hidden="true">
-      <div class="trail-marker"><div class="cap">📍</div></div>
-      <div style="position:relative;flex-shrink:0;display:flex;align-items:center;">
-        <div class="trail-line" style="left:0;right:0;"><div class="trail-line-fill" style="width:${fillPct}%;"></div></div>
-        ${nodes}
-      </div>
-      <div class="trail-marker"><div class="cap" style="background:var(--mint-dim);border-color:#37E2A066;">🎯</div></div>
-    </div>
+  <div class="tr-head">
+    <span class="muted" style="font-size:12.5px;">${done} de ${blocks.length} blocos feitos</span>
+    ${nextIdx>=0 ? `<span class="tr-nextlbl">Próximo: <b>${esc(blocks[nextIdx].label)}</b></span>` : `<span class="tr-nextlbl">🎉 Todos feitos!</span>`}
   </div>
-  <div class="row" style="padding:0 4px;">
-    <span class="faint" style="font-size:11px;">🟢 feito + corrigido &nbsp; 🟡 aguardando correção &nbsp; ⚪ a fazer</span>
+  <div class="tr-grid">${chips}</div>
+  <div class="tr-legend">
+    <span><i class="lg ok"></i>corrigido</span>
+    <span><i class="lg wait"></i>aguardando correção</span>
+    <span><i class="lg"></i>a fazer</span>
   </div>`;
 }
 
@@ -1350,12 +1791,10 @@ function renderHall(student){
 }
 
 function monthlyAttendanceHistory(student){
-  // Agrupa o mapa de presença (attendance) por mês, retornando o histórico completo
-  // (todos os meses que tiverem pelo menos um dia marcado), do mais recente ao mais antigo.
   const attendance = student.attendance || {};
   const monthMap = {};
   Object.keys(attendance).forEach(d=>{
-    const ym = d.slice(0,7); // "YYYY-MM"
+    const ym = d.slice(0,7);
     if(!monthMap[ym]) monthMap[ym] = { kumon:0, presencial:0, teste:0 };
     const type = attendance[d];
     if(monthMap[ym][type]!==undefined) monthMap[ym][type]++;
@@ -1415,18 +1854,22 @@ function renderMonthlyHistoryAdmin(student){
 
 function renderMetaHistoryRows(student, forAdmin){
   const planned = (student.metaHistory||[]).filter(e=>e.status==='planned');
-  const completed = (student.metaHistory||[]).filter(e=>e.status==='completed').sort((a,b)=> (b.archivedAt||'').localeCompare(a.archivedAt||''));
+  const completed = (student.metaHistory||[]).filter(e=>e.status==='completed').sort((a,b)=> (b.archivedAtTime||b.archivedAt||'').localeCompare(a.archivedAtTime||a.archivedAt||''));
 
   const rows = [];
-  planned.forEach(e=>{
+  (forAdmin ? planned : []).forEach(e=>{
+    const th = e.theme || null;
+    const from = e.startStage ? `${esc(e.startStage)}${esc(e.startSheet)} → ` : '';
+    const studentRespHtml = '';
     rows.push(`
-      <div class="meta-row">
-        <span class="meta-badge planned">Planejada</span>
-        <div class="meta-range">
-          <div>${esc(e.targetStage)}${esc(e.targetSheet)}</div>
-          <div class="meta-extra">até ${fmtDate(e.targetEnd)}</div>
+      <div class="plan-card">
+        <div class="plan-top">
+          <span class="meta-badge planned">${modeOfEntry(e)==='vacation' ? '🌴 Modo férias' : '📘 Modo normal'} · Planejada</span>
+          ${forAdmin ? `<div class="plan-actions"><button class="btn btn-ghost btn-sm" data-edit-planned="${e.id}">Editar</button><button class="btn btn-ghost btn-sm" data-remove-planned="${e.id}">Remover</button></div>` : ''}
         </div>
-        ${forAdmin ? `<button class="btn btn-ghost btn-sm" data-remove-planned="${e.id}">Remover</button>` : ''}
+        <div class="plan-route">${e.startStage ? `<span>${esc(e.startStage)}${esc(e.startSheet)}</span><span class="arr">➜</span>` : ''}<span class="goal">${esc(e.targetStage)}${esc(e.targetSheet)}</span></div>
+        <div class="plan-dates">${e.startDate ? `${fmtDate(e.startDate)} até ` : 'até '}${fmtDate(e.targetEnd)}${e.theme && e.theme.name ? ' · '+esc(e.theme.name) : ''}</div>
+        ${studentRespHtml}
       </div>`);
   });
 
@@ -1439,15 +1882,31 @@ function renderMetaHistoryRows(student, forAdmin){
       </div>
     </div>`);
 
-  completed.forEach(e=>{
-    const pct = e.blocksTotal>0 ? Math.round((e.blocksCompleted/e.blocksTotal)*100) : 0;
+  completed.forEach((e,i)=>{
+    const pct = e.balance ? e.balance.percent : (e.blocksTotal>0 ? Math.round((e.blocksCompleted/e.blocksTotal)*100) : 0);
+    const reached = e.reached !== undefined ? e.reached : e.blocksCompleted===e.blocksTotal;
+    const canUndo = forAdmin && i===0 && !!e.undoSnapshot;
+    const askingUndo = canUndo && UNDO_TRIMESTER_CONFIRM && UNDO_TRIMESTER_CONFIRM.studentId===student.id && UNDO_TRIMESTER_CONFIRM.entryId===e.id;
     rows.push(`
-      <div class="meta-row">
-        <span class="meta-badge completed">Concluída</span>
-        <div class="meta-range">
-          <div>${esc(e.startStage)}${esc(e.startSheet)} → ${esc(e.targetStage)}${esc(e.targetSheet)}</div>
-          <div class="meta-extra">${pct}% concluído · encerrada em ${fmtDate(e.archivedAt)}</div>
+      <div class="meta-row" style="${askingUndo?'flex-direction:column;align-items:stretch;':''}">
+        <div class="row" style="width:100%;">
+          <span class="meta-badge completed">${reached ? '🎯 Meta batida' : 'Encerrada'}</span>
+          <div class="meta-range">
+            <div>${esc(e.startStage)}${esc(e.startSheet)} → ${esc(e.targetStage)}${esc(e.targetSheet)}</div>
+            <div class="meta-extra">${pct}% da meta · encerrada em ${fmtDate(e.archivedAt)}</div>
+            ${e.balance ? `<div class="meta-extra" style="margin-top:3px;">🔥 ${e.balance.days} ${e.balance.days===1?'dia':'dias'} de constância · 📄 ${e.balance.sheets} ${e.balance.sheets===1?'folha':'folhas'}</div>` : ''}
+          </div>
+          ${canUndo && !askingUndo ? `<button class="btn btn-ghost btn-sm" style="flex-shrink:0;" data-ask-undo-trimester-student="${student.id}" data-ask-undo-trimester-id="${e.id}">↩️ Desfazer</button>` : ''}
         </div>
+        ${askingUndo ? `
+          <p class="faint" style="font-size:11px;margin:10px 0 8px;">
+            Isso restaura o aluno exatamente como estava antes desse encerramento — meta, blocos e histórico voltam ao que eram.
+            <b>Folhas, presenças e blocos registrados depois do encerramento serão perdidos.</b> Não dá pra desfazer de novo depois.
+          </p>
+          <div class="field-row">
+            <button class="btn btn-ghost btn-block btn-sm" id="btn-cancel-undo-trimester">Cancelar</button>
+            <button class="btn btn-danger btn-block btn-sm" id="btn-confirm-undo-trimester">Confirmar, desfazer</button>
+          </div>` : ''}
       </div>`);
   });
 
@@ -1455,6 +1914,11 @@ function renderMetaHistoryRows(student, forAdmin){
 }
 
 function renderTrimesterSectionAdmin(student){
+  const editing = PLAN_EDIT_ID ? (student.metaHistory||[]).find(e=>e.id===PLAN_EDIT_ID && e.status==='planned') : null;
+  if(PLAN_META_MODE && !PLAN_THEME_DRAFT) PLAN_THEME_DRAFT = draftFromTheme(editing && editing.theme);
+  if(PLAN_META_MODE && !PLAN_MODE_DRAFT) PLAN_MODE_DRAFT = editing ? modeOfEntry(editing) : 'vacation';
+  const pv = editing || {};
+  const defStartDate = student.targetEnd && student.targetEnd>=todayISO() ? student.targetEnd : todayISO();
   return `
     <div class="section-title">📜 Trimestres</div>
     <div class="card">
@@ -1462,14 +1926,37 @@ function renderTrimesterSectionAdmin(student){
 
       ${PLAN_META_MODE ? `
         <div class="forgot-editor" style="background:var(--peri-dim);border-color:#8C93FF55;margin-top:10px;">
-          <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:8px;">Planejar meta do próximo trimestre</label>
+          <label style="display:block;font-size:13px;color:var(--text);font-weight:700;margin-bottom:4px;">${editing ? '✏️ Editar a próxima meta' : '🎯 Planejar a próxima meta'}</label>
+          <p class="faint" style="font-size:11px;margin:0 0 12px;">O aluno verá esta meta como "Próxima missão" (modo férias) ou "Próxima meta" (modo normal). A ativação (transformar em meta atual) continua sendo sua decisão ao encerrar o trimestre.</p>
+
+          <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;">Ponto de partida</label>
           <div class="field-row">
-            <div class="field"><label>Estágio</label>
-              <select id="f-plan-stage">${STAGES.map(st=>`<option value="${st}" ${st===student.targetStage?'selected':''}>${st}</option>`).join('')}</select>
+            <div class="field">
+              <select id="f-plan-start-stage">${STAGES.map(st=>`<option value="${st}" ${st===(pv.startStage||student.targetStage)?'selected':''}>${st}</option>`).join('')}</select>
             </div>
-            <div class="field"><label>Folha final (0–200)</label><input type="number" id="f-plan-sheet" placeholder="Ex: 100"></div>
+            <div class="field"><input type="number" id="f-plan-start-sheet" min="0" max="200" value="${esc(pv.startSheet!==undefined ? pv.startSheet : student.targetSheet)}" placeholder="Folha"></div>
           </div>
-          <div class="field"><label>Data prevista</label><input type="date" id="f-plan-date"></div>
+
+          <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;">Meta (onde quer chegar)</label>
+          <div class="field-row">
+            <div class="field">
+              <select id="f-plan-stage">${STAGES.map(st=>`<option value="${st}" ${st===(pv.targetStage||student.targetStage)?'selected':''}>${st}</option>`).join('')}</select>
+            </div>
+            <div class="field"><input type="number" id="f-plan-sheet" min="0" max="200" value="${esc(pv.targetSheet!==undefined ? pv.targetSheet : '')}" placeholder="Folha final (0–200)"></div>
+          </div>
+
+          <div class="field-row">
+            <div class="field"><label>Data inicial</label><input type="date" id="f-plan-start-date" value="${esc(pv.startDate || defStartDate)}"></div>
+            <div class="field"><label>Data final</label><input type="date" id="f-plan-date" value="${esc(pv.targetEnd || '')}"></div>
+          </div>
+
+          <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;">Modo da meta</label>
+          ${renderModeSwitch('plan', PLAN_MODE_DRAFT)}
+          <div id="plan-theme-box" style="${PLAN_MODE_DRAFT==='vacation' ? '' : 'display:none;'}">
+            <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;">Tema da aventura</label>
+            ${renderThemeEditor('plan', PLAN_THEME_DRAFT)}
+          </div>
+
           <div class="error-msg" id="plan-meta-error"></div>
           <div class="field-row">
             <button class="btn btn-ghost btn-block btn-sm" id="btn-cancel-plan">Cancelar</button>
@@ -1494,11 +1981,54 @@ function renderTrimesterSectionAdmin(student){
 }
 
 function renderTrimesterSectionStudent(student){
+  const cur = stats(student);
+  const completed = (student.metaHistory||[]).filter(e=>e.status==='completed')
+    .sort((x,y)=> (y.archivedAtTime||y.archivedAt||'').localeCompare(x.archivedAtTime||x.archivedAt||''));
+  const planned = (student.metaHistory||[]).find(e=>e.status==='planned');
+  const route = (a1,a2,b1,b2)=> `<span class="tl-route">${a1?`${esc(a1)}${esc(a2)}<i>➜</i>`:''}<b>${esc(b1)}${esc(b2)}</b></span>`;
+
+  const items = [];
+  items.push(`
+    <div class="tl-item current">
+      <span class="tl-dot"></span>
+      <div class="tl-card">
+        <div class="tl-top"><span class="tl-badge now">Atual</span><span class="tl-pct">${cur.percent}%</span></div>
+        ${route(student.startStage, student.startSheet, student.targetStage, student.targetSheet)}
+        <div class="tl-dates">${student.startDate ? fmtDate(student.startDate)+' → ' : 'até '}${fmtDate(student.targetEnd)}</div>
+        <div class="progress-track" style="height:8px;margin-top:10px;"><div class="progress-fill" style="width:${cur.percent}%;"></div></div>
+      </div>
+    </div>`);
+
+  if(planned){
+    items.unshift(`
+    <div class="tl-item next">
+      <span class="tl-dot"></span>
+      <div class="tl-card">
+        <div class="tl-top"><span class="tl-badge soon">${modeOfEntry(planned)==='vacation' ? '🌴 Próxima' : 'Próxima'}</span></div>
+        ${route(planned.startStage, planned.startSheet, planned.targetStage, planned.targetSheet)}
+        <div class="tl-dates">${planned.startDate ? fmtDate(planned.startDate)+' → ' : 'até '}${fmtDate(planned.targetEnd)}</div>
+      </div>
+    </div>`);
+  }
+
+  completed.forEach(e=>{
+    const pct = e.balance ? e.balance.percent : (e.blocksTotal>0 ? Math.round((e.blocksCompleted/e.blocksTotal)*100) : 0);
+    const reached = e.reached !== undefined ? e.reached : e.blocksCompleted===e.blocksTotal;
+    items.push(`
+    <div class="tl-item done ${reached?'reached':''}">
+      <span class="tl-dot">${reached?'🎯':''}</span>
+      <div class="tl-card">
+        <div class="tl-top"><span class="tl-badge ${reached?'win':'end'}">${reached?'🎯 Meta batida':'Encerrada'}</span><span class="tl-pct">${pct}%</span></div>
+        ${route(e.startStage, e.startSheet, e.targetStage, e.targetSheet)}
+        <div class="tl-dates">${e.startDate ? fmtDate(e.startDate)+' → ' : 'até '}${fmtDate(e.archivedAt)}</div>
+        ${e.balance ? `<div class="tl-chips"><span>🔥 ${e.balance.days} ${e.balance.days===1?'dia':'dias'}</span><span>📄 ${e.balance.sheets} ${e.balance.sheets===1?'folha':'folhas'}</span></div>` : ''}
+      </div>
+    </div>`);
+  });
+
   return `
     <div class="section-title">📜 Trimestres</div>
-    <div class="card">
-      ${renderMetaHistoryRows(student, false)}
-    </div>`;
+    <div class="card"><div class="tl">${items.join('')}</div></div>`;
 }
 
 function renderWeeklyHistoryStudent(student){
@@ -1563,8 +2093,6 @@ function renderStudentProfile(student){
       <div class="stat-card"><div class="stat-num">${streak.total}</div><div class="stat-label">Dias de constância</div></div>
     </div>
 
-    ${renderMonthComparisonSimple(student)}
-
     ${renderWeeklyHistoryStudent(student)}
 
     ${renderTrimesterSectionStudent(student)}
@@ -1584,7 +2112,7 @@ function renderStudentProfile(student){
 }
 
 /* =========================================================
-   ÁREA DO ORIENTADOR (sem mudanças significativas)
+   ÁREA DO ORIENTADOR
    ========================================================= */
 
 function renderAdminApp(){
@@ -1595,7 +2123,6 @@ function renderAdminApp(){
   else if(ADMIN_VIEW==='add') body = renderAdminAdd();
   else if(ADMIN_VIEW==='evolution') body = renderAdminEvolution();
   else if(ADMIN_VIEW==='hall') body = renderAdminHall();
-  else if(ADMIN_VIEW==='report') body = renderAdminReport();
   else if(ADMIN_VIEW==='trimbalance') body = renderAdminTrimesterBalance();
   else if(ADMIN_VIEW==='backup') body = renderAdminBackup();
   else if(ADMIN_VIEW==='profile') body = renderAdminProfile();
@@ -1614,6 +2141,7 @@ function renderAdminApp(){
     </div>
     ${body}
     ${ADMIN_VIEW==='profile' ? '' : renderAdminNav()}
+    ${TB_MODAL ? renderTbOverlay(TB_MODAL, 'btn-close-tb-modal') : ''}
   `;
 }
 function renderAdminProfile(){
@@ -1624,6 +2152,23 @@ function renderAdminProfile(){
         <div class="avatar-circle" style="width:64px;height:64px;font-size:30px;margin:0 auto 10px;">🧑‍🏫</div>
         <div class="display" style="font-size:19px;font-weight:700;">Perfil do Orientador</div>
         <div class="faint" style="font-size:12px;margin-top:5px;">${esc(email)}</div>
+      </div>
+
+      <div class="section-title">📅 Fim da meta de todos os alunos</div>
+      <div class="card">
+        <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Define a mesma data final da meta atual para todos os ${DATA.students.length} alunos cadastrados. O material didático e o progresso não são alterados.</p>
+        <div class="field">
+          <label>Nova data de fim</label>
+          <input type="date" id="f-bulk-end" value="${esc(BULK_END_CONFIRM || '')}">
+        </div>
+        <div class="error-msg" id="bulk-end-error"></div>
+        ${BULK_END_CONFIRM ? `
+          <p style="font-size:13px;margin:10px 0;">Alterar o fim da meta de <b>${DATA.students.length} ${DATA.students.length===1?'aluno':'alunos'}</b> para <b>${fmtDate(BULK_END_CONFIRM)}</b>?</p>
+          <div class="field-row">
+            <button class="btn btn-ghost btn-block btn-sm" id="btn-bulk-cancel">Cancelar</button>
+            <button class="btn btn-primary btn-block btn-sm" id="btn-bulk-confirm">Confirmar</button>
+          </div>` : `
+          <button class="btn btn-primary btn-block btn-sm" id="btn-bulk-end" ${DATA.students.length===0?'disabled':''}>Aplicar a todos os alunos</button>`}
       </div>
 
       <button class="btn btn-ghost btn-block" id="btn-admin-profile-back">← Voltar ao painel</button>
@@ -1639,7 +2184,6 @@ function renderAdminNav(){
   </div>`;
 }
 function sheetsInRange(student, rangeStart, rangeEnd){
-  // Folhas feitas em [rangeStart, rangeEnd]. Períodos que cruzam a borda são divididos pelos dias de cada lado.
   let total = 0;
   (student.weeklyHistory || []).forEach(h=>{
     const a = h.startDate || h.endDate, b = h.endDate || h.startDate;
@@ -1651,7 +2195,6 @@ function sheetsInRange(student, rangeStart, rangeEnd){
   return Math.round(total);
 }
 function monthSheets(student, ym){
-  // Folhas feitas no mês (AAAA-MM).
   const [y,m] = ym.split('-').map(Number);
   const mStart = ym+'-01';
   const mEnd = ym+'-'+String(new Date(y, m, 0).getDate()).padStart(2,'0');
@@ -1660,22 +2203,51 @@ function monthSheets(student, ym){
 function correctedInRange(student, rangeStart, rangeEnd){
   return student.blocks.filter(b=> b.correctedDate && b.correctedDate>=rangeStart && b.correctedDate<=rangeEnd).length;
 }
+// Correções do Hall: soma as da meta atual + as de metas já encerradas (que ficam guardadas no histórico),
+// para o mês/trimestre não "perder" correções depois que o trimestre é encerrado.
+function hallCorrectedInRange(student, rangeStart, rangeEnd){
+  const inRange = b => b.correctedDate && b.correctedDate>=rangeStart && b.correctedDate<=rangeEnd;
+  let n = (student.blocks || []).filter(inRange).length;
+  (student.metaHistory || []).forEach(h=>{
+    if(h.status==='completed' && h.undoSnapshot && Array.isArray(h.undoSnapshot.blocks)){
+      n += h.undoSnapshot.blocks.filter(inRange).length;
+    }
+  });
+  return n;
+}
 function attendanceInRange(student, rangeStart, rangeEnd){
   return Object.keys(student.attendance || {}).filter(d=> d>=rangeStart && d<=rangeEnd).length;
 }
 function metasConcluidasInRange(student, rangeStart, rangeEnd){
-  return (student.metaHistory || []).filter(h=> h.status==='completed' && h.archivedAt && h.archivedAt>=rangeStart && h.archivedAt<=rangeEnd);
+  return (student.metaHistory || []).filter(h=>
+    h.status==='completed' && h.archivedAt && h.archivedAt>=rangeStart && h.archivedAt<=rangeEnd &&
+    (h.reached !== undefined ? h.reached : h.blocksCompleted===h.blocksTotal)
+  );
+}
+function hallFolhasRange(){
+  if(HALL_PERIOD_MODE==='trimester'){
+    const t = DATA.currentTrimester || {};
+    if(!t.startDate || !t.endDate) return null;
+    return { start: t.startDate, end: t.endDate, label: `${fmtDate(t.startDate)} – ${fmtDate(t.endDate)}` };
+  }
+  const ym = HALL_MONTH || todayISO().slice(0,7);
+  const [y,m] = ym.split('-').map(Number);
+  const mStart = ym+'-01';
+  const mEnd = ym+'-'+String(new Date(y, m, 0).getDate()).padStart(2,'0');
+  const monthLabel = new Date(y, m-1, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+  return { start: mStart, end: mEnd, label: monthLabel, ym };
 }
 function renderSheetsRanking(){
-  const ym = todayISO().slice(0,7);
-  const [y,m] = ym.split('-').map(Number);
-  const monthLabel = new Date(y, m-1, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+  const range = hallFolhasRange();
+  if(!range){
+    return `<p class="muted center" style="margin:24px 0;font-size:13px;">Defina as datas do trimestre atual em Perfil → Trimestre atual pra ver esse período aqui.</p>`;
+  }
   const sorted = DATA.students
-    .map(st=>({ st, sheets: monthSheets(st, ym) }))
+    .map(st=>({ st, sheets: sheetsInRange(st, range.start, range.end) }))
     .sort((a,b)=> b.sheets - a.sheets || a.st.name.localeCompare(b.st.name, 'pt-BR', {sensitivity:'base'}));
   const ranked = withCompetitionRank(sorted, r=>r.sheets);
   return `
-    <p class="faint" style="font-size:11.5px;margin:0 0 10px;text-transform:capitalize;">${esc(monthLabel)}</p>
+    <p class="faint" style="font-size:11.5px;margin:0 0 10px;text-transform:capitalize;">${esc(range.label)}</p>
     <div class="card">
       ${ranked.map(({item:r, rank, tied})=>`
       <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${r.st.id}" style="cursor:pointer;">
@@ -1689,75 +2261,10 @@ function renderSheetsRanking(){
       </div>`).join('')}
     </div>`;
 }
-function monthKudos(student, ym){
-  // dias com presença marcada (Kumon, presencial ou teste) no mês, igual ao Histórico mensal do aluno
-  return Object.keys(student.attendance || {}).filter(d=>d.startsWith(ym)).length;
-}
 function shiftMonth(ym, d){
   const [y,m] = ym.split('-').map(Number);
   const dt = new Date(y, m-1+d, 1);
   return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
-}
-function renderAdminReport(){
-  const nowYm = todayISO().slice(0,7);
-  const ym = REPORT_MONTH || nowYm;
-  const [y,m] = ym.split('-').map(Number);
-  const monthLabel = new Date(y, m-1, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
-  const mStart = ym+'-01';
-  const mEnd = ym+'-'+String(new Date(y, m, 0).getDate()).padStart(2,'0');
-  const rows = DATA.students.map(st=>({ st, days: monthKudos(st, ym), sheets: monthSheets(st, ym), corrected: correctedInRange(st, mStart, mEnd) }));
-  const byDays = rows.slice().sort((a,b)=> b.days-a.days || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
-  const bySheets = rows.slice().sort((a,b)=> b.sheets-a.sheets || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
-  const byCorrected = rows.slice().sort((a,b)=> b.corrected-a.corrected || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
-  const winnerCard = (title, list, key, unit, color)=>{
-    const max = list.length ? list[0][key] : 0;
-    const winners = max>0 ? list.filter(r=>r[key]===max) : [];
-    return `
-    <div class="section-title">${title}</div>
-    <div class="card report-winner">
-      ${winners.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro neste mês.</span>` : `
-        <div class="avatars">${winners.map(r=>`<div class="w"><div class="av">${r.st.avatar}</div><div class="nm">${esc(r.st.name)}</div></div>`).join('')}</div>
-        <div class="mono" style="font-weight:700;font-size:18px;color:${color};">${max} ${unit}</div>
-        ${winners.length>1 ? `<div class="faint" style="font-size:11.5px;margin-top:4px;">Empate</div>` : ''}`}
-    </div>`;
-  };
-  const table = (list, key, icon, color)=> withCompetitionRank(list, r=>r[key]).map(({item:r, rank, tied})=>`
-    <div class="hall-row ${rank<=3?'top3':''}">
-      ${hallRankMark(rank)}
-      <span class="hall-avatar">${r.st.avatar}</span>
-      <span class="hall-name">${esc(r.st.name)}</span>
-      <span class="hall-metric" style="color:${color};">${icon} ${r[key]}</span>
-    </div>`).join('');
-
-  return `
-  <div class="screen">
-    <div class="row no-print" style="margin-bottom:14px;">
-      <button class="btn btn-ghost btn-sm" data-report-month="-1" aria-label="Mês anterior">‹</button>
-      <span style="font-weight:700;font-size:15px;text-transform:capitalize;">${esc(monthLabel)}</span>
-      <button class="btn btn-ghost btn-sm" data-report-month="1" aria-label="Próximo mês" ${ym>=nowYm?'disabled style="opacity:.4;"':''}>›</button>
-    </div>
-    <div class="center" style="margin-bottom:6px;">
-      <div class="display" style="font-size:20px;font-weight:700;">🏆 Destaques de <span style="text-transform:capitalize;">${esc(monthLabel)}</span></div>
-    </div>
-
-    ${winnerCard('🎯 Mais dias no Kumon', byDays, 'days', 'dias', 'var(--amber)')}
-    ${winnerCard('📄 Mais folhas feitas', bySheets, 'sheets', 'folhas', 'var(--peri)')}
-    ${winnerCard('🧠 Mais correções feitas', byCorrected, 'corrected', 'correções', 'var(--mint)')}
-
-    <div class="section-title">Dias no Kumon — todos os alunos</div>
-    <div class="card">${table(byDays,'days','🔥','var(--amber)')}</div>
-
-    <div class="section-title">Folhas feitas — todos os alunos</div>
-    <div class="card">${table(bySheets,'sheets','📄','var(--peri)')}</div>
-
-    <div class="section-title">Correções feitas — todos os alunos</div>
-    <div class="card">${table(byCorrected,'corrected','🧠','var(--mint)')}</div>
-
-    <div class="no-print" style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
-      <button class="btn btn-primary btn-block" id="btn-report-print">🖨️ Imprimir / salvar em PDF</button>
-      <button class="btn btn-ghost btn-block" id="btn-report-back">← Voltar ao Hall</button>
-    </div>
-  </div>`;
 }
 function renderAdminHall(){
   const list = DATA.students;
@@ -1766,7 +2273,19 @@ function renderAdminHall(){
   <div class="screen">
     <div class="growth-msg">✨ Acompanhe as folhas, a constância e as correções de todos os alunos. Toque em um aluno para abrir o perfil dele.</div>
 
-    <button class="btn btn-outline btn-block" id="btn-open-report" style="margin-bottom:14px;">📋 Relatório do mês (para o mural)</button>
+    <div class="hall-tabs" style="margin-bottom:8px;">
+      <div class="hall-tab ${HALL_PERIOD_MODE==='month'?'active':''}" data-hall-period="month">📅 Mês</div>
+      <div class="hall-tab ${HALL_PERIOD_MODE==='trimester'?'active':''}" data-hall-period="trimester">🗓️ Trimestre</div>
+    </div>
+    ${HALL_PERIOD_MODE==='month' ? `
+    <div class="row" style="margin-bottom:14px;">
+      <button class="btn btn-ghost btn-sm" data-hall-month="-1" aria-label="Mês anterior">‹</button>
+      <span style="font-weight:700;font-size:13.5px;text-transform:capitalize;">${esc((hallFolhasRange()||{}).label || '')}</span>
+      <button class="btn btn-ghost btn-sm" data-hall-month="1" aria-label="Próximo mês" ${(HALL_MONTH||todayISO().slice(0,7))>=todayISO().slice(0,7)?'disabled style="opacity:.4;"':''}>›</button>
+    </div>
+    ` : `
+    <p class="faint" style="font-size:11.5px;margin:0 0 14px;">${hallFolhasRange() ? esc(hallFolhasRange().label) : 'Defina as datas do trimestre atual em Perfil → Trimestre atual.'}</p>
+    `}
 
     <div class="hall-tabs">
       <div class="hall-tab ${HALL_TAB==='sheets'?'active':''}" data-hall-tab="sheets">📄 Folhas</div>
@@ -1778,33 +2297,32 @@ function renderAdminHall(){
 }
 function renderHallTabBody(){
   const list = DATA.students;
-  if(HALL_TAB==='streak'){
-    const sorted = [...list].sort((a,b)=>streakStats(b).total-streakStats(a).total || a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base'}));
-    const ranked = withCompetitionRank(sorted, st=>streakStats(st).total);
-    return `<div class="card">${ranked.map(({item:st, rank, tied})=>`
-      <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${st.id}" style="cursor:pointer;">
+  if(HALL_TAB==='streak' || HALL_TAB==='correction'){
+    // Constância e Correções respeitam o período escolhido (Mês ou Trimestre), igual às Folhas
+    const range = hallFolhasRange();
+    if(!range){
+      return `<p class="muted center" style="margin:24px 0;font-size:13px;">Defina as datas do trimestre atual em Perfil → Trimestre atual pra ver esse período aqui.</p>`;
+    }
+    const isStreak = HALL_TAB==='streak';
+    const valueOf = (st)=> isStreak ? attendanceInRange(st, range.start, range.end) : hallCorrectedInRange(st, range.start, range.end);
+    const sorted = list
+      .map(st=>({ st, v: valueOf(st) }))
+      .sort((a,b)=> b.v - a.v || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
+    const ranked = withCompetitionRank(sorted, r=>r.v);
+    return `
+      <p class="faint" style="font-size:11.5px;margin:0 0 10px;text-transform:capitalize;">${esc(range.label)}</p>
+      <div class="card">${ranked.map(({item:r, rank, tied})=>`
+      <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${r.st.id}" style="cursor:pointer;">
         ${hallRankMark(rank)}
-        <span class="hall-avatar">${st.avatar}</span>
-        <span class="hall-name">${esc(st.name)}</span>
-        <span class="hall-metric" style="color:var(--amber);">🔥 ${streakStats(st).total}</span>
-      </div>`).join('')}</div>`;
-  }
-  if(HALL_TAB==='correction'){
-    const sorted = [...list].sort((a,b)=> stats(b).correctionRatio - stats(a).correctionRatio || stats(b).done - stats(a).done || a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base'}));
-    const ranked = withCompetitionRank(sorted, st=>Math.round(stats(st).correctionRatio*100));
-    return `<div class="card">${ranked.map(({item:st, rank, tied})=>`
-      <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${st.id}" style="cursor:pointer;">
-        ${hallRankMark(rank)}
-        <span class="hall-avatar">${st.avatar}</span>
-        <span class="hall-name">${esc(st.name)}</span>
-        <span class="hall-metric" style="color:var(--mint);">🧠 ${Math.round(stats(st).correctionRatio*100)}%</span>
+        <span class="hall-avatar">${r.st.avatar}</span>
+        <span class="hall-name">${esc(r.st.name)}</span>
+        <span class="hall-metric" style="color:${isStreak?'var(--amber)':'var(--mint)'};">${isStreak?'🔥':'🧠'} ${r.v}</span>
       </div>`).join('')}</div>`;
   }
   return renderSheetsRanking();
 }
 
 function fmtBackupId(id){
-  // ids automáticos são datas 'AAAA-MM-DD'; ids manuais/snapshot têm outro formato
   if(/^\d{4}-\d{2}-\d{2}$/.test(id)) return fmtDate(id) + (id===todayISO() ? ' (hoje)' : '');
   return 'Snapshot manual';
 }
@@ -1883,13 +2401,19 @@ function renderAdminTrimesterBalance(){
   const timePct = totalDays>0 ? Math.round(clamp(elapsed,0,totalDays)/totalDays*100) : 0;
   const periodLabel = `${fmtDate(start)} – ${fmtDate(end)}`;
 
-  const rows = list.map(st=>({
-    st,
-    sheets: sheetsInRange(st, start, end),
-    days: attendanceInRange(st, start, end),
-    corrected: correctedInRange(st, start, end),
-    goalsDone: metasConcluidasInRange(st, start, end).length,
-  }));
+  const rows = list.map(st=>{
+    const s = stats(st);
+    const archivedDone = metasConcluidasInRange(st, start, end).length;
+    const currentlyReached = s.goalReached;
+    return {
+      st,
+      sheets: sheetsInRange(st, start, end),
+      days: attendanceInRange(st, start, end),
+      corrected: correctedInRange(st, start, end),
+      goalsDone: archivedDone + (currentlyReached ? 1 : 0),
+      currentlyReached,
+    };
+  });
   const totalSheets = rows.reduce((sum,r)=>sum+r.sheets,0);
   const totalCorrected = rows.reduce((sum,r)=>sum+r.corrected,0);
   const totalGoals = rows.reduce((sum,r)=>sum+r.goalsDone,0);
@@ -1898,6 +2422,7 @@ function renderAdminTrimesterBalance(){
 
   const bySheets = rows.slice().sort((a,b)=> b.sheets-a.sheets || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
   const byDays = rows.slice().sort((a,b)=> b.days-a.days || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
+  const byCorrected = rows.slice().sort((a,b)=> b.corrected-a.corrected || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
 
   const winnerBlock = (title, rankedList, key, unit, color) => {
     const max = rankedList.length ? rankedList[0][key] : 0;
@@ -1911,13 +2436,12 @@ function renderAdminTrimesterBalance(){
     </div>`;
   };
 
-  const table = (rankedList, key, icon, color) => withCompetitionRank(rankedList, r=>r[key]).map(({item:r, rank})=>`
-    <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${r.st.id}" style="cursor:pointer;">
-      ${hallRankMark(rank)}
-      <span class="hall-avatar">${r.st.avatar}</span>
-      <span class="hall-name">${esc(r.st.name)}</span>
-      <span class="hall-metric" style="color:${color};">${icon} ${r[key]}</span>
-    </div>`).join('');
+  const metGoalList = [];
+  rows.forEach(r=>{
+    metasConcluidasInRange(r.st, start, end).forEach(e=> metGoalList.push({ st: r.st, archived: true, archivedAt: e.archivedAt }));
+    if(r.currentlyReached) metGoalList.push({ st: r.st, archived: false });
+  });
+  metGoalList.sort((a,b)=> a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
 
   return `
   <div class="screen">
@@ -1938,13 +2462,20 @@ function renderAdminTrimesterBalance(){
     </div>
 
     ${winnerBlock('📄 Quem mais fez folhas', bySheets, 'sheets', 'folhas', 'var(--peri)')}
-    ${winnerBlock('🔥 Quem mais foi ao Kumon', byDays, 'days', 'dias', 'var(--amber)')}
+    ${winnerBlock('🔥 Quem mais fez Kumon', byDays, 'days', 'dias', 'var(--amber)')}
+    ${winnerBlock('🧠 Quem mais fez correção', byCorrected, 'corrected', 'correções', 'var(--mint)')}
 
-    <div class="section-title">Ranking de folhas no trimestre</div>
-    <div class="card">${table(bySheets,'sheets','📄','var(--peri)')}</div>
-
-    <div class="section-title">Ranking de frequência no trimestre</div>
-    <div class="card">${table(byDays,'days','🔥','var(--amber)')}</div>
+    <div class="section-title">🎯 Alunos que bateram a meta</div>
+    ${metGoalList.length===0 ? `
+    <div class="card"><span class="muted" style="font-size:13px;">Ninguém bateu a meta neste trimestre ainda.</span></div>` : `
+    <div class="card" style="border-color:#8C93FF55;">
+      ${metGoalList.map(r=>`
+      <div class="hall-row" data-open-student="${r.st.id}" style="cursor:pointer;">
+        <span class="hall-avatar">${r.st.avatar}</span>
+        <span class="hall-name">${esc(r.st.name)}</span>
+        ${r.archived ? `<span class="faint" style="font-size:11px;margin-left:auto;">encerrada em ${fmtDate(r.archivedAt)}</span>` : ''}
+      </div>`).join('')}
+    </div>`}
 
     ${inactive.length===0 ? '' : `
     <div class="section-title">⚠️ Sem movimento neste trimestre</div>
@@ -2019,6 +2550,7 @@ function studentsListHtml(){
           </div>
           <div class="meta-row">
             <span class="faint" style="font-size:10px;">🕓 ${fmtDateTime(s.updatedAt)}</span>
+            ${planResponseBadge(s)}
           </div>
         </div>
       </button>`;
@@ -2084,7 +2616,7 @@ function renderForgotEditor(student){
     </div>`;
 }
 
-function renderCalendar(student){
+function renderCalendar(student, readOnly){
   if(!CALENDAR_MONTH){
     const now = new Date();
     CALENDAR_MONTH = { year: now.getFullYear(), month: now.getMonth() };
@@ -2104,7 +2636,7 @@ function renderCalendar(student){
   for(let d=1; d<=daysInMonth; d++){
     const dateObj = new Date(year, month, d);
     const cellIso = dateObj.toISOString().slice(0,10);
-    const type = attendance[cellIso]; // undefined | 'kumon' | 'presencial' | 'teste'
+    const type = attendance[cellIso];
     const isToday = cellIso===todayIso;
     let cls = 'cal-cell';
     if(type==='kumon'){ cls += ' marked-kumon'; markedCount++; kumonCount++; }
@@ -2112,7 +2644,9 @@ function renderCalendar(student){
     else if(type==='teste'){ cls += ' marked-teste'; markedCount++; testeCount++; }
     if(isToday) cls += ' today';
     const label = type==='teste' ? 'dia de teste' : (type==='presencial' ? 'veio para a unidade' : (type==='kumon' ? 'fez o Kumon' : 'sem marcação'));
-    cells += `<button class="${cls}" data-cal-day="${cellIso}" aria-label="${d}, ${label}" title="${label}">${d}</button>`;
+    cells += readOnly
+      ? `<button type="button" class="${cls}" tabindex="-1" style="pointer-events:none;cursor:default;" aria-label="${d}, ${label}" title="${label}">${d}</button>`
+      : `<button class="${cls}" data-cal-day="${cellIso}" aria-label="${d}, ${label}" title="${label}">${d}</button>`;
   }
   const monthPct = daysInMonth>0 ? Math.round((markedCount/daysInMonth)*100) : 0;
 
@@ -2141,11 +2675,13 @@ function renderCalendar(student){
       <span><span class="cal-dot" style="background:var(--sky);"></span>veio para a unidade</span>
       <span><span class="cal-dot" style="background:var(--peri);"></span>dia de teste</span>
     </div>
-    <p class="faint" style="font-size:11px;margin-top:8px;">Toque em um dia para alternar: sem marcação → fez o Kumon → veio para a unidade → dia de teste.</p>
+    ${readOnly ? '' : `<p class="faint" style="font-size:11px;margin-top:8px;">Toque em um dia para alternar: sem marcação → fez o Kumon → veio para a unidade → dia de teste.</p>`}
   `;
 }
 
 function renderStudentEditForm(student){
+  if(!EDIT_THEME_DRAFT) EDIT_THEME_DRAFT = draftFromTheme(student.missionTheme);
+  if(!EDIT_MODE_DRAFT) EDIT_MODE_DRAFT = student.missionTheme ? 'vacation' : 'normal';
   return `
     <div class="field"><label>Nome</label><input id="f-edit-name" value="${esc(student.name)}"></div>
     <div class="field"><label>Código individual de acesso</label><input id="f-edit-code" inputmode="numeric" value="${esc(student.code)}"></div>
@@ -2175,153 +2711,17 @@ function renderStudentEditForm(student){
     <div class="field"><label>Data final da meta</label><input type="date" id="f-edit-target-date" value="${student.targetEnd}"></div>
     <p class="faint" style="font-size:11px;margin:-6px 0 16px;">O progresso já feito é mantido ao mudar só a meta — blocos são adicionados ou removidos do final.</p>
 
+    <div class="eyebrow" style="margin:6px 0 8px;">🎯 Modo da meta atual</div>
+    ${renderModeSwitch('edit', EDIT_MODE_DRAFT)}
+    <div id="edit-theme-box" style="${EDIT_MODE_DRAFT==='vacation' ? '' : 'display:none;'}">
+      ${renderThemeEditor('edit', EDIT_THEME_DRAFT)}
+    </div>
+
     <div class="error-msg" id="edit-student-error"></div>
     <div class="field-row">
       <button class="btn btn-ghost btn-block btn-sm" id="btn-cancel-target">Cancelar</button>
       <button class="btn btn-primary btn-block btn-sm" id="btn-save-target">Salvar alterações</button>
     </div>`;
-}
-
-function renderAdminDetail(){
-  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
-  if(!student){ ADMIN_VIEW='students'; return renderAdminStudents(); }
-  const s = stats(student);
-  const wd = weeklyDelta(student);
-  const streak = streakStats(student);
-  const rw = rewardStats(student);
-
-  return `
-  <div class="screen">
-    <button class="btn btn-ghost btn-sm" id="btn-back-students" style="margin-bottom:14px;">← Alunos</button>
-
-    <div class="card">
-      <div class="row">
-        <div class="row" style="gap:10px;">
-          <div class="avatar-circle">${student.avatar}</div>
-          <div>
-            <div style="font-weight:700;font-size:16.5px;">${esc(student.name)}</div>
-            <div class="faint mono" style="font-size:11.5px;">código ${esc(student.code)}</div>
-          </div>
-        </div>
-        ${DELETE_CONFIRM_ID === student.id
-          ? `<div class="row" style="gap:6px;">
-               <button class="btn btn-ghost btn-sm" id="btn-cancel-delete">Cancelar</button>
-               <button class="btn btn-danger btn-sm" id="btn-confirm-delete">Confirmar exclusão</button>
-             </div>`
-          : `<button class="btn btn-danger btn-sm" id="btn-delete-student">Excluir</button>`}
-      </div>
-      <div class="divider"></div>
-      ${EDIT_STUDENT_MODE ? renderStudentEditForm(student) : `
-        <div class="row">
-          <span class="pill">📍 ${esc(student.startStage)}${esc(student.startSheet)}</span>
-          <span class="pill" style="color:var(--mint);border-color:#37E2A044;">🎯 ${esc(student.targetStage)}${esc(student.targetSheet)}</span>
-          <span class="pill" style="color:var(--peri);border-color:#8C93FF44;">⏰ ${s.daysRemaining>=0?s.daysRemaining:0}d</span>
-        </div>
-        <div class="row" style="margin-top:10px;">
-          <div class="faint mono" style="font-size:11px;">🕓 Última atualização: ${fmtDateTime(student.updatedAt)}</div>
-          <button class="btn btn-ghost btn-sm" id="btn-edit-student">✏️ Editar aluno</button>
-        </div>
-      `}
-    </div>
-
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num">${s.percent}%</div><div class="stat-label">Progresso</div></div>
-      <div class="stat-card"><div class="stat-num">${s.done}/${s.total}</div><div class="stat-label">Blocos feitos</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${s.pending}</div><div class="stat-label">Correções pendentes</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--peri);">🔥 ${streak.total}</div><div class="stat-label">Dias de constância</div></div>
-    </div>
-
-    <div class="section-title">Material didático</div>
-    <div class="card">
-      ${renderBlocksSection(student)}
-    </div>
-
-    <div class="section-title">Registrar período</div>
-    <div class="card">
-      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Escolha o período que quiser — não precisa ser de segunda a domingo, nem a semana atual.</p>
-      <div class="field-row">
-        <div class="field"><label>De</label><input type="date" id="input-week-start" value="${daysAgoISO(6)}"></div>
-        <div class="field"><label>Até</label><input type="date" id="input-week-end" value="${todayISO()}"></div>
-      </div>
-      <div class="field">
-        <label>Folhas realizadas no período</label>
-        <input type="number" min="0" max="200" id="input-weekly-sheets" placeholder="Ex: 35">
-      </div>
-      <div class="field">
-        <label>Observação / texto (opcional)</label>
-        <input type="text" id="input-weekly-note" maxlength="120" placeholder="Ex: recesso, prova, férias...">
-      </div>
-      <div class="error-msg" id="week-error"></div>
-      <button class="btn btn-primary btn-block" id="btn-register-week">Registrar período</button>
-    </div>
-
-    <div class="section-title">🍬 Prêmios (bombom ou Fini)</div>
-    <div class="card">
-      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">A cada 3 blocos corrigidos, o aluno ganha 1 doce — um bombom ou um Fini, não os dois. Toque no doce que ele escolheu; toque de novo para desfazer.</p>
-      ${renderRewardDots(student)}
-      <p class="faint" style="font-size:11px;margin:0 0 14px;">faltam ${rw.remaining} bloco${rw.remaining===1?'':'s'} para o próximo doce</p>
-      ${rw.earned===0 ? `<p class="faint" style="font-size:11.5px;margin:0;">Ainda não conquistou nenhum doce.</p>` : `
-      <div class="reward-list">
-        ${Array.from({length: rw.earned}).map((_,i)=>{
-          const chosen = (student.rewards || {})[i] || null;
-          return `<div class="reward-item">
-            <span>Doce ${i+1}</span>
-            <div class="reward-choice">
-              <button class="reward-chip ${chosen==='bombom'?'active':''}" data-reward-choice="${i}:bombom">🍫 Bombom</button>
-              <button class="reward-chip ${chosen==='fini'?'active':''}" data-reward-choice="${i}:fini">🍬 Fini</button>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>`}
-    </div>
-
-    <div class="section-title">🗓️ Calendário</div>
-    <div class="card">
-      <div class="row" style="margin-bottom:14px;">
-        <span class="pill" style="color:var(--amber);border-color:#FFB64844;">🔥 ${streak.total} dias acumulados</span>
-      </div>
-      ${renderCalendar(student)}
-    </div>
-
-    ${renderMonthlyHistoryAdmin(student)}
-
-    ${renderTrimesterSectionAdmin(student)}
-
-    <div class="section-title">Histórico</div>
-    <div class="card">
-      ${student.weeklyHistory.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro ainda.</span>` :
-        student.weeklyHistory.slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||'')).map(h=>{
-          if(EDITING_WEEK_HISTORY_ID===h.id){
-            return `
-            <div style="padding:10px 0;">
-              <div class="field-row">
-                <div class="field"><label>De</label><input type="date" id="edit-week-start-${h.id}" value="${esc(h.startDate||'')}"></div>
-                <div class="field"><label>Até</label><input type="date" id="edit-week-end-${h.id}" value="${esc(h.endDate||'')}"></div>
-              </div>
-              <div class="field"><label>Folhas (0–200)</label><input type="number" min="0" max="200" id="edit-week-sheets-${h.id}" value="${esc(h.sheets)}"></div>
-              <div class="field"><label>Observação / texto</label><input type="text" maxlength="120" id="edit-week-note-${h.id}" value="${esc(h.note||'')}" placeholder="Ex: recesso, prova, férias..."></div>
-              <div class="error-msg" id="edit-week-error-${h.id}"></div>
-              <div class="field-row">
-                <button class="btn btn-ghost btn-block btn-sm" data-cancel-edit-week="${h.id}">Cancelar</button>
-                <button class="btn btn-primary btn-block btn-sm" data-save-edit-week="${h.id}">Salvar</button>
-              </div>
-            </div>`;
-          }
-          return `
-          <div class="row" style="padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
-            <div style="flex:1;min-width:0;">
-              <div class="row" style="justify-content:flex-start;gap:12px;">
-                <span class="muted" style="font-size:13px;">${fmtDate(h.startDate)} – ${fmtDate(h.endDate)}</span>
-                <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap;">${esc(h.sheets)} folhas</span>
-              </div>
-              ${h.note ? `<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>` : ''}
-            </div>
-            <button class="btn btn-ghost btn-sm" data-edit-week="${h.id}" title="Editar histórico">✏️</button>
-          </div>`;
-        }).join('')
-      }
-    </div>
-  </div>`;
 }
 
 function renderAdminAdd(){ 
@@ -2435,6 +2835,149 @@ function renderAdminEvolution(){
   </div>`;
 }
 
+function renderAdminDetail(){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  if(!student){ ADMIN_VIEW='students'; return renderAdminStudents(); }
+  const s = stats(student);
+  const wd = weeklyDelta(student);
+  const streak = streakStats(student);
+  const rw = rewardStats(student);
+
+  return `
+  <div class="screen">
+    <button class="btn btn-ghost btn-sm" id="btn-back-students" style="margin-bottom:14px;">← Alunos</button>
+
+    <div class="card">
+      <div class="row">
+        <div class="row" style="gap:10px;">
+          <div class="avatar-circle">${student.avatar}</div>
+          <div>
+            <div style="font-weight:700;font-size:16.5px;">${esc(student.name)}</div>
+            <div class="faint mono" style="font-size:11.5px;">código ${esc(student.code)}</div>
+          </div>
+        </div>
+        ${DELETE_CONFIRM_ID === student.id
+          ? `<div class="row" style="gap:6px;">
+               <button class="btn btn-ghost btn-sm" id="btn-cancel-delete">Cancelar</button>
+               <button class="btn btn-danger btn-sm" id="btn-confirm-delete">Confirmar exclusão</button>
+             </div>`
+          : `<button class="btn btn-danger btn-sm" id="btn-delete-student">Excluir</button>`}
+      </div>
+      <div class="divider"></div>
+      ${EDIT_STUDENT_MODE ? renderStudentEditForm(student) : `
+        <div class="row">
+          <span class="pill">📍 ${esc(student.startStage)}${esc(student.startSheet)}</span>
+          <span class="pill" style="color:var(--mint);border-color:#37E2A044;">🎯 ${esc(student.targetStage)}${esc(student.targetSheet)}</span>
+          <span class="pill" style="color:var(--peri);border-color:#8C93FF44;">⏰ ${s.daysRemaining>=0?s.daysRemaining:0}d</span>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <div class="faint mono" style="font-size:11.5px;">🕓 Última atualização: ${fmtDateTime(student.updatedAt)}</div>
+          ${planResponseBadge(student)}
+          <button class="btn btn-ghost btn-sm" id="btn-edit-student">✏️ Editar aluno</button>
+        </div>
+      `}
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${s.percent}%</div><div class="stat-label">Progresso</div></div>
+      <div class="stat-card"><div class="stat-num">${s.done}/${s.total}</div><div class="stat-label">Blocos feitos</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${s.pending}</div><div class="stat-label">Correções pendentes</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--peri);">🔥 ${streak.total}</div><div class="stat-label">Dias de constância</div></div>
+    </div>
+
+    <div class="section-title">Material didático</div>
+    <div class="card">
+      ${renderBlocksSection(student)}
+    </div>
+
+    <div class="section-title">Registrar período</div>
+    <div class="card">
+      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Escolha o período que quiser — não precisa ser de segunda a domingo, nem a semana atual.</p>
+      <div class="field-row">
+        <div class="field"><label>De</label><input type="date" id="input-week-start" value="${daysAgoISO(6)}"></div>
+        <div class="field"><label>Até</label><input type="date" id="input-week-end" value="${todayISO()}"></div>
+      </div>
+      <div class="field">
+        <label>Folhas realizadas no período</label>
+        <input type="number" min="0" max="200" id="input-weekly-sheets" placeholder="Ex: 35">
+      </div>
+      <div class="field">
+        <label>Observação / texto (opcional)</label>
+        <input type="text" id="input-weekly-note" maxlength="120" placeholder="Ex: recesso, prova, férias...">
+      </div>
+      <div class="error-msg" id="week-error"></div>
+      <button class="btn btn-primary btn-block" id="btn-register-week">Registrar período</button>
+    </div>
+
+    <div class="section-title">🍬 Prêmios (bombom ou Fini)</div>
+    <div class="card">
+      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">A cada 3 blocos corrigidos, o aluno ganha 1 doce — um bombom ou um Fini, não os dois. Toque no doce que ele escolheu; toque de novo para desfazer.</p>
+      ${renderRewardDots(student)}
+      <p class="faint" style="font-size:11px;margin:0 0 14px;">faltam ${rw.remaining} bloco${rw.remaining===1?'':'s'} para o próximo doce</p>
+      ${rw.earned===0 ? `<p class="faint" style="font-size:11.5px;margin:0;">Ainda não conquistou nenhum doce.</p>` : `
+      <div class="reward-list">
+        ${Array.from({length: rw.earned}).map((_,i)=>{
+          const chosen = (student.rewards || {})[i] || null;
+          return `<div class="reward-item">
+            <span>Doce ${i+1}</span>
+            <div class="reward-choice">
+              <button class="reward-chip ${chosen==='bombom'?'active':''}" data-reward-choice="${i}:bombom">🍫 Bombom</button>
+              <button class="reward-chip ${chosen==='fini'?'active':''}" data-reward-choice="${i}:fini">🍬 Fini</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>
+
+    <div class="section-title">🗓️ Calendário</div>
+    <div class="card">
+      <div class="row" style="margin-bottom:14px;">
+        <span class="pill" style="color:var(--amber);border-color:#FFB64844;">🔥 ${streak.total} dias acumulados</span>
+      </div>
+      ${renderCalendar(student)}
+    </div>
+
+    ${renderMonthlyHistoryAdmin(student)}
+
+    ${renderTrimesterSectionAdmin(student)}
+
+    <div class="section-title">Histórico</div>
+    <div class="card">
+      ${student.weeklyHistory.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro ainda.</span>` :
+        student.weeklyHistory.slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||'')).map(h=>{
+          if(EDITING_WEEK_HISTORY_ID===h.id){
+            return `
+            <div style="padding:10px 0;">
+              <div class="field-row">
+                <div class="field"><label>De</label><input type="date" id="edit-week-start-${h.id}" value="${esc(h.startDate||'')}"></div>
+                <div class="field"><label>Até</label><input type="date" id="edit-week-end-${h.id}" value="${esc(h.endDate||'')}"></div>
+              </div>
+              <div class="field"><label>Folhas (0–200)</label><input type="number" min="0" max="200" id="edit-week-sheets-${h.id}" value="${esc(h.sheets)}"></div>
+              <div class="field"><label>Observação / texto</label><input type="text" maxlength="120" id="edit-week-note-${h.id}" value="${esc(h.note||'')}" placeholder="Ex: recesso, prova, férias..."></div>
+              <div class="error-msg" id="edit-week-error-${h.id}"></div>
+              <div class="field-row">
+                <button class="btn btn-ghost btn-block btn-sm" data-cancel-edit-week="${h.id}">Cancelar</button>
+                <button class="btn btn-primary btn-block btn-sm" data-save-edit-week="${h.id}">Salvar</button>
+              </div>
+            </div>`;
+          }
+          return `
+          <div class="row" style="padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
+            <div style="flex:1;min-width:0;">
+              <div class="row" style="justify-content:flex-start;gap:12px;">
+                <span class="muted" style="font-size:13px;">${fmtDate(h.startDate)} – ${fmtDate(h.endDate)}</span>
+                <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap;">${esc(h.sheets)} folhas</span>
+              </div>
+              ${h.note ? `<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>` : ''}
+            </div>
+            <button class="btn btn-ghost btn-sm" data-edit-week="${h.id}" title="Editar histórico">✏️</button>
+          </div>`;
+        }).join('')
+      }
+    </div>
+  </div>`;
+}
+
 /* =========================================================
    EVENT HANDLERS
    ========================================================= */
@@ -2452,6 +2995,7 @@ function attachHandlers(){
 
   // Tema
   $$('[data-theme-toggle]').forEach(btn=> btn.onclick = ()=> setTheme(btn.getAttribute('data-theme-toggle')));
+  $$('[data-view-select]').forEach(sel=> sel.onchange = ()=> setViewMode(sel.value));
   if($('#btn-enter-admin')){
     $('#btn-enter-admin').onclick = handleAdminLogin;
     $('#admin-email-input').addEventListener('keydown', e=>{ if(e.key==='Enter') handleAdminLogin(); });
@@ -2469,8 +3013,21 @@ function attachHandlers(){
 
   if($('#btn-admin-profile')) $('#btn-admin-profile').onclick = ()=>{ ADMIN_VIEW='profile'; render(); };
   if($('#btn-admin-profile-back')) $('#btn-admin-profile-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
-  if($('#btn-open-report')) $('#btn-open-report').onclick = ()=>{ REPORT_MONTH=''; ADMIN_VIEW='report'; render(); };
   if($('#btn-open-trimbalance')) $('#btn-open-trimbalance').onclick = ()=>{ ADMIN_VIEW='trimbalance'; render(); };
+  $$('[data-hall-period]').forEach(tab=> tab.onclick = ()=>{ HALL_PERIOD_MODE = tab.getAttribute('data-hall-period'); render(); });
+  $$('[data-hall-month]').forEach(btn=> btn.onclick = ()=>{
+    if(btn.disabled) return;
+    HALL_MONTH = shiftMonth(HALL_MONTH || todayISO().slice(0,7), Number(btn.getAttribute('data-hall-month')));
+    render();
+  });
+  if($('#btn-bulk-end')) $('#btn-bulk-end').onclick = ()=>{
+    const v = (document.getElementById('f-bulk-end')||{}).value || '';
+    const er = document.getElementById('bulk-end-error');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(v)){ if(er) er.textContent = 'Escolha a nova data de fim.'; return; }
+    BULK_END_CONFIRM = v; render();
+  };
+  if($('#btn-bulk-cancel')) $('#btn-bulk-cancel').onclick = ()=>{ BULK_END_CONFIRM = null; render(); };
+  if($('#btn-bulk-confirm')) $('#btn-bulk-confirm').onclick = ()=> applyBulkTargetEnd(BULK_END_CONFIRM);
   if($('#btn-balance-back')) $('#btn-balance-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
   if($('#btn-balance-print')) $('#btn-balance-print').onclick = ()=>{ window.print(); };
   $$('[data-hall-tab]').forEach(tab=> tab.onclick = ()=>{
@@ -2479,13 +3036,6 @@ function attachHandlers(){
     tabsBox.querySelectorAll('[data-hall-tab]').forEach(t=> t.classList.toggle('active', t===tab));
     const body = document.getElementById('hall-tab-body');
     if(body){ body.innerHTML = renderHallTabBody(); body.querySelectorAll('[data-open-student]').forEach(openStudentFromRow); }
-  });
-  if($('#btn-report-back')) $('#btn-report-back').onclick = ()=>{ ADMIN_VIEW='hall'; render(); };
-  if($('#btn-report-print')) $('#btn-report-print').onclick = ()=>{ window.print(); };
-  $$('[data-report-month]').forEach(btn=> btn.onclick = ()=>{
-    if(btn.disabled) return;
-    REPORT_MONTH = shiftMonth(REPORT_MONTH || todayISO().slice(0,7), Number(btn.getAttribute('data-report-month')));
-    render();
   });
 
   // Admin nav
@@ -2502,7 +3052,6 @@ function attachHandlers(){
     ADMIN_VIEW='detail'; render();
   };
   if($('#admin-search')) $('#admin-search').oninput = (e)=>{
-    // atualiza só a lista: redesenhar a tela inteira fazia o campo perder o foco a cada letra
     SEARCH_TERM = e.target.value;
     const box = document.getElementById('admin-students-list');
     if(box){ box.innerHTML = studentsListHtml(); box.querySelectorAll('[data-open-student]').forEach(openStudentFromRow); }
@@ -2537,7 +3086,7 @@ function attachHandlers(){
   // Admin detail: números personalizados dos blocos
   if($('#btn-edit-labels')) $('#btn-edit-labels').onclick = ()=>{ EDIT_LABELS_MODE=true; render(); };
   if($('#btn-edit-student')) $('#btn-edit-student').onclick = ()=>{ EDIT_STUDENT_MODE=true; render(); };
-  if($('#btn-cancel-target')) $('#btn-cancel-target').onclick = ()=>{ EDIT_STUDENT_MODE=false; render(); };
+  if($('#btn-cancel-target')) $('#btn-cancel-target').onclick = ()=>{ EDIT_STUDENT_MODE=false; EDIT_THEME_DRAFT=null; EDIT_MODE_DRAFT=null; render(); };
   if($('#avatar-picker-edit')){
     $$('#avatar-picker-edit .avatar-opt').forEach(btn=> btn.onclick = ()=>{
       $$('#avatar-picker-edit .avatar-opt').forEach(b=>b.classList.remove('sel'));
@@ -2545,11 +3094,55 @@ function attachHandlers(){
     });
   }
   if($('#btn-save-target')) $('#btn-save-target').onclick = saveStudentEdit;
-  if($('#btn-plan-meta')) $('#btn-plan-meta').onclick = ()=>{ PLAN_META_MODE=true; render(); };
-  if($('#btn-cancel-plan')) $('#btn-cancel-plan').onclick = ()=>{ PLAN_META_MODE=false; render(); };
+  if($('#btn-plan-meta')) $('#btn-plan-meta').onclick = ()=>{ PLAN_EDIT_ID=null; PLAN_THEME_DRAFT=null; PLAN_MODE_DRAFT=null; PLAN_META_MODE=true; render(); };
+  $$('[data-edit-planned]').forEach(btn=> btn.onclick = ()=>{ PLAN_EDIT_ID=btn.getAttribute('data-edit-planned'); PLAN_THEME_DRAFT=null; PLAN_MODE_DRAFT=null; PLAN_META_MODE=true; render(); });
+  // justificativa obrigatória: o botão só habilita com pelo menos 5 letras
+  $$('[id^="f-prop-note-"]').forEach(ta=>{
+    const pid = ta.id.replace('f-prop-note-','');
+    const sendBtn = document.getElementById('btn-send-proposal');
+    const cnt = document.getElementById('prop-count-'+pid);
+    const er = document.getElementById('prop-error-'+pid);
+    const need = document.getElementById('prop-need-'+pid);
+    const sync = ()=>{
+      if(cnt) cnt.textContent = ta.value.length;
+      const ok = proposalNoteOk(ta.value);
+      const len = ta.value.trim().length;
+      if(need){
+        if(ok) need.textContent = '✅ Justificativa ok';
+        else if(len < PROPOSAL_MIN_CHARS){ const f = PROPOSAL_MIN_CHARS-len; need.textContent = f===1 ? 'Falta 1 caractere' : `Faltam ${f} caracteres`; }
+        else need.textContent = `Escreva pelo menos ${PROPOSAL_MIN_WORDS} palavras`;
+        need.style.color = ok ? 'var(--mint)' : '';
+      }
+      if(sendBtn) sendBtn.disabled = !ok;
+      if(ok && er) er.textContent = '';
+    };
+    ta.oninput = sync; sync();
+  });
+  bindModeSwitch('plan', m=>{ PLAN_MODE_DRAFT = m; }, 'plan-theme-box');
+  bindModeSwitch('edit', m=>{ EDIT_MODE_DRAFT = m; }, 'edit-theme-box');
+  bindThemeEditor('plan', ()=>PLAN_THEME_DRAFT);
+  bindThemeEditor('edit', ()=>EDIT_THEME_DRAFT);
+  if($('#btn-cancel-plan')) $('#btn-cancel-plan').onclick = ()=>{ PLAN_META_MODE=false; PLAN_THEME_DRAFT=null; PLAN_MODE_DRAFT=null; PLAN_EDIT_ID=null; render(); };
   if($('#btn-save-plan')) $('#btn-save-plan').onclick = savePlannedMeta;
   $$('[data-remove-planned]').forEach(btn=> btn.onclick = ()=> removePlannedMeta(btn.getAttribute('data-remove-planned')));
   if($('#btn-end-trimester')) $('#btn-end-trimester').onclick = ()=>{ END_TRIMESTER_CONFIRM = SELECTED_STUDENT_ID; render(); };
+  if($('#btn-close-tb-modal')) $('#btn-close-tb-modal').onclick = ()=>{ TB_MODAL = null; render(); };
+  $$('[data-undo-trimester-id]').forEach(btn=> btn.onclick = ()=>{
+    undoTrimester(btn.getAttribute('data-undo-trimester-student'), btn.getAttribute('data-undo-trimester-id'));
+  });
+  $$('[data-ask-undo-trimester-id]').forEach(btn=> btn.onclick = ()=>{
+    UNDO_TRIMESTER_CONFIRM = { studentId: btn.getAttribute('data-ask-undo-trimester-student'), entryId: btn.getAttribute('data-ask-undo-trimester-id') };
+    render();
+  });
+  if($('#btn-cancel-undo-trimester')) $('#btn-cancel-undo-trimester').onclick = ()=>{ UNDO_TRIMESTER_CONFIRM = null; render(); };
+  if($('#btn-confirm-undo-trimester')) $('#btn-confirm-undo-trimester').onclick = ()=>{
+    if(UNDO_TRIMESTER_CONFIRM) undoTrimester(UNDO_TRIMESTER_CONFIRM.studentId, UNDO_TRIMESTER_CONFIRM.entryId);
+  };
+  $$('[data-dismiss-balance]').forEach(btn=> btn.onclick = async ()=>{
+    const student = DATA.students.find(s=>s.id===SESSION.studentId);
+    if(student){ student.lastSeenBalanceId = btn.getAttribute('data-dismiss-balance'); touch(student); await saveData(); }
+    render();
+  });
   if($('#btn-cancel-end-trimester')) $('#btn-cancel-end-trimester').onclick = ()=>{ END_TRIMESTER_CONFIRM = null; render(); };
   if($('#btn-confirm-end-trimester')) $('#btn-confirm-end-trimester').onclick = endTrimester;
   if($('#btn-cancel-labels')) $('#btn-cancel-labels').onclick = ()=>{ EDIT_LABELS_MODE=false; render(); };
@@ -2581,17 +3174,68 @@ function attachHandlers(){
   $$('[data-restore-auto]').forEach(btn=> btn.onclick = ()=> stageAutoRestore(btn.getAttribute('data-restore-auto')));
   if($('#btn-confirm-restore')) $('#btn-confirm-restore').onclick = confirmPendingRestore;
   if($('#btn-cancel-restore')) $('#btn-cancel-restore').onclick = cancelPendingRestore;
+
+  /* ---------- Handlers para aceitar/propor (aluno) ---------- */
+  $$('[data-accept-plan]').forEach(btn=> btn.onclick = (e)=> {
+    const id = btn.getAttribute('data-accept-plan');
+    handleStudentAccept(id);
+  });
+  $$('[data-propose-plan]').forEach(btn=> btn.onclick = (e)=> {
+    const id = btn.getAttribute('data-propose-plan');
+    // abre o formulário de proposta
+    STUDENT_PROPOSAL_MODE = id;
+    render();
+  });
+  // formulário de proposta: cancelar/enviar (eles têm ids/atributos gerados dinamicamente)
+  if($('#btn-cancel-proposal')) $('#btn-cancel-proposal').onclick = (e)=> {
+    const id = e.target.getAttribute('data-proposal-cancel');
+    STUDENT_PROPOSAL_MODE = null;
+    render();
+  };
+  if($('#btn-send-proposal')) $('#btn-send-proposal').onclick = (e)=> {
+    const id = e.target.getAttribute('data-proposal-send');
+    handleStudentProposeSubmit(id);
+  };
+
+  /* re-bind dynamic open-student rows (when rendered in tab bodies) */
+  document.querySelectorAll('[data-open-student]').forEach(openStudentFromRow);
+
+  // Delegação global: garante que qualquer elemento (criado dinamicamente ou não)
+  // com data-open-student abra o perfil corretamente.
+  // Isso resolve o problema de elementos dinâmicos que às vezes perdem o listener.
+  if(!document.body.__openStudentDelegationAttached){
+    document.body.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-open-student]');
+      if (!btn) return;
+      const id = btn.getAttribute('data-open-student');
+      if (!id) return;
+      SELECTED_STUDENT_ID = id;
+      CALENDAR_MONTH = null;
+      EDIT_LABELS_MODE = false;
+      EDIT_STUDENT_MODE = false;
+      EDITING_FORGOT_INDEX = null;
+      DELETE_CONFIRM_ID = null;
+      PLAN_META_MODE = false;
+      END_TRIMESTER_CONFIRM = null;
+      ADMIN_VIEW = 'detail';
+      render();
+    });
+    document.body.__openStudentDelegationAttached = true;
+  }
 }
 
 function handleStudentLogin(){
+  CALENDAR_MONTH = null;
   const code=document.getElementById('student-code-input').value.trim();
   if(!/^\d+$/.test(code)){
     LOGIN_ERROR='Código deve conter apenas números.';
     render(); return;
   }
   const student=DATA.students.find(s=>s.code===code);
-  if(!student){ LOGIN_ERROR='Código não encontrado. Confira com seu orientador.'; render(); return; }
+  if(!student){ LOGIN_ERROR='Código não encontrado. Confira com seu orientador.'; render(); return;
+  }
   LOGIN_ERROR=''; SESSION={role:'student',studentId:student.id}; STUDENT_VIEW='journey'; render();
+  loadPlanResponsesForStudent(student).then(changed=>{ if(changed && SESSION && SESSION.studentId===student.id) render(); });
 }
 async function handleAdminLogin(){
   const now=Date.now();
@@ -2651,6 +3295,7 @@ async function handleAdminLogin(){
   }
 }
 
+/* ---------- Alternar status de bloco, adicionar/remover ---------- */
 async function toggleBlock(index){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   const block = student.blocks.find(b=>b.index===index);
@@ -2688,6 +3333,125 @@ async function removeBlock(index){
   await saveData();
   render();
 }
+
+/* ---------- Proposta / Aceite do aluno (fluxo solicitado) ---------- */
+// Justificativa da proposta do aluno: precisa ser uma explicação de verdade
+const PROPOSAL_MIN_CHARS = 30;
+const PROPOSAL_MIN_WORDS = 5;
+const proposalWordCount = (t) => (String(t||'').trim().match(/\S+/g) || []).length;
+const proposalNoteOk = (t) => String(t||'').trim().length >= PROPOSAL_MIN_CHARS && proposalWordCount(t) >= PROPOSAL_MIN_WORDS;
+
+// ---- Respostas do aluno às metas planejadas ----
+// Ficam numa coleção própria (plan_responses), assim o aluno não precisa sobrescrever o banco inteiro.
+const PLAN_RESPONSES = 'plan_responses';
+const planResponseDocId = (studentId, entryId) => `${studentId}_${entryId}`;
+const hasFirestore = () => !!(window.firebase && typeof db !== 'undefined' && db);
+function applyPlanResponse(entry, r){
+  if(!entry || !r || entry.studentResponse) return false;
+  entry.studentResponse = r.response;
+  entry.studentRespondedAt = r.respondedAt || null;
+  if(r.response === 'proposed'){
+    entry.studentProposal = { proposedStage:r.proposedStage, proposedSheet:r.proposedSheet, note:r.note||'', submittedAt:r.respondedAt||null };
+  }
+  return true;
+}
+async function sendPlanResponse(student, entry, response, proposal){
+  if(!hasFirestore()) return { ok:false };
+  const payload = { studentId:student.id, entryId:entry.id, response, respondedAt:new Date().toISOString() };
+  if(proposal){ payload.proposedStage = proposal.proposedStage; payload.proposedSheet = proposal.proposedSheet; payload.note = proposal.note || ''; }
+  try{
+    await db.collection(PLAN_RESPONSES).doc(planResponseDocId(student.id, entry.id)).set(payload);
+    return { ok:true, payload };
+  }catch(e){
+    console.warn('Falha ao enviar resposta da meta', e);
+    FIREBASE_LAST_ERROR = e;
+    return { ok:false, error:e };
+  }
+}
+async function loadPlanResponsesForStudent(student){
+  if(!hasFirestore()) return false;
+  let changed = false;
+  for(const entry of (student.metaHistory||[]).filter(e=>e.status==='planned' && !e.studentResponse)){
+    try{
+      const doc = await db.collection(PLAN_RESPONSES).doc(planResponseDocId(student.id, entry.id)).get();
+      if(doc.exists && applyPlanResponse(entry, doc.data())) changed = true;
+    }catch(e){ console.warn('Falha ao ler resposta da meta', e); }
+  }
+  return changed;
+}
+async function syncPlanResponsesAdmin(){
+  if(!hasFirestore() || !auth || !auth.currentUser || !DATA || !DATA.students) return;
+  try{
+    const snap = await db.collection(PLAN_RESPONSES).get();
+    let changed = false;
+    snap.forEach(doc=>{
+      const r = doc.data() || {};
+      const st = DATA.students.find(x=>x.id===r.studentId);
+      const entry = st && (st.metaHistory||[]).find(e=>e.id===r.entryId && e.status==='planned');
+      if(entry && applyPlanResponse(entry, r)){ touch(st); changed = true; }
+    });
+    if(changed){
+      await saveData();
+      if(!EDIT_STUDENT_MODE && !PLAN_META_MODE) render();
+    }
+  }catch(e){ console.warn('Falha ao sincronizar respostas dos alunos', e); }
+}
+// selo de status da resposta (visão do orientador)
+function planResponseBadge(student){ return ''; }
+
+async function handleStudentAccept(entryId){
+  if(!SESSION || SESSION.role!=='student') return;
+  const student = DATA.students.find(s=>s.id===SESSION.studentId);
+  if(!student) return;
+  const entry = (student.metaHistory||[]).find(e=>e.id===entryId && e.status==='planned');
+  if(!entry) return;
+  if(entry.studentResponse) { showToast('Você já respondeu essa proposta.'); return; }
+  const res = await sendPlanResponse(student, entry, 'accepted');
+  SAVE_FAILURE_PENDING = false;
+  if(!res.ok){ showToast('⚠️ Não foi possível enviar sua resposta agora. Tente de novo em instantes.'); return; }
+  applyPlanResponse(entry, res.payload);
+  STUDENT_PROPOSAL_MODE = null;
+  showToast('Aceite enviado! O orientador já pode ver sua resposta.');
+}
+async function handleStudentProposeSubmit(entryId){
+  if(!SESSION || SESSION.role!=='student') return;
+  const student = DATA.students.find(s=>s.id===SESSION.studentId);
+  if(!student) return;
+  const entry = (student.metaHistory||[]).find(e=>e.id===entryId && e.status==='planned');
+  if(!entry) return;
+  if(entry.studentResponse) { showToast('Você já respondeu essa proposta.'); return; }
+
+  const stageEl = document.getElementById(`f-prop-stage-${entryId}`);
+  const sheetEl = document.getElementById(`f-prop-sheet-${entryId}`);
+  const noteEl = document.getElementById(`f-prop-note-${entryId}`);
+  if(!stageEl || !sheetEl) { showToast('Erro no formulário. Tente novamente.'); return; }
+
+  const proposedStage = stageEl.value;
+  const proposedSheetRaw = sheetEl.value;
+  const proposedSheet = Number(proposedSheetRaw);
+  const note = (noteEl?.value || '').trim();
+
+  if(proposedSheetRaw==='' || !isValidSheet(proposedSheet)){
+    showToast('Informe uma folha válida (0–200).'); return;
+  }
+  if(!proposalNoteOk(note)){
+    const er = document.getElementById(`prop-error-${entryId}`);
+    if(er) er.textContent = `Explique melhor o motivo da sua proposta: escreva uma frase com pelo menos ${PROPOSAL_MIN_CHARS} caracteres e ${PROPOSAL_MIN_WORDS} palavras.`;
+    else showToast('Escreva a justificativa para enviar sua proposta.');
+    if(noteEl) noteEl.focus();
+    return;
+  }
+
+  // envio único: vai para a coleção de respostas, sem reescrever o banco inteiro
+  const res = await sendPlanResponse(student, entry, 'proposed', { proposedStage, proposedSheet, note });
+  SAVE_FAILURE_PENDING = false;
+  if(!res.ok){ showToast('⚠️ Não foi possível enviar sua proposta agora. Tente de novo em instantes.'); return; }
+  applyPlanResponse(entry, res.payload);
+  STUDENT_PROPOSAL_MODE = null;
+  showToast('Proposta enviada ao orientador.');
+}
+
+/* ---------- Manuseio de avisos de esquecimento ---------- */
 async function saveForgottenNote(){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   const block = student.blocks.find(b=>b.index===EDITING_FORGOT_INDEX);
@@ -2711,6 +3475,8 @@ async function removeForgottenNote(){
   EDITING_FORGOT_INDEX = null;
   showToast('Aviso removido.');
 }
+
+/* ---------- Registrar período, editar histórico ---------- */
 async function registerWeek(){
   const startInput = document.getElementById('input-week-start');
   const endInput = document.getElementById('input-week-end');
@@ -2760,6 +3526,7 @@ async function saveWeeklyHistoryEdit(id){
   render();
 }
 
+/* ---------- Recompensas ---------- */
 async function setRewardCandy(index, candy){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   if(!student.rewards) student.rewards = {};
@@ -2815,46 +3582,66 @@ async function saveStudentEdit(){
   student.code = code;
   student.avatar = avatar;
 
-  if(startChanged){
-    // ponto de partida mudou: a trilha inteira é recalculada a partir da nova referência
-    const { total, blocks } = buildBlocks(startStage, startSheet, targetStage, targetSheet);
-    student.blocks = blocks;
-    student.totalBlocks = total;
-  } else {
-    // só a meta pode ter mudado: preserva o progresso já feito
-    updateStudentTarget(student, targetStage, targetSheet, targetDate);
-  }
+  // O material didático (blocos, números e status) NÃO é alterado ao mudar a meta.
+  student.targetStage = targetStage;
+  student.targetSheet = targetSheet;
+  student.targetEnd = targetDate;
   student.startStage = startStage;
   student.startSheet = startSheet;
   student.startDate = startDate;
   student.targetStart = startDate;
 
+  if(EDIT_MODE_DRAFT){
+    const d = EDIT_THEME_DRAFT || draftFromTheme(student.missionTheme);
+    student.missionTheme = (EDIT_MODE_DRAFT === 'vacation')
+      ? { emoji: MISSION_THEME_DEFAULT.emoji, name: (d.name||'').trim() || 'Missão de Férias', message: (d.message||'').trim() }
+      : null;
+  }
+  EDIT_THEME_DRAFT = null; EDIT_MODE_DRAFT = null;
   touch(student);
   await saveData();
   EDIT_STUDENT_MODE = false;
-  showToast(startChanged ? 'Aluno atualizado! (progresso dos blocos recalculado)' : 'Aluno atualizado!');
+  showToast('Aluno atualizado! O material didático foi mantido.');
 }
 async function savePlannedMeta(){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   const errEl = document.getElementById('plan-meta-error');
+  const startStage = document.getElementById('f-plan-start-stage').value;
+  const startSheetRaw = document.getElementById('f-plan-start-sheet').value;
   const stage = document.getElementById('f-plan-stage').value;
   const sheetRaw = document.getElementById('f-plan-sheet').value;
+  const startDate = document.getElementById('f-plan-start-date').value;
   const date = document.getElementById('f-plan-date').value;
+  const fail = (t)=>{ if(errEl) errEl.textContent = t; };
 
-  if(sheetRaw==='' || !isValidSheet(sheetRaw) || !date){
-    if(errEl) errEl.textContent = 'Preencha o estágio, a folha e a data prevista.';
-    return;
+  if(startSheetRaw==='' || !isValidSheet(startSheetRaw) || sheetRaw==='' || !isValidSheet(sheetRaw)){
+    fail('Preencha as folhas de partida e da meta (entre 0 e 200).'); return;
   }
+  if(!startDate || !date){ fail('Preencha a data inicial e a data final.'); return; }
+  if(startDate >= date){ fail('A data final precisa ser depois da data inicial.'); return; }
+  if(stagePoint(startStage, startSheetRaw) === stagePoint(stage, sheetRaw)){
+    fail('O ponto de partida e a meta não podem ser iguais.'); return;
+  }
+
+  const d = PLAN_THEME_DRAFT || draftFromTheme(null);
+  const planMode = PLAN_MODE_DRAFT === 'normal' ? 'normal' : 'vacation';
   if(!student.metaHistory) student.metaHistory = [];
+  student.metaHistory = student.metaHistory.filter(e=>e.status!=='planned');
   student.metaHistory.push({
     id: uid(), status:'planned',
+    startStage, startSheet: Number(startSheetRaw), startDate,
     targetStage: stage, targetSheet: Number(sheetRaw), targetEnd: date,
-    plannedAt: todayISO()
+    mode: planMode,
+    theme: planMode==='vacation' ? { emoji: MISSION_THEME_DEFAULT.emoji, name: (d.name||'').trim() || 'Missão de Férias', message: (d.message||'').trim() } : null,
+    plannedAt: todayISO(),
+    studentResponse: null,
+    studentProposal: null,
+    studentRespondedAt: null
   });
   touch(student);
   await saveData();
-  PLAN_META_MODE = false;
-  showToast('Próxima meta planejada!');
+  PLAN_META_MODE = false; PLAN_THEME_DRAFT = null; PLAN_MODE_DRAFT = null; PLAN_EDIT_ID = null;
+  showToast(planMode==='vacation' ? 'Próxima meta salva! O aluno já vê como "Próxima missão".' : 'Próxima meta salva! O aluno já vê como "Próxima meta".');
 }
 async function removePlannedMeta(id){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
@@ -2865,12 +3652,20 @@ async function removePlannedMeta(id){
 }
 async function endTrimester(){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
-  archiveCurrentMeta(student);
+  const archivedEntry = archiveCurrentMeta(student);
+  TB_MODAL = {
+    name: student.name, avatar: student.avatar,
+    stage: `${student.startStage}${student.startSheet} → ${student.targetStage}${student.targetSheet}`,
+    periodLabel: `${fmtDate(student.startDate)} – ${fmtDate(archivedEntry.archivedAt)}`,
+    days: archivedEntry.balance.days, sheets: archivedEntry.balance.sheets,
+    percent: archivedEntry.balance.percent, reached: archivedEntry.reached,
+    allowUndo: true, studentId: student.id, entryId: archivedEntry.id
+  };
 
-  const newStartStage = student.targetStage;
-  const newStartSheet = student.targetSheet;
-  const newStartDate = todayISO();
   const planned = (student.metaHistory||[]).find(e=>e.status==='planned');
+  const newStartStage = (planned && planned.startStage) || student.targetStage;
+  const newStartSheet = (planned && planned.startStage) ? planned.startSheet : student.targetSheet;
+  const newStartDate = (planned && planned.startDate) || todayISO();
 
   student.startStage = newStartStage;
   student.startSheet = newStartSheet;
@@ -2878,7 +3673,6 @@ async function endTrimester(){
   student.targetStart = newStartDate;
 
   if(planned){
-    // já existe uma meta planejada para o próximo trimestre: aplica direto
     const { total, blocks } = buildBlocks(newStartStage, newStartSheet, planned.targetStage, planned.targetSheet);
     student.blocks = blocks;
     student.totalBlocks = total;
@@ -2886,14 +3680,15 @@ async function endTrimester(){
     student.targetSheet = planned.targetSheet;
     student.targetEnd = planned.targetEnd;
     student.metaHistory = student.metaHistory.filter(e=>e.id!==planned.id);
+    student.missionTheme = planned.theme || null;
     touch(student);
     await saveData();
     END_TRIMESTER_CONFIRM = null;
-    showToast('Novo trimestre iniciado com a meta planejada!');
+    showToast(planned.theme ? 'Nova meta ativada! O aluno já vê a missão de férias.' : 'Nova meta ativada!');
   } else {
-    // sem meta planejada: zera os blocos e abre a edição para definir a nova meta
     student.blocks = [];
     student.totalBlocks = 0;
+    student.missionTheme = null;
     touch(student);
     await saveData();
     END_TRIMESTER_CONFIRM = null;
@@ -2924,6 +3719,19 @@ async function deleteStudent(){
   await saveData();
   DELETE_CONFIRM_ID = null;
   ADMIN_VIEW='students'; render();
+}
+async function applyBulkTargetEnd(date){
+  if(!date) return;
+  let changed = 0; const skipped = [];
+  DATA.students.forEach(st=>{
+    if(st.startDate && date < st.startDate){ skipped.push(st.name); return; }
+    st.targetEnd = date; touch(st); changed++;
+  });
+  BULK_END_CONFIRM = null;
+  await saveData();
+  showToast(skipped.length
+    ? `Fim da meta alterado para ${changed} alunos. Não alterado (data antes do início): ${skipped.join(', ')}.`
+    : `Fim da meta alterado para ${changed} ${changed===1?'aluno':'alunos'}!`);
 }
 async function saveTrimesterDefaults(){
   const start = document.getElementById('f-trimester-start').value;
@@ -3051,6 +3859,8 @@ async function loadBackupsList(){
 (async function init(){
   loadTheme();
   applyTheme();
+  loadViewMode();
+  applyViewMode();
   await loadData();
   render();
   if(auth){
@@ -3060,6 +3870,7 @@ async function loadBackupsList(){
         ADMIN_LOGIN_STAGE=false;
         LOGIN_ERROR='';
         render();
+        syncPlanResponsesAdmin();
       }else if(SESSION.role==='admin'){
         SESSION={role:null,studentId:null};
         ADMIN_LOGIN_STAGE=false;
@@ -3068,6 +3879,7 @@ async function loadBackupsList(){
         render();
       }
     });
+    setInterval(()=>{ if(SESSION && SESSION.role==='admin') syncPlanResponsesAdmin(); }, 60000);
   }
 })();
 </script>
