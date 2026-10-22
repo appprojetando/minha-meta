@@ -8,7 +8,7 @@
 <title>MINHA META</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%2337E2A0' width='100' height='100' rx='18'/%3E%3Ctext x='50' y='60' font-size='60' text-anchor='middle' fill='%2306301F' font-family='Arial'%3E%F0%9F%9A%80%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- === FIREBASE: já inserido com a sua configuração (modo compat) === -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -68,6 +68,7 @@
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;}
+*,*::before,*::after{font-family:'Lexend',sans-serif!important;}
 html,body{margin:0;padding:0;}
 body{
   background:
@@ -75,7 +76,7 @@ body{
     radial-gradient(circle at 90% 8%, #17204a 0%, transparent 40%),
     var(--bg-deep);
   color:var(--text);
-  font-family:'Inter',sans-serif;
+  font-family:'Source Sans 3',sans-serif;
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
 }
@@ -147,12 +148,120 @@ input,select{font-family:inherit;}
 .muted{color:var(--text-muted);}
 .faint{color:var(--text-faint);}
 .center{text-align:center;}
+.quick-nav{display:flex;gap:6px;overflow-x:auto;position:sticky;top:0;z-index:6;background:var(--bg-deep);padding:8px 0 10px;margin:0 0 4px;scrollbar-width:none;}
+.quick-nav::-webkit-scrollbar{display:none;}
+[id^="sec-"]{scroll-margin-top:56px;}
+.evo-chips{display:flex;flex-wrap:wrap;gap:6px;max-height:128px;overflow-y:auto;margin:10px 0 4px;}
+.evo-chip{border:1px solid var(--border);background:var(--bg-surface-2);color:var(--text-muted);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;}
+.evo-chip.active{background:var(--peri-dim);border-color:#8C93FF88;color:var(--text);}
+.bars-scroll{overflow-x:auto;padding-bottom:4px;}
+.evo-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--text-muted);}
+.evo-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;}
+.hist-group{border-bottom:1px solid var(--border);}
+.hist-group:last-child{border-bottom:none;}
+.hist-group>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;}
+.hist-group>summary::-webkit-details-marker{display:none;}
+.hist-group>summary::after{content:'▾';color:var(--text-faint);transition:transform .15s;flex-shrink:0;}
+.hist-group:not([open])>summary::after{transform:rotate(-90deg);}
+.quick-nav .qn-chip{flex-shrink:0;border:1px solid var(--border);background:var(--bg-surface-2);color:var(--text-muted);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;}
 .section-title{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin:22px 0 10px;font-weight:600;}
 .divider{height:1px;background:var(--border);margin:14px 0;}
 .badge-green{color:var(--mint);background:var(--mint-dim);border:1px solid #37E2A044;}
 .badge-amber{color:var(--amber);background:var(--amber-dim);border:1px solid #FFB64844;}
 .badge-peri{color:var(--peri);background:var(--peri-dim);border:1px solid #8C93FF44;}
 .badge{padding:3px 9px;border-radius:8px;font-size:11.5px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
+
+/* ---------- Comparativo e leitura de tendência da evolução ---------- */
+.evo-compare-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.evo-compare-heading small{display:block;color:var(--text-muted);font-size:10.5px;margin-bottom:4px;}
+.evo-compare-heading strong{display:block;font-size:13px;text-transform:capitalize;}
+.evo-compare-previous{text-align:right;}
+.evo-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.evo-compare-metric{min-width:0;border:1px solid var(--border);border-radius:12px;background:var(--bg-surface-2);padding:10px 9px;}
+.evo-compare-metric span{display:block;font-size:11px;color:var(--text-muted);line-height:1.35;}
+.evo-compare-metric strong{display:block;font-family:'Space Grotesk',sans-serif;font-size:22px;margin:5px 0;}
+.evo-compare-metric small{display:block;font-size:10px;line-height:1.4;color:var(--text-muted);overflow-wrap:anywhere;}
+.evo-trend-box{display:flex;align-items:flex-start;gap:10px;margin-top:12px;padding:12px;border-radius:12px;background:var(--bg-surface-2);border:1px solid var(--border);}
+.evo-trend-icon{font-size:22px;flex-shrink:0;}
+.evo-trend-box strong{font-size:12.5px;}
+.evo-trend-box p{font-size:11.5px;line-height:1.5;color:var(--text-muted);margin:4px 0 0;}
+@media(max-width:380px){.evo-compare-grid{grid-template-columns:1fr;}.evo-compare-metric{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 8px;}.evo-compare-metric strong{grid-column:2;grid-row:1/3;margin:0;}.evo-compare-metric small{grid-column:1;}}
+
+/* ---------- Perfil do aluno: pesquisa e histórico mais intuitivos ---------- */
+.profile-edit-intro{padding:13px 14px;border-radius:12px;background:var(--mint-dim);border:1px solid #37E2A044;}
+.profile-edit-intro strong{display:block;font-size:14px;color:var(--text);}
+.profile-edit-intro span{display:block;margin-top:4px;font-size:12px;line-height:1.45;color:var(--text-muted);}
+.admin-profile-hero{display:flex;align-items:center;gap:14px;padding:18px;background:linear-gradient(145deg,#202849 0%,#171D3A 72%);border:1px solid rgba(55,226,160,.22);border-radius:18px;margin-bottom:20px;box-shadow:0 12px 28px #00000018;}
+.admin-profile-mark{width:58px;height:58px;display:grid;place-items:center;flex-shrink:0;border-radius:17px;background:linear-gradient(135deg,var(--mint-dim),var(--sky-dim));border:1px solid #37E2A044;font-size:29px;}
+.admin-profile-heading{min-width:0;}
+.admin-profile-heading h2{font-size:19px;line-height:1.2;margin:0 0 4px;}
+.admin-profile-heading p{font-size:12px;line-height:1.4;color:var(--text-muted);margin:0;overflow-wrap:anywhere;}
+.admin-profile-section{margin:0 0 18px;}
+.admin-profile-section-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.02em;margin:0 0 9px;color:var(--text);}
+.admin-profile-card{padding:16px;background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-surface-2) 100%);border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 18px #00000012;}
+.admin-profile-help{font-size:12px;line-height:1.55;color:var(--text-muted);margin:0 0 14px;}
+.admin-profile-card .field-row{gap:10px;}
+.admin-profile-card .field{min-width:0;}
+.admin-profile-card .field input{min-height:46px;}
+.admin-profile-card .btn{min-height:42px;}
+.admin-profile-back{margin-top:4px;}
+@media(max-width:380px){.admin-profile-hero{padding:14px;gap:11px;}.admin-profile-mark{width:50px;height:50px;font-size:25px;border-radius:14px;}.admin-profile-card{padding:13px;}.admin-profile-card .field-row{gap:7px;}}
+
+.evo-student-results{display:flex;flex-direction:column;gap:7px;margin-top:8px;max-height:260px;overflow:auto;padding:1px 2px 4px;}
+.evo-student-result{width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:13px;border:1px solid var(--border);background:var(--bg-surface);color:var(--text);cursor:pointer;min-width:0;}
+.evo-student-result.active{border-color:var(--peri);background:var(--peri-dim);box-shadow:0 0 0 1px #8C93FF22;}
+.evo-result-avatar{width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:11px;background:var(--bg-surface-2);font-size:21px;}
+.evo-result-info{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.evo-result-info strong{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.evo-result-info small{font-size:10.5px;color:var(--text-muted);}
+.evo-result-action{font-size:10.5px;color:var(--peri);font-weight:700;white-space:nowrap;}
+.monthly-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.monthly-overview>div{background:var(--bg-surface-2);border:1px solid var(--border);border-radius:12px;padding:11px 8px;min-width:0;}
+.monthly-overview small{display:block;font-size:10px;line-height:1.3;color:var(--text-muted);}
+.monthly-overview strong{display:block;font-family:'Space Grotesk',sans-serif;font-size:21px;margin-top:5px;}
+.monthly-record{padding:2px 0;}
+.monthly-record>summary{padding:13px 0;}
+.monthly-record-main{width:100%;min-width:0;}
+.monthly-record-title{font-size:13.5px;font-weight:700;text-transform:capitalize;}
+.monthly-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.monthly-metrics span{display:flex;align-items:baseline;gap:4px;background:var(--bg-surface-2);border-radius:8px;padding:7px 8px;min-width:0;}
+.monthly-metrics b{font-family:'JetBrains Mono',monospace;font-size:13px;}
+.monthly-metrics small{font-size:10px;color:var(--text-muted);}
+.monthly-record-detail{padding:0 0 14px;}
+.empty-history{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:22px 8px;}
+.empty-history>span{font-size:30px;}
+.empty-history b{font-size:14px;}
+.empty-history small{font-size:12px;color:var(--text-muted);line-height:1.45;max-width:250px;}
+@media(max-width:360px){.evo-result-action{font-size:0}.evo-result-action span{font-size:18px}.monthly-overview strong{font-size:18px}.monthly-metrics span{gap:2px;padding:7px 5px}}
+
+/* ---------- Perfil do aluno: calendário mensal responsivo ---------- */
+.student-calendar-compact{width:100%;max-width:440px;margin:0 auto;padding:0;}
+.student-calendar-card{padding:16px 14px;background:linear-gradient(160deg,var(--bg-surface) 0%,#1b2344 100%);border:1px solid var(--border);border-radius:18px;box-shadow:0 12px 30px #00000018;}
+.student-calendar-compact .cal-header{margin-bottom:16px;}
+.student-calendar-compact .cal-month-label{font-size:15px;letter-spacing:.01em;}
+.student-calendar-compact .cal-summary{padding:12px;border:1px solid var(--border);border-radius:13px;background:#0f142844;margin-bottom:15px;}
+.student-calendar-compact .cal-summary-pct{font-size:25px;}
+.student-calendar-compact .cal-summary-breakdown{gap:7px 12px;}
+.student-calendar-compact .cal-summary-breakdown span{font-size:10.5px;}
+.student-calendar-compact .cal-weekdays,.student-calendar-compact .cal-grid{gap:6px;}
+.student-calendar-compact .cal-weekdays{margin-bottom:8px;}
+.student-calendar-compact .cal-weekdays span{font-size:10px;letter-spacing:.04em;}
+.student-calendar-compact .cal-cell{font-size:11px;max-width:none;width:100%;border-radius:10px;}
+.student-calendar-compact .cal-legend{gap:9px 14px;padding-top:12px;border-top:1px solid var(--border);}
+.student-calendar-compact .cal-legend span{font-size:10.5px;}
+@media(max-width:380px){.student-calendar-card{padding:13px 10px;}.student-calendar-compact .cal-weekdays,.student-calendar-compact .cal-grid{gap:4px;}.student-calendar-compact .cal-cell{border-radius:8px;font-size:10px;}.student-calendar-compact .cal-summary{padding:10px;}}
+.student-study-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch;}
+.student-study-entry{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);grid-template-rows:auto auto;gap:9px;align-items:start;padding:12px;border:1px solid var(--border);border-radius:15px;background:linear-gradient(145deg,var(--bg-surface) 0%,var(--bg-surface-2) 100%);min-width:0;box-shadow:0 3px 10px #00000008;}
+.student-study-entry-icon{width:30px;height:30px;border-radius:9px;background:var(--mint-dim);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.student-study-entry-content{min-width:0;align-self:center;}
+.student-study-entry-date{font-size:12px;font-weight:750;line-height:1.4;overflow-wrap:anywhere;}
+.student-study-entry-label{font-size:10px;color:var(--text-muted);margin-top:3px;}
+.student-study-entry-note{grid-column:1 / -1;margin-top:0;padding:8px 9px;border-radius:9px;background:var(--bg-surface);border:1px solid var(--border);font-size:11.5px;line-height:1.45;color:var(--text-muted);overflow-wrap:anywhere;}
+.student-study-sheets{text-align:center;white-space:nowrap;padding:6px 8px;border-radius:10px;background:var(--mint-dim);color:var(--text);grid-column:1 / -1;display:flex;align-items:baseline;justify-content:center;gap:5px;}
+.student-study-sheets strong{display:block;font-family:'Space Grotesk',sans-serif;font-size:17px;line-height:1.2;}
+.student-study-sheets small{display:block;font-size:9px;color:var(--text-muted);margin-top:2px;}
+@media(max-width:420px){.student-study-list{grid-template-columns:1fr;gap:8px;}.student-study-entry{padding:10px;}.student-study-entry-note{grid-column:1 / -1;}.student-study-sheets{justify-content:flex-start;padding:5px 8px;}.student-study-sheets strong{font-size:15px;}.student-study-sheets small{margin-top:0;}}
 
 /* ---------- Landing ---------- */
 .landing-wrap{
@@ -641,22 +750,6 @@ input,select{font-family:inherit;}
 }
 .theme-toggle:active{transform:scale(.96);}
 
-/* ---------- Visualização (celular / tablet / computador) ---------- */
-.tt-wrap{display:inline-flex;align-items:center;gap:8px;}
-.view-select{height:38px;border-radius:11px;border:1px solid var(--border);background:var(--bg-surface-2);color:var(--text);font-size:12.5px;padding:0 8px;max-width:128px;}
-body[data-view="phone"] #app, body[data-view="phone"] .bottom-nav{max-width:430px;}
-body[data-view="phone"] .blocks-grid{grid-template-columns:repeat(3,1fr);}
-/* Tablet: uma coluna, mais larga e arejada (sem aumentar o tamanho dos elementos) */
-body[data-view="tablet"] #app, body[data-view="tablet"] .bottom-nav{max-width:700px;}
-body[data-view="tablet"] .screen{padding-left:28px;padding-right:28px;}
-body[data-view="tablet"] .blocks-grid{grid-template-columns:repeat(5,1fr);}
-/* Computador: duas colunas de cartões; títulos, avisos e missões ocupam a linha toda */
-body[data-view="desktop"] #app, body[data-view="desktop"] .bottom-nav{max-width:1040px;}
-body[data-view="desktop"] .screen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;align-items:start;padding-left:32px;padding-right:32px;}
-body[data-view="desktop"] .screen > *{grid-column:1 / -1;}
-body[data-view="desktop"] .screen > .card{grid-column:auto;}
-body[data-view="desktop"] .screen > .card.jc{grid-column:1 / -1;}
-@media print{.view-select{display:none !important;}}
 
 
 /* ---------- Modo claro/escuro ---------- */
@@ -783,11 +876,13 @@ let HALL_TAB = 'sheets';         // aba ativa do Hall: sheets | streak | correct
 let TB_MODAL = null;             // balanço do trimestre recém-encerrado, exibido para o orientador
 let HALL_PERIOD_MODE = 'month';
 let HALL_MONTH = '';
+let HALL_TRIMESTER_INDEX = 0; // 0 = trimestre atual, 1+ = períodos anteriores
 let UNDO_TRIMESTER_CONFIRM = null;
 let ADMIN_VIEW = 'overview';
 let STUDENT_VIEW = 'journey';
 let SELECTED_STUDENT_ID = null;
 let SEARCH_TERM = '';
+let EVO_SEARCH = '';           // busca de aluno na aba Evolução
 let LOGIN_ERROR = '';
 /* ===== MODO MANUTENÇÃO =====
    true  = alunos veem o aviso de manutenção (o orientador continua entrando normalmente)
@@ -812,9 +907,6 @@ let SAVE_LAST_STATUS = null;
 let SAVE_FAILURE_PENDING = false;
 let THEME = 'dark';
 const THEME_STORAGE_KEY = 'minha-meta-theme';
-const VIEW_STORAGE_KEY = 'minha-meta-view';
-const VIEW_MODES = [['auto','🔄 Automático'],['phone','📱 Celular'],['tablet','📋 Tablet'],['desktop','💻 Computador']];
-let VIEW_MODE = 'auto';
 let ADMIN_LOGIN_ATTEMPTS = 0;
 let ADMIN_LOGIN_LOCK_UNTIL = 0;
 let ADMIN_LOGIN_LOCK_TIMER = null;
@@ -881,7 +973,8 @@ const storage = {
 const uid = () => 'id_' + Math.random().toString(36).slice(2,10);
 const todayISO = () => new Date().toISOString().slice(0,10);
 const daysAgoISO = (n) => { const d = new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); };
-const fmtDate = (iso) => { if(!iso) return '—'; const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); };
+const fmtDate = (iso) => { if(!iso) return '—'; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
+const fmtDateFull = (iso) => { if(!iso) return '—'; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
 const fmtDateTime = (iso) => {
   if(!iso) return '—';
   const d = new Date(iso);
@@ -900,19 +993,6 @@ function loadTheme(){
     THEME = saved === 'light' ? 'light' : 'dark';
   }catch(e){ THEME = 'dark'; }
 }
-function loadViewMode(){
-  try{
-    const v = localStorage.getItem(VIEW_STORAGE_KEY);
-    VIEW_MODE = VIEW_MODES.some(m=>m[0]===v) ? v : 'auto';
-  }catch(e){ VIEW_MODE = 'auto'; }
-}
-function applyViewMode(){ document.body.setAttribute('data-view', VIEW_MODE); }
-function setViewMode(mode){
-  VIEW_MODE = VIEW_MODES.some(m=>m[0]===mode) ? mode : 'auto';
-  try{ localStorage.setItem(VIEW_STORAGE_KEY, VIEW_MODE); }catch(e){}
-  applyViewMode();
-  render();
-}
 function applyTheme(){
   document.body.classList.toggle('theme-light', THEME === 'light');
   document.body.setAttribute('data-theme', THEME);
@@ -927,12 +1007,7 @@ function renderThemeToggle(){
   const nextTheme = THEME==='dark' ? 'light' : 'dark';
   const icon = THEME==='dark' ? '☀️' : '🌙';
   const label = THEME==='dark' ? 'Ativar modo claro' : 'Ativar modo escuro';
-  return `<span class="tt-wrap">
-    <select class="view-select" data-view-select aria-label="Escolher visualização" title="Visualização">
-      ${VIEW_MODES.map(([id,name])=>`<option value="${id}" ${VIEW_MODE===id?'selected':''}>${name}</option>`).join('')}
-    </select>
-    <button class="theme-toggle" data-theme-toggle="${nextTheme}" aria-label="${label}" title="${label}">${icon}</button>
-  </span>`;
+  return `<button class="theme-toggle" data-theme-toggle="${nextTheme}" aria-label="${label}" title="${label}">${icon}</button>`;
 }
 
 /* ---------- estrutura de estágios e blocos ---------- */
@@ -1098,7 +1173,10 @@ function hallRankMark(rank){
 }
 function streakStats(student){
   const attendance = student.attendance || {};
-  return { total: Object.keys(attendance).length };
+  // Após encerrar o trimestre, a contagem recomeça na data de início da nova meta
+  // (os dias continuam salvos no calendário e no histórico).
+  const from = student.constancyStart || '';
+  return { total: Object.keys(attendance).filter(d=> !from || d >= from).length };
 }
 function isRecentlyActive(student){
   const dates = Object.keys(student.attendance || {});
@@ -1490,14 +1568,17 @@ function renderStudentApp(){
           <div class="faint" style="font-size:12px;">Estágio ${esc(student.targetStage)}</div>
         </div>
       </div>
-      ${renderThemeToggle()}
+      <div class="row" style="gap:6px;">
+        ${renderThemeToggle()}
+        <button class="icon-btn" id="btn-logout" aria-label="Sair" title="Sair">⎋</button>
+      </div>
     </div>
     ${body}
     ${renderStudentNav()}
     ${unseenBalance ? renderTbOverlay({
         name: student.name, avatar: student.avatar,
         stage: `${unseenBalance.startStage}${unseenBalance.startSheet} → ${unseenBalance.targetStage}${unseenBalance.targetSheet}`,
-        periodLabel: `${fmtDate(unseenBalance.startDate)} – ${fmtDate(unseenBalance.archivedAt)}`,
+        periodLabel: `${fmtDateFull(unseenBalance.startDate)} a ${fmtDateFull(unseenBalance.archivedAt)}`,
         days: unseenBalance.balance.days, sheets: unseenBalance.balance.sheets,
         percent: unseenBalance.balance.percent, reached: unseenBalance.reached
       }, null, `data-dismiss-balance="${unseenBalance.id}"`) : ''}
@@ -1706,9 +1787,7 @@ function renderJourney(student){
     </div>
 
     <div class="section-title">📅 Histórico mensal</div>
-    <div class="card">
-      ${renderCalendar(student, true)}
-    </div>
+    <div class="student-calendar-card"><div class="student-calendar-compact">${renderCalendar(student, true)}</div></div>
   </div>`;
 }
 
@@ -1829,26 +1908,233 @@ function renderMonthComparisonSimple(student){
     </div>`;
 }
 
+function monthLabelOf(ym){ const [y,m]=ym.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}); }
+function monthShortOf(ym){ const [y,m]=ym.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'short'}).replace('.',''); }
+function monthEndISO(ym){ const [y,m]=ym.split('-').map(Number); return ym+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0'); }
+function metaPeriodKeyOf(dateISO){
+  if(!dateISO || !/^\d{4}-\d{2}-\d{2}$/.test(dateISO)) return null;
+  let [y,m,d] = dateISO.split('-').map(Number);
+  if(d < 21){ m--; if(m<1){m=12;y--;} }
+  return y+'-'+String(m).padStart(2,'0');
+}
+function metaPeriodRange(ym){
+  const [y,m] = ym.split('-').map(Number);
+  const start = ym+'-21';
+  let ny=y, nm=m+1; if(nm>12){nm=1;ny++;}
+  const end = ny+'-'+String(nm).padStart(2,'0')+'-20';
+  return {start,end};
+}
+function metaPeriodLabel(ym, short=false){
+  const r = metaPeriodRange(ym);
+  return short ? `${fmtDateFull(r.start)}–${fmtDateFull(r.end)}` : `${fmtDateFull(r.start)} a ${fmtDateFull(r.end)}`;
+}
+function studentMonthStats(student, ym){
+  const range = metaPeriodRange(ym);
+  const att = student.attendance || {};
+  let kumon=0, presencial=0, teste=0;
+  Object.keys(att).forEach(d=>{
+    if(d < range.start || d > range.end) return;
+    const t = att[d];
+    if(t==='kumon') kumon++; else if(t==='presencial') presencial++; else if(t==='teste') teste++;
+  });
+  const days = kumon+presencial+teste;
+  const dim = daysBetween(range.start,range.end)+1;
+  return { ym, startDate:range.start, endDate:range.end, kumon, presencial, teste, days, dim,
+           pct: dim>0 ? Math.round(days/dim*100) : 0,
+           sheets: sheetsInRange(student, range.start, range.end),
+           corrected: hallCorrectedInRange(student, range.start, range.end) };
+}
+// Série contínua por ciclo mensal, de dia 21 a dia 20, em ordem cronológica.
+function studentMonthSeries(student){
+  const set = new Set();
+  Object.keys(student.attendance||{}).forEach(d=>{const k=metaPeriodKeyOf(d);if(k)set.add(k);});
+  (student.weeklyHistory||[]).forEach(h=>{
+    [h.startDate,h.endDate].forEach(d=>{const k=metaPeriodKeyOf(d);if(k)set.add(k);});
+  });
+  (student.blocks||[]).forEach(b=>{const k=metaPeriodKeyOf(b.correctedDate);if(k)set.add(k);});
+  const all = [...set].filter(x=>/^\d{4}-\d{2}$/.test(x)).sort();
+  if(all.length===0) return [];
+  const out = [];
+  let [y,m] = all[0].split('-').map(Number);
+  const last = all[all.length-1];
+  for(let guard=0; guard<240; guard++){
+    const ym = y+'-'+String(m).padStart(2,'0');
+    out.push(studentMonthStats(student, ym));
+    if(ym>=last) break;
+    m++; if(m>12){ m=1; y++; }
+  }
+  return out;
+}
+function evoCompareLabel(current, previous, key, unit=''){
+  const a = Number(current && current[key] || 0), b = Number(previous && previous[key] || 0);
+  if(!previous) return 'Ainda sem mês anterior para comparar';
+  const delta = a-b;
+  if(delta===0) return `Sem alteração em relação ao mês anterior (${a}${unit})`;
+  return `${delta>0?'↑ +':'↓ '}${delta}${unit} em relação ao mês anterior`;
+}
+function evoTrendSummary(months){
+  const active = (months||[]).filter(m=>m.days>0 || m.sheets>0 || m.corrected>0).slice(-3);
+  if(active.length===0) return { title:'Ainda não há dados suficientes', detail:'Os indicadores aparecerão quando houver registros de presença, folhas ou correções.' };
+  if(active.length===1) return { title:'Primeiro mês registrado', detail:`${metaPeriodLabel(active[0].ym)}: ${active[0].days} dias de presença, ${active[0].sheets} folhas e ${active[0].corrected} correções.` };
+  const first=active[0], last=active[active.length-1];
+  const sheetDelta=last.sheets-first.sheets;
+  const dayDelta=last.days-first.days;
+  const direction = sheetDelta>0 ? 'aumento' : sheetDelta<0 ? 'redução' : 'estabilidade';
+  const attendance = dayDelta>0 ? 'mais dias de presença' : dayDelta<0 ? 'menos dias de presença' : 'o mesmo número de dias de presença';
+  return { title:`${direction.charAt(0).toUpperCase()+direction.slice(1)} de folhas no período`, detail:`De ${metaPeriodLabel(first.ym)} a ${metaPeriodLabel(last.ym)}, foram ${Math.abs(sheetDelta)} folhas ${sheetDelta>0?'a mais':sheetDelta<0?'a menos':'de diferença'} e ${attendance} (${last.days} no último mês registrado).` };
+}
+function evoBars(items, opts){
+  opts = opts || {};
+  const color = opts.color || 'linear-gradient(180deg,#5AC8FF,var(--mint))';
+  const unit = opts.unit || '';
+  if(!items.length) return `<span class="muted" style="font-size:13px;">Sem registros ainda.</span>`;
+  const mx = Math.max(opts.max||0, 1, ...items.map(i=>i.value));
+  return `<div class="bars-scroll"><div class="bars-wrap" style="min-width:${items.length*40}px;">${items.map(i=>`
+    <div class="bar-col" title="${esc(i.title||i.label)}">
+      <span class="mono" style="font-size:10px;color:var(--text-muted);">${i.value}${unit}</span>
+      <div class="bar-fill" style="height:${(i.value/mx*80).toFixed(1)}%;background:${color};${i.value===0?'min-height:2px;opacity:.35;':''}"></div>
+      <span class="bar-label">${esc(i.label)}</span>
+    </div>`).join('')}</div></div>`;
+}
+function evoStackedBars(months){
+  if(!months.length) return `<span class="muted" style="font-size:13px;">Sem registros ainda.</span>`;
+  const mx = Math.max(1, ...months.map(m=>m.days));
+  return `<div class="bars-scroll"><div class="bars-wrap" style="min-width:${months.length*40}px;">${months.map(m=>`
+    <div class="bar-col" title="${esc(monthLabelOf(m.ym))}: ${m.kumon} Kumon, ${m.presencial} presencial, ${m.teste} teste">
+      <span class="mono" style="font-size:10px;color:var(--text-muted);">${m.days}</span>
+      <div style="width:100%;height:${(m.days/mx*80).toFixed(1)}%;display:flex;flex-direction:column-reverse;border-radius:6px 6px 3px 3px;overflow:hidden;${m.days===0?'min-height:2px;background:var(--bg-surface-2);':''}">
+        ${m.kumon?`<div style="flex:${m.kumon};background:var(--mint);"></div>`:''}
+        ${m.presencial?`<div style="flex:${m.presencial};background:#5AC8FF;"></div>`:''}
+        ${m.teste?`<div style="flex:${m.teste};background:var(--peri);"></div>`:''}
+      </div>
+      <span class="bar-label">${esc(monthShortOf(m.ym))}</span>
+    </div>`).join('')}</div></div>
+    <div class="evo-legend"><span><i style="background:var(--mint)"></i>Kumon</span><span><i style="background:#5AC8FF"></i>Presencial</span><span><i style="background:var(--peri)"></i>Teste</span></div>`;
+}
+function evoDonut(parts, centerText){
+  const total = parts.reduce((a,p)=>a+p.value,0);
+  const r=40, C=2*Math.PI*r;
+  let off=0;
+  const arcs = total>0 ? parts.filter(p=>p.value>0).map(p=>{
+    const len = p.value/total*C;
+    const el = `<circle cx="50" cy="50" r="${r}" fill="none" stroke="${p.color}" stroke-width="14" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 50 50)"/>`;
+    off += len; return el;
+  }).join('') : '';
+  return `<svg viewBox="0 0 100 100" width="120" height="120" role="img" aria-label="Situação dos blocos" style="flex-shrink:0;">
+    <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--bg-surface-2)" stroke-width="14"/>
+    ${arcs}
+    <text x="50" y="55" text-anchor="middle" font-size="17" font-weight="700" fill="var(--text)" font-family="'Space Grotesk',sans-serif">${esc(centerText)}</text>
+  </svg>`;
+}
+
 function renderMonthlyHistoryAdmin(student){
-  const months = monthlyAttendanceHistory(student);
+  const series = studentMonthSeries(student);
+  const withData = series.filter(m=> m.days>0 || m.sheets>0 || m.corrected>0).slice().reverse();
   return `
-    <div class="section-title">📅 Histórico mensal</div>
-    <div class="card">
-      ${months.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro ainda.</span>` :
-        months.map((m,i)=>`
-          <div style="${i<months.length-1?'margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);':''}">
-            <div class="row" style="margin-bottom:6px;">
-              <span style="font-weight:600;font-size:13px;text-transform:capitalize;">${esc(m.label)}</span>
-              <span class="mono" style="font-size:12.5px;color:var(--mint);">${m.pct}%</span>
+    <div class="section-title" id="sec-mensal">📅 Histórico mensal</div>
+    <div class="card monthly-history-card">
+      ${withData.length===0 ? `<div class="empty-history"><span>📅</span><b>Nenhum histórico mensal ainda</b><small>Os dados aparecerão aqui conforme forem registrados.</small></div>` : `
+      <div class="monthly-overview">
+        <div><small>Meses com registros</small><strong>${withData.length}</strong></div>
+        <div><small>Folhas registradas</small><strong>${withData.reduce((a,m)=>a+m.sheets,0)}</strong></div>
+        <div><small>Dias de presença</small><strong>${withData.reduce((a,m)=>a+m.days,0)}</strong></div>
+      </div>
+      <div class="section-title" style="margin-top:16px;">Presença mensal</div>
+      ${evoBars(series.slice(-12).map(m=>({ label: metaPeriodLabel(m.ym, true), value: m.pct, title: metaPeriodLabel(m.ym)+': '+m.days+' de '+m.dim+' dias' })), { unit:'%', max:100 })}
+      <div class="evo-legend"><span><i style="background:var(--mint)"></i>Percentual de presença</span></div>
+      <div class="divider"></div>
+      <div class="section-title" style="margin-top:8px;">Detalhamento por mês</div>
+      ${withData.map((m,i)=>`
+        <details class="hist-group monthly-record" ${i===0?'open':''}>
+          <summary>
+            <div class="monthly-record-main">
+              <div class="row" style="margin-bottom:7px;">
+                <span class="monthly-record-title">${esc(metaPeriodLabel(m.ym))}</span>
+                <span class="badge ${m.pct>=80?'badge-green':m.pct>=50?'badge-amber':'badge-peri'}">${m.pct}% presença</span>
+              </div>
+              <div class="monthly-metrics">
+                <span><b>${m.days}</b><small>dias</small></span>
+                <span><b>${m.sheets}</b><small>folhas</small></span>
+                <span><b>${m.corrected}</b><small>correções</small></span>
+              </div>
             </div>
-            <div class="progress-track" style="height:8px;"><div class="progress-fill" style="width:${m.pct}%;"></div></div>
-            <div class="cal-summary-breakdown" style="margin-top:8px;">
+          </summary>
+          <div class="monthly-record-detail">
+            <div class="cal-summary-breakdown">
               <span>🟢 ${m.kumon} Kumon</span>
               <span>🔵 ${m.presencial} presencial</span>
               <span>🟣 ${m.teste} teste</span>
             </div>
-          </div>`).join('')
-      }
+            <div class="progress-track" style="height:7px;margin-top:12px;"><div class="progress-fill" style="width:${m.pct}%;"></div></div>
+            <button class="btn btn-ghost btn-sm" data-open-cal-month="${m.ym}" style="margin-top:12px;">🗓️ Abrir calendário deste mês</button>
+          </div>
+        </details>`).join('')}`}
+    </div>`;
+}
+
+function renderWeeklyHistoryAdmin(student){
+  const hist = (student.weeklyHistory||[]).slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||''));
+  if(hist.length===0){
+    return `<div class="section-title" id="sec-historico">📝 Histórico de períodos</div>
+    <div class="card"><span class="muted" style="font-size:13px;">Nenhum registro ainda.</span></div>`;
+  }
+  const groups = [];
+  hist.forEach(h=>{
+    const rawDate = h.endDate || h.startDate || '';
+    const ym = metaPeriodKeyOf(rawDate) || 'sem-data';
+    let g = groups.find(x=>x.ym===ym);
+    if(!g){ g = { ym, items:[] }; groups.push(g); }
+    g.items.push(h);
+  });
+  const totalSheets = hist.reduce((a,h)=>a+Number(h.sheets||0),0);
+  const rowHtml = h=>{
+    if(EDITING_WEEK_HISTORY_ID===h.id){
+      return `
+      <div style="padding:10px 0;">
+        <div class="field-row">
+          <div class="field"><label>De</label><input type="date" id="edit-week-start-${h.id}" value="${esc(h.startDate||'')}"></div>
+          <div class="field"><label>Até</label><input type="date" id="edit-week-end-${h.id}" value="${esc(h.endDate||'')}"></div>
+        </div>
+        <div class="field"><label>Folhas (0–200)</label><input type="number" min="0" max="200" id="edit-week-sheets-${h.id}" value="${esc(h.sheets)}"></div>
+        <div class="field"><label>Observação / texto</label><input type="text" maxlength="120" id="edit-week-note-${h.id}" value="${esc(h.note||'')}" placeholder="Ex: recesso, prova, férias..."></div>
+        <div class="error-msg" id="edit-week-error-${h.id}"></div>
+        <div class="field-row">
+          <button class="btn btn-ghost btn-block btn-sm" data-cancel-edit-week="${h.id}">Cancelar</button>
+          <button class="btn btn-primary btn-block btn-sm" data-save-edit-week="${h.id}">Salvar</button>
+        </div>
+      </div>`;
+    }
+    return `
+    <div class="row" style="padding:9px 0;border-top:1px solid var(--border);align-items:flex-start;">
+      <div style="flex:1;min-width:0;">
+        <div class="row" style="justify-content:flex-start;gap:12px;">
+          <span class="muted" style="font-size:13px;">${fmtDateFull(h.startDate)} a ${fmtDateFull(h.endDate)}</span>
+          <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap;">${esc(h.sheets)} folhas</span>
+        </div>
+        ${h.note ? `<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>` : ''}
+      </div>
+      <button class="btn btn-ghost btn-sm" data-edit-week="${h.id}" title="Editar histórico">✏️</button>
+    </div>`;
+  };
+  return `
+    <div class="section-title" id="sec-historico">📝 Histórico de períodos</div>
+    <div class="card">
+      <div class="faint" style="font-size:11.5px;margin-bottom:4px;">${hist.length} ${hist.length===1?'registro':'registros'} · ${totalSheets} folhas no total</div>
+      ${groups.map((g,i)=>{
+        const sum = g.items.reduce((a,h)=>a+Number(h.sheets||0),0);
+        const hasEditing = g.items.some(h=>h.id===EDITING_WEEK_HISTORY_ID);
+        const label = g.ym==='sem-data' ? 'Sem data' : metaPeriodLabel(g.ym);
+        return `
+        <details class="hist-group" ${(i===0||hasEditing)?'open':''}>
+          <summary>
+            <div class="row" style="flex:1;min-width:0;">
+              <span style="font-weight:600;font-size:13px;text-transform:capitalize;">${esc(label)}</span>
+              <span class="mono faint" style="font-size:11.5px;">${sum} folhas · ${g.items.length} ${g.items.length===1?'registro':'registros'}</span>
+            </div>
+          </summary>
+          <div style="padding-bottom:6px;">${g.items.map(rowHtml).join('')}</div>
+        </details>`;
+      }).join('')}
     </div>`;
 }
 
@@ -2032,25 +2318,19 @@ function renderTrimesterSectionStudent(student){
 }
 
 function renderWeeklyHistoryStudent(student){
-  const history = (student.weeklyHistory || []).slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||''));
-  return `
-    <div class="section-title">📚 Histórico de estudos</div>
-    <div class="card">
-      ${history.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro ainda.</span>` :
-        history.map(h=>`
-          <div style="padding:10px 0;${history[history.length-1]===h?'':'border-bottom:1px solid var(--border);'}">
-            <div class="row" style="align-items:flex-start;gap:12px;">
-              <div>
-                <div style="font-weight:600;font-size:13px;">${fmtDate(h.startDate)} – ${fmtDate(h.endDate)}</div>
-                ${h.note ? `<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>` : ''}
-              </div>
-              <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap;">${esc(h.sheets)} folhas</span>
-            </div>
-          </div>`).join('')
-      }
-    </div>`;
+  const hist = (student.weeklyHistory||[]).slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||''));
+  if(hist.length===0) return `<div class="section-title">📚 Histórico de estudos</div><div class="card"><span class="muted" style="font-size:13px;">Nenhum registro ainda.</span></div>`;
+  const groups=[];
+  hist.forEach(h=>{const ym=metaPeriodKeyOf(h.endDate||h.startDate||'')||'sem-data';let g=groups.find(x=>x.ym===ym);if(!g){g={ym,items:[]};groups.push(g);}g.items.push(h);});
+  const totalSheets=hist.reduce((sum,h)=>sum+Number(h.sheets||0),0);
+  return `<div class="section-title">📚 Histórico de estudos</div><div class="card">
+    <div class="faint" style="font-size:11.5px;margin-bottom:4px;">${hist.length} ${hist.length===1?'registro':'registros'} · ${totalSheets} folhas no total</div>
+    ${groups.map((g,i)=>{const sum=g.items.reduce((n,h)=>n+Number(h.sheets||0),0);const label=g.ym==='sem-data'?'Sem data':metaPeriodLabel(g.ym);return `<details class="hist-group" ${i===0?'open':''}>
+      <summary><div class="row" style="flex:1;min-width:0;"><span style="font-weight:600;font-size:13px;text-transform:capitalize;">${esc(label)}</span><span class="mono faint" style="font-size:11.5px;">${sum} folhas · ${g.items.length} ${g.items.length===1?'registro':'registros'}</span></div></summary>
+      <div style="padding:0 0 6px;">${g.items.map(h=>`<div class="row" style="padding:9px 0;border-top:1px solid var(--border);align-items:flex-start;"><div style="flex:1;min-width:0;"><div class="row" style="justify-content:flex-start;gap:12px;"><span class="muted" style="font-size:13px;">${fmtDate(h.startDate)} a ${fmtDate(h.endDate)}</span><span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap;">${esc(h.sheets)} folhas</span></div>${h.note?`<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>`:''}</div></div>`).join('')}</div>
+    </details>`;}).join('')}
+  </div>`;
 }
-
 function renderStudentProfile(student){
   const s = stats(student);
   const streak = streakStats(student);
@@ -2106,8 +2386,6 @@ function renderStudentProfile(student){
         </div>`).join('')}
     </div>
 
-
-    <button class="btn btn-ghost btn-block" style="margin-top:22px;" id="btn-logout">Sair</button>
   </div>`;
 }
 
@@ -2146,32 +2424,49 @@ function renderAdminApp(){
 }
 function renderAdminProfile(){
   const email = auth && auth.currentUser ? (auth.currentUser.email || 'Usuário autenticado') : 'Usuário autenticado';
+  const trimester=DATA.currentTrimester||{};
   return `
     <div class="screen" role="region" aria-label="Perfil do orientador">
-      <div class="card center">
-        <div class="avatar-circle" style="width:64px;height:64px;font-size:30px;margin:0 auto 10px;">🧑‍🏫</div>
-        <div class="display" style="font-size:19px;font-weight:700;">Perfil do Orientador</div>
-        <div class="faint" style="font-size:12px;margin-top:5px;">${esc(email)}</div>
-      </div>
-
-      <div class="section-title">📅 Fim da meta de todos os alunos</div>
-      <div class="card">
-        <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Define a mesma data final da meta atual para todos os ${DATA.students.length} alunos cadastrados. O material didático e o progresso não são alterados.</p>
-        <div class="field">
-          <label>Nova data de fim</label>
-          <input type="date" id="f-bulk-end" value="${esc(BULK_END_CONFIRM || '')}">
+      <header class="admin-profile-hero">
+        <div class="admin-profile-mark" aria-hidden="true">🧑‍🏫</div>
+        <div class="admin-profile-heading">
+          <h2>Perfil do Orientador</h2>
+          <p>${esc(email)}</p>
         </div>
-        <div class="error-msg" id="bulk-end-error"></div>
-        ${BULK_END_CONFIRM ? `
-          <p style="font-size:13px;margin:10px 0;">Alterar o fim da meta de <b>${DATA.students.length} ${DATA.students.length===1?'aluno':'alunos'}</b> para <b>${fmtDate(BULK_END_CONFIRM)}</b>?</p>
-          <div class="field-row">
-            <button class="btn btn-ghost btn-block btn-sm" id="btn-bulk-cancel">Cancelar</button>
-            <button class="btn btn-primary btn-block btn-sm" id="btn-bulk-confirm">Confirmar</button>
-          </div>` : `
-          <button class="btn btn-primary btn-block btn-sm" id="btn-bulk-end" ${DATA.students.length===0?'disabled':''}>Aplicar a todos os alunos</button>`}
-      </div>
+      </header>
 
-      <button class="btn btn-ghost btn-block" id="btn-admin-profile-back">← Voltar ao painel</button>
+      <section class="admin-profile-section">
+        <h3 class="admin-profile-section-title"><span>🗓️</span> Período do trimestre atual</h3>
+        <div class="admin-profile-card">
+          <p class="admin-profile-help">Esse intervalo alimenta o Hall do trimestre e a Visão geral. Também serve como sugestão no cadastro de novos alunos; alterar o período não modifica metas individuais já cadastradas.</p>
+          <div class="field-row">
+            <div class="field"><label>Início do trimestre</label><input type="date" id="f-trimester-start" value="${esc(trimester.startDate || todayISO())}"></div>
+            <div class="field"><label>Fim do trimestre</label><input type="date" id="f-trimester-end" value="${esc(trimester.endDate || '')}"></div>
+          </div>
+          <button class="btn btn-primary btn-block btn-sm" id="btn-save-trimester">Salvar período atual</button>
+        </div>
+      </section>
+
+      <section class="admin-profile-section">
+        <h3 class="admin-profile-section-title"><span>📅</span> Fim da meta de todos os alunos</h3>
+        <div class="admin-profile-card">
+          <p class="admin-profile-help">Aplica uma nova data final à meta atual dos ${DATA.students.length} alunos cadastrados. O material didático e o progresso não são alterados.</p>
+          <div class="field">
+            <label>Nova data de fim</label>
+            <input type="date" id="f-bulk-end" value="${esc(BULK_END_CONFIRM || '')}">
+          </div>
+          <div class="error-msg" id="bulk-end-error"></div>
+          ${BULK_END_CONFIRM ? `
+            <p style="font-size:13px;line-height:1.5;margin:10px 0 12px;">Alterar o fim da meta de <b>${DATA.students.length} ${DATA.students.length===1?'aluno':'alunos'}</b> para <b>${fmtDate(BULK_END_CONFIRM)}</b>?</p>
+            <div class="field-row">
+              <button class="btn btn-ghost btn-block btn-sm" id="btn-bulk-cancel">Cancelar</button>
+              <button class="btn btn-primary btn-block btn-sm" id="btn-bulk-confirm">Confirmar alteração</button>
+            </div>` : `
+            <button class="btn btn-outline btn-block btn-sm" id="btn-bulk-end" ${DATA.students.length===0?'disabled':''}>Aplicar a todos os alunos</button>`}
+        </div>
+      </section>
+
+      <button class="btn btn-ghost btn-block admin-profile-back" id="btn-admin-profile-back">← Voltar ao painel</button>
     </div>`;
 }
 function renderAdminNav(){
@@ -2224,18 +2519,39 @@ function metasConcluidasInRange(student, rangeStart, rangeEnd){
     (h.reached !== undefined ? h.reached : h.blocksCompleted===h.blocksTotal)
   );
 }
+function hallTrimesterOptions(){
+  const options=[];
+  const seen=new Set();
+  const add=(item,isCurrent=false)=>{
+    if(!item || !item.startDate || !item.endDate || item.startDate>item.endDate) return;
+    const key=item.startDate+'|'+item.endDate;
+    if(seen.has(key)) return;
+    seen.add(key);
+    options.push({start:item.startDate,end:item.endDate,isCurrent,label:`${fmtDate(item.startDate)} a ${fmtDate(item.endDate)}`});
+  };
+  const current=DATA.currentTrimester||{};
+  add(current,true);
+  // Período anterior confirmado pelo orientador.
+  add({startDate:'2026-08-01',endDate:'2026-10-20'},false);
+  (DATA.trimesterHistory||[]).slice().sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||'')).forEach(item=>add(item,false));
+  // Older files did not keep a global trimester archive. Recover available ranges from each student's saved meta history.
+  DATA.students.forEach(st=>(st.metaHistory||[]).filter(e=>e.status==='completed').forEach(e=>{
+    const end=e.targetEnd||e.archivedAt;
+    if(e.startDate && end) add({startDate:e.startDate,endDate:end},false);
+  }));
+  return options;
+}
 function hallFolhasRange(){
   if(HALL_PERIOD_MODE==='trimester'){
-    const t = DATA.currentTrimester || {};
-    if(!t.startDate || !t.endDate) return null;
-    return { start: t.startDate, end: t.endDate, label: `${fmtDate(t.startDate)} – ${fmtDate(t.endDate)}` };
+    const options=hallTrimesterOptions();
+    HALL_TRIMESTER_INDEX=Math.max(0,Math.min(HALL_TRIMESTER_INDEX,Math.max(0,options.length-1)));
+    const selected=options[HALL_TRIMESTER_INDEX];
+    if(!selected) return null;
+    return {start:selected.start,end:selected.end,label:selected.label,isCurrent:selected.isCurrent,index:HALL_TRIMESTER_INDEX,total:options.length};
   }
-  const ym = HALL_MONTH || todayISO().slice(0,7);
-  const [y,m] = ym.split('-').map(Number);
-  const mStart = ym+'-01';
-  const mEnd = ym+'-'+String(new Date(y, m, 0).getDate()).padStart(2,'0');
-  const monthLabel = new Date(y, m-1, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
-  return { start: mStart, end: mEnd, label: monthLabel, ym };
+  const ym = HALL_MONTH || metaPeriodKeyOf(todayISO());
+  const range = metaPeriodRange(ym);
+  return { ...range, label: metaPeriodLabel(ym), ym };
 }
 function renderSheetsRanking(){
   const range = hallFolhasRange();
@@ -2281,10 +2597,17 @@ function renderAdminHall(){
     <div class="row" style="margin-bottom:14px;">
       <button class="btn btn-ghost btn-sm" data-hall-month="-1" aria-label="Mês anterior">‹</button>
       <span style="font-weight:700;font-size:13.5px;text-transform:capitalize;">${esc((hallFolhasRange()||{}).label || '')}</span>
-      <button class="btn btn-ghost btn-sm" data-hall-month="1" aria-label="Próximo mês" ${(HALL_MONTH||todayISO().slice(0,7))>=todayISO().slice(0,7)?'disabled style="opacity:.4;"':''}>›</button>
+      <button class="btn btn-ghost btn-sm" data-hall-month="1" aria-label="Próximo ciclo" ${(HALL_MONTH||metaPeriodKeyOf(todayISO()))>=metaPeriodKeyOf(todayISO())?'disabled style="opacity:.4;"':''}>›</button>
     </div>
     ` : `
-    <p class="faint" style="font-size:11.5px;margin:0 0 14px;">${hallFolhasRange() ? esc(hallFolhasRange().label) : 'Defina as datas do trimestre atual em Perfil → Trimestre atual.'}</p>
+    ${(()=>{const range=hallFolhasRange();return range?`<div class="row" style="margin-bottom:14px;gap:8px;">
+      <button class="btn btn-ghost btn-sm" data-hall-trimester-shift="1" aria-label="Trimestre anterior" ${range.index>=range.total-1?'disabled style="opacity:.4;"':''}>‹</button>
+      <div style="flex:1;text-align:center;min-width:0;">
+        <div style="font-weight:700;font-size:13px;">${range.isCurrent?'Trimestre atual':`Anterior ${range.index} de ${range.total-1}`}</div>
+        <div class="faint" style="font-size:11.5px;margin-top:2px;">${esc(range.label)}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" data-hall-trimester-shift="-1" aria-label="Trimestre mais recente" ${range.index<=0?'disabled style="opacity:.4;"':''}>›</button>
+    </div>`:`<p class="muted center" style="font-size:12px;margin:12px 0;">Defina as datas do trimestre atual em Perfil do orientador → Período do trimestre atual.</p>`;})()}
     `}
 
     <div class="hall-tabs">
@@ -2399,7 +2722,7 @@ function renderAdminTrimesterBalance(){
   const totalDays = daysBetween(start,end)+1;
   const elapsed = clamp(daysBetween(start, today<end?today:(today>end?end:today))+1, 0, totalDays);
   const timePct = totalDays>0 ? Math.round(clamp(elapsed,0,totalDays)/totalDays*100) : 0;
-  const periodLabel = `${fmtDate(start)} – ${fmtDate(end)}`;
+  const periodLabel = `${fmtDateFull(start)} a ${fmtDateFull(end)}`;
 
   const rows = list.map(st=>{
     const s = stats(st);
@@ -2409,7 +2732,7 @@ function renderAdminTrimesterBalance(){
       st,
       sheets: sheetsInRange(st, start, end),
       days: attendanceInRange(st, start, end),
-      corrected: correctedInRange(st, start, end),
+      corrected: hallCorrectedInRange(st, start, end),
       goalsDone: archivedDone + (currentlyReached ? 1 : 0),
       currentlyReached,
     };
@@ -2418,7 +2741,6 @@ function renderAdminTrimesterBalance(){
   const totalCorrected = rows.reduce((sum,r)=>sum+r.corrected,0);
   const totalGoals = rows.reduce((sum,r)=>sum+r.goalsDone,0);
   const avgProgress = Math.round(list.reduce((sum,s)=>sum+stats(s).percent,0)/list.length);
-  const inactive = rows.filter(r=>r.sheets===0 && r.days===0);
 
   const bySheets = rows.slice().sort((a,b)=> b.sheets-a.sheets || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
   const byDays = rows.slice().sort((a,b)=> b.days-a.days || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
@@ -2473,19 +2795,9 @@ function renderAdminTrimesterBalance(){
       <div class="hall-row" data-open-student="${r.st.id}" style="cursor:pointer;">
         <span class="hall-avatar">${r.st.avatar}</span>
         <span class="hall-name">${esc(r.st.name)}</span>
-        ${r.archived ? `<span class="faint" style="font-size:11px;margin-left:auto;">encerrada em ${fmtDate(r.archivedAt)}</span>` : ''}
       </div>`).join('')}
     </div>`}
 
-    ${inactive.length===0 ? '' : `
-    <div class="section-title">⚠️ Sem movimento neste trimestre</div>
-    <div class="card">
-      ${inactive.map(r=>`
-      <div class="hall-row" data-open-student="${r.st.id}" style="cursor:pointer;">
-        <span class="hall-avatar">${r.st.avatar}</span>
-        <span class="hall-name">${esc(r.st.name)}</span>
-      </div>`).join('')}
-    </div>`}
 
     <button class="btn btn-primary btn-block no-print" id="btn-balance-print" style="margin-top:6px;">🖨️ Imprimir / salvar em PDF</button>
   </div>`;
@@ -2496,20 +2808,50 @@ function renderAdminOverview(){
   const active = list.filter(s=>isRecentlyActive(s)).length;
   const avgProgress = totalStudents ? Math.round(list.reduce((sum,s)=>sum+stats(s).percent,0)/totalStudents) : 0;
   const pendingTotal = list.reduce((sum,s)=>sum+stats(s).pending,0);
+  const trimester = DATA.currentTrimester || {};
+  const trimesterStart = trimester.startDate || '';
+  const trimesterEnd = trimester.endDate || '';
+  const today = todayISO();
+  let trimesterCounter = 'Defina as datas do trimestre';
+  let trimesterCounterDetail = 'Defina as datas do período em Perfil do orientador → Trimestre atual.';
+  if(trimesterStart && trimesterEnd){
+    if(today < trimesterStart){
+      const days = Math.max(0, daysBetween(today, trimesterStart));
+      trimesterCounter = `Começa em ${days} dia${days===1?'':'s'}`;
+      trimesterCounterDetail = 'Contagem regressiva para o início do trimestre.';
+    } else if(today > trimesterEnd){
+      const days = Math.max(0, daysBetween(trimesterEnd, today));
+      trimesterCounter = `Encerrado há ${days} dia${days===1?'':'s'}`;
+      trimesterCounterDetail = 'O período definido para este trimestre já terminou.';
+    } else {
+      const days = Math.max(0, daysBetween(today, trimesterEnd));
+      trimesterCounter = `${days} dia${days===1?'':'s'} restantes`;
+      trimesterCounterDetail = 'Tempo restante até o fim do trimestre.';
+    }
+  }
+  const trimesterPeriod = trimesterStart && trimesterEnd
+    ? `${fmtDateFull(trimesterStart)} a ${fmtDateFull(trimesterEnd)}`
+    : 'Datas não definidas';
   return `
   <div class="screen">
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num">${totalStudents}</div><div class="stat-label">Alunos cadastrados</div></div>
-      <div class="stat-card"><div class="stat-num">${active}</div><div class="stat-label">Alunos ativos</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--mint);">${avgProgress}%</div><div class="stat-label">Progresso médio</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${pendingTotal}</div><div class="stat-label">Correções pendentes</div></div>
+    <div class="card" style="padding:15px;margin:0 0 14px;border-color:#37E2A055;background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-surface-2) 100%);">
+      <div class="eyebrow" style="margin:0 0 9px;color:var(--mint);">🗓️ META DO TRIMESTRE</div>
+      <div class="faint" style="font-size:11px;margin-bottom:3px;">Período definido</div>
+      <div style="font-size:15px;font-weight:700;">${esc(trimesterPeriod)}</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--amber);margin-top:7px;">${esc(trimesterCounter)}</div>
+      <div class="faint" style="font-size:11px;margin-top:2px;">${esc(trimesterCounterDetail)}</div>
     </div>
 
-    <button class="btn btn-outline btn-block" id="btn-open-trimbalance" style="margin:4px 0 16px;">📊 Balanço do trimestre</button>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${totalStudents}</div><div class="stat-label">Alunos cadastrados</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--mint);">${avgProgress}%</div><div class="stat-label">Progresso médio</div></div>
+    </div>
+
+    <button class="btn btn-outline btn-block" id="btn-open-trimbalance" style="margin:0 0 16px;">📊 Balanço do trimestre</button>
 
     <div class="section-title">Alunos por progresso</div>
     <div class="card">
-      ${list.slice().sort((a,b)=>stats(b).percent-stats(a).percent).map(s=>{
+      ${list.length===0 ? `<div class="empty-history"><span>👥</span><b>Nenhum aluno cadastrado</b><small>Cadastre alunos para acompanhar o progresso por aqui.</small></div>` : list.slice().sort((a,b)=>stats(b).percent-stats(a).percent).map(s=>{
         const p = stats(s).percent;
         const pending = stats(s).pending;
         return `<div style="margin-bottom:12px;cursor:pointer;" data-open-student="${s.id}">
@@ -2683,9 +3025,11 @@ function renderStudentEditForm(student){
   if(!EDIT_THEME_DRAFT) EDIT_THEME_DRAFT = draftFromTheme(student.missionTheme);
   if(!EDIT_MODE_DRAFT) EDIT_MODE_DRAFT = student.missionTheme ? 'vacation' : 'normal';
   return `
-    <div class="field"><label>Nome</label><input id="f-edit-name" value="${esc(student.name)}"></div>
-    <div class="field"><label>Código individual de acesso</label><input id="f-edit-code" inputmode="numeric" value="${esc(student.code)}"></div>
-    <div class="field"><label>Avatar</label>
+    <div class="profile-edit-intro"><strong>Atualizar perfil do aluno</strong><span>Altere os dados abaixo e salve ao final. As informações serão atualizadas no perfil do aluno.</span></div>
+    <div class="eyebrow" style="margin:16px 0 8px;">👤 Dados do aluno</div>
+    <div class="field"><label>Nome completo</label><input id="f-edit-name" value="${esc(student.name)}" autocomplete="name"></div>
+    <div class="field"><label>Código individual de acesso</label><input id="f-edit-code" inputmode="numeric" value="${esc(student.code)}" autocomplete="off"></div>
+    <div class="field"><label>Avatar do aluno</label>
       <div class="avatar-picker" id="avatar-picker-edit">
         ${AVATARS.map(a=>`<button type="button" class="avatar-opt ${a===student.avatar?'sel':''}" data-avatar-edit="${a}" aria-label="Avatar ${a}">${a}</button>`).join('')}
       </div>
@@ -2781,57 +3125,124 @@ function renderAdminAdd(){
   </div>`; 
 }
 
+function normTxt(t){ return String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function evoSelectedId(){
+  const list = DATA.students;
+  if(list.length===0) return null;
+  return SELECTED_STUDENT_ID && list.find(s=>s.id===SELECTED_STUDENT_ID) ? SELECTED_STUDENT_ID : list[0].id;
+}
+function evoResultsHtml(){
+  const selectedId = evoSelectedId();
+  const term = normTxt(EVO_SEARCH.trim());
+  if(!term) return '';
+  const list = DATA.students.filter(s=> normTxt(s.name).includes(term))
+    .slice().sort((a,b)=> a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base'}));
+  if(list.length===0) return `<p class="muted" style="font-size:13px;margin:10px 0 0;">Nenhum aluno encontrado.</p>`;
+  return `<div class="evo-student-results" role="listbox" aria-label="Resultados da pesquisa de alunos">${list.map(st=>`
+    <button type="button" class="evo-student-result ${st.id===selectedId?'active':''}" data-evo-pick="${st.id}" role="option" aria-selected="${st.id===selectedId}">
+      <span class="evo-result-avatar">${esc(st.avatar||'🙂')}</span>
+      <span class="evo-result-info"><strong>${esc(st.name)}</strong><small>${esc(st.startStage)}${esc(st.startSheet)} → ${esc(st.targetStage)}${esc(st.targetSheet)}</small></span>
+      <span class="evo-result-action">${st.id===selectedId?'Selecionado':'Ver evolução'} <span aria-hidden="true">›</span></span>
+    </button>`).join('')}</div>`;
+}
 function renderAdminEvolution(){
   const list = DATA.students;
   if(list.length===0) return `<div class="screen"><p class="muted center">Cadastre um aluno para ver a evolução.</p></div>`;
-  const selectedId = SELECTED_STUDENT_ID && list.find(s=>s.id===SELECTED_STUDENT_ID) ? SELECTED_STUDENT_ID : list[0].id;
-  const student = list.find(s=>s.id===selectedId);
-  const hist = student.weeklyHistory.slice().sort((a,b)=> (a.endDate||'').localeCompare(b.endDate||''));
-  const maxSheets = Math.max(10, ...hist.map(h=>h.sheets));
+  const student = list.find(s=>s.id===evoSelectedId());
   const s = stats(student);
+  const streak = streakStats(student);
+  const rw = rewardStats(student);
+  const wd = weeklyDelta(student);
+  const hist = (student.weeklyHistory||[]).slice().sort((a,b)=> (a.endDate||'').localeCompare(b.endDate||'')).slice(-12);
+  const months = studentMonthSeries(student).slice(-12);
+  const activeMonths = months.filter(m=>m.days>0 || m.sheets>0 || m.corrected>0);
+  const latestMonth = activeMonths.length ? activeMonths[activeMonths.length-1] : null;
+  const previousMonth = activeMonths.length>1 ? activeMonths[activeMonths.length-2] : null;
+  const trend = evoTrendSummary(months);
+  const notDone = Math.max(0, s.total - s.done);
+  const shortDate = d => d ? d.slice(8,10)+'/'+d.slice(5,7) : '';
 
   return `
   <div class="screen">
-    <div class="field">
-      <label>Selecionar aluno</label>
-      <select id="f-evolution-student">
-        ${list.map(st=>`<option value="${st.id}" ${st.id===selectedId?'selected':''}>${st.avatar} ${esc(st.name)}</option>`).join('')}
-      </select>
-    </div>
+    <input class="search-input" id="evo-search" placeholder="🔍 Buscar aluno pelo nome…" value="${esc(EVO_SEARCH)}" aria-label="Buscar aluno" autocomplete="off">
+    <div id="evo-results">${evoResultsHtml()}</div>
 
-    <div class="section-title">Folhas por período</div>
-    <div class="card">
-      ${hist.length===0 ? `<span class="muted" style="font-size:13px;">Sem registros ainda.</span>` : `
-      <div class="bars-wrap">
-        ${hist.map(h=>`
-          <div class="bar-col">
-            <span class="mono" style="font-size:10px;color:var(--text-muted);">${h.sheets}</span>
-            <div class="bar-fill" style="height:${(h.sheets/maxSheets*100)}%;"></div>
-            <span class="bar-label">${fmtDate(h.endDate)}</span>
-          </div>`).join('')}
-      </div>`}
-    </div>
-
-    <div class="section-title">Panorama dos blocos</div>
-    <div class="card">
-      <div class="blocks-grid">
-        ${student.blocks.map(b=>{
-          let cls='block-btn', ic='⚪';
-          if(b.status==='pending_correction'){ cls+=' pending'; ic='🟡'; }
-          if(b.status==='corrected'){ cls+=' corrected'; ic='🟢'; }
-          return `
-          <div class="block-tile-wrap">
-            <div class="${cls}" style="cursor:default;"><span>${esc(b.label)}</span><span class="status-ic">${ic}</span></div>
-            ${b.forgotten ? `<span class="forgot-flag active" style="cursor:default;">📌</span>` : ''}
-          </div>`;
-        }).join('')}
+    <div class="card" style="margin-top:12px;">
+      <div class="row">
+        <div class="row" style="gap:10px;justify-content:flex-start;">
+          <div class="avatar-circle">${student.avatar}</div>
+          <div>
+            <div style="font-weight:700;font-size:16px;">${esc(student.name)}</div>
+            <div class="faint mono" style="font-size:11.5px;">${esc(student.startStage)}${esc(student.startSheet)} → ${esc(student.targetStage)}${esc(student.targetSheet)} · até ${fmtDate(student.targetEnd)}</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" data-open-student="${student.id}">Abrir perfil</button>
       </div>
     </div>
 
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num">${s.percent}%</div><div class="stat-label">Progresso da meta</div></div>
-      <div class="stat-card"><div class="stat-num">${Math.round(s.correctionRatio*100)}%</div><div class="stat-label">Correções em dia</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">🔥 ${streak.total}</div><div class="stat-label">Dias de constância</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--peri);">${s.sheetsCompleted}</div><div class="stat-label">Folhas na meta atual</div></div>
     </div>
+
+    <div class="section-title">🎯 Blocos da meta</div>
+    <div class="card">
+      <div class="row" style="justify-content:flex-start;gap:16px;">
+        ${evoDonut([
+          { value:s.corrected, color:'var(--mint)' },
+          { value:s.pending, color:'var(--amber)' },
+          { value:notDone, color:'var(--text-faint)' }
+        ], s.percent+'%')}
+        <div style="font-size:12.5px;line-height:1.9;">
+          <div>🟢 <b>${s.corrected}</b> corrigidos</div>
+          <div>🟡 <b>${s.pending}</b> aguardando correção</div>
+          <div>⚪ <b>${notDone}</b> a fazer</div>
+          <div class="faint" style="font-size:11.5px;">🍬 ${rw.earned} ${rw.earned===1?'doce ganho':'doces ganhos'} · ${rw.given} entregue${rw.given===1?'':'s'}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">📄 Folhas por período</div>
+    <div class="card">
+      ${evoBars(hist.map(h=>({ label: shortDate(h.endDate), value: Number(h.sheets||0), title: fmtDate(h.startDate)+' – '+fmtDate(h.endDate)+(h.note?' · '+h.note:'') })))}
+      ${hist.length>=2 ? `<div class="faint" style="font-size:11.5px;margin-top:8px;">Último período: <b>${wd.thisWeek}</b> folhas · anterior: <b>${wd.lastWeek}</b> ${wd.delta>0?'📈 +'+wd.delta:(wd.delta<0?'📉 '+wd.delta:'➖')}</div>` : ''}
+    </div>
+
+    <div class="section-title">📅 Folhas por ciclo mensal</div>
+    <div class="card">
+      ${evoBars(months.map(m=>({ label: metaPeriodLabel(m.ym, true), value: m.sheets, title: metaPeriodLabel(m.ym) })), { color:'linear-gradient(180deg,var(--peri),#5AC8FF)' })}
+    </div>
+
+    <div class="section-title">🔥 Constância por ciclo mensal (dias)</div>
+    <div class="card">${evoStackedBars(months)}</div>
+
+    <div class="section-title">🧠 Correções por ciclo mensal</div>
+    <div class="card">
+      ${evoBars(months.map(m=>({ label: metaPeriodLabel(m.ym, true), value: m.corrected, title: metaPeriodLabel(m.ym) })), { color:'linear-gradient(180deg,var(--mint),#2FBF86)' })}
+    </div>
+
+    <div class="section-title">📊 Comparativo entre ciclos mensais</div>
+    <div class="card">
+      ${!latestMonth ? `<div class="empty-history"><span>📈</span><b>Aguardando os primeiros registros</b><small>Assim que houver dados, será possível comparar os meses.</small></div>` : `
+        <div class="evo-compare-heading">
+          <div><small>Último mês com registros</small><strong>${esc(monthLabelOf(latestMonth.ym))}</strong></div>
+          ${previousMonth ? `<div class="evo-compare-previous"><small>Comparado com</small><strong>${esc(monthLabelOf(previousMonth.ym))}</strong></div>` : ''}
+        </div>
+        <div class="evo-compare-grid">
+          <div class="evo-compare-metric"><span>📄 Folhas</span><strong>${latestMonth.sheets}</strong><small>${esc(evoCompareLabel(latestMonth,previousMonth,'sheets'))}</small></div>
+          <div class="evo-compare-metric"><span>🔥 Dias de presença</span><strong>${latestMonth.days}</strong><small>${esc(evoCompareLabel(latestMonth,previousMonth,'days'))}</small></div>
+          <div class="evo-compare-metric"><span>✏️ Correções</span><strong>${latestMonth.corrected}</strong><small>${esc(evoCompareLabel(latestMonth,previousMonth,'corrected'))}</small></div>
+        </div>
+      `}
+      <div class="evo-trend-box">
+        <span class="evo-trend-icon">${!latestMonth?'📌':(activeMonths.length>1 && latestMonth.sheets>activeMonths[activeMonths.length-2].sheets)?'📈':(activeMonths.length>1 && latestMonth.sheets<activeMonths[activeMonths.length-2].sheets)?'📉':'📊'}</span>
+        <div><strong>${esc(trend.title)}</strong><p>${esc(trend.detail)}</p></div>
+      </div>
+      <p class="faint" style="font-size:11px;margin:10px 0 0;">Comparações usam apenas meses com algum registro. Um mês em andamento pode ter números menores por ainda não estar completo.</p>
+    </div>
+
+
+
   </div>`;
 }
 
@@ -2842,6 +3253,12 @@ function renderAdminDetail(){
   const wd = weeklyDelta(student);
   const streak = streakStats(student);
   const rw = rewardStats(student);
+  let periodFrom = daysAgoISO(6);
+  const lastEnd = (student.weeklyHistory||[]).map(h=>h.endDate).filter(Boolean).sort().pop();
+  if(lastEnd && lastEnd < todayISO()){
+    const d = new Date(lastEnd+'T00:00:00'); d.setDate(d.getDate()+1);
+    periodFrom = d.toISOString().slice(0,10);
+  }
 
   return `
   <div class="screen">
@@ -2885,31 +3302,12 @@ function renderAdminDetail(){
       <div class="stat-card"><div class="stat-num" style="color:var(--peri);">🔥 ${streak.total}</div><div class="stat-label">Dias de constância</div></div>
     </div>
 
-    <div class="section-title">Material didático</div>
+    <div class="section-title" id="sec-material">Material didático</div>
     <div class="card">
       ${renderBlocksSection(student)}
     </div>
 
-    <div class="section-title">Registrar período</div>
-    <div class="card">
-      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Escolha o período que quiser — não precisa ser de segunda a domingo, nem a semana atual.</p>
-      <div class="field-row">
-        <div class="field"><label>De</label><input type="date" id="input-week-start" value="${daysAgoISO(6)}"></div>
-        <div class="field"><label>Até</label><input type="date" id="input-week-end" value="${todayISO()}"></div>
-      </div>
-      <div class="field">
-        <label>Folhas realizadas no período</label>
-        <input type="number" min="0" max="200" id="input-weekly-sheets" placeholder="Ex: 35">
-      </div>
-      <div class="field">
-        <label>Observação / texto (opcional)</label>
-        <input type="text" id="input-weekly-note" maxlength="120" placeholder="Ex: recesso, prova, férias...">
-      </div>
-      <div class="error-msg" id="week-error"></div>
-      <button class="btn btn-primary btn-block" id="btn-register-week">Registrar período</button>
-    </div>
-
-    <div class="section-title">🍬 Prêmios (bombom ou Fini)</div>
+    <div class="section-title" id="sec-premios">🍬 Prêmios (bombom ou Fini)</div>
     <div class="card">
       <p class="muted" style="font-size:12.5px;margin:0 0 4px;">A cada 3 blocos corrigidos, o aluno ganha 1 doce — um bombom ou um Fini, não os dois. Toque no doce que ele escolheu; toque de novo para desfazer.</p>
       ${renderRewardDots(student)}
@@ -2929,10 +3327,32 @@ function renderAdminDetail(){
       </div>`}
     </div>
 
-    <div class="section-title">🗓️ Calendário</div>
+    <div class="section-title" id="sec-periodo">Registrar período</div>
+    <div class="card">
+      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">O período já começa no dia seguinte ao último registro. Pode mudar as datas se quiser — não precisa ser de segunda a domingo.</p>
+      <div class="field-row">
+        <div class="field"><label>De</label><input type="date" id="input-week-start" value="${periodFrom}"></div>
+        <div class="field"><label>Até</label><input type="date" id="input-week-end" value="${todayISO()}"></div>
+      </div>
+      <div class="field">
+        <label>Folhas realizadas no período</label>
+        <input type="number" min="0" max="200" id="input-weekly-sheets" placeholder="Ex: 35">
+      </div>
+      <div class="field">
+        <label>Observação / texto (opcional)</label>
+        <input type="text" id="input-weekly-note" maxlength="120" placeholder="Ex: recesso, prova, férias...">
+      </div>
+      <div class="error-msg" id="week-error"></div>
+      <button class="btn btn-primary btn-block" id="btn-register-week">Registrar período</button>
+    </div>
+
+    ${renderWeeklyHistoryAdmin(student)}
+
+    <div class="section-title" id="sec-calendario">🗓️ Calendário</div>
     <div class="card">
       <div class="row" style="margin-bottom:14px;">
         <span class="pill" style="color:var(--amber);border-color:#FFB64844;">🔥 ${streak.total} dias acumulados</span>
+        ${(student.attendance||{})[todayISO()] ? '' : `<button class="btn btn-primary btn-sm" id="btn-mark-today">✅ Marcar hoje</button>`}
       </div>
       ${renderCalendar(student)}
     </div>
@@ -2940,41 +3360,6 @@ function renderAdminDetail(){
     ${renderMonthlyHistoryAdmin(student)}
 
     ${renderTrimesterSectionAdmin(student)}
-
-    <div class="section-title">Histórico</div>
-    <div class="card">
-      ${student.weeklyHistory.length===0 ? `<span class="muted" style="font-size:13px;">Nenhum registro ainda.</span>` :
-        student.weeklyHistory.slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||'')).map(h=>{
-          if(EDITING_WEEK_HISTORY_ID===h.id){
-            return `
-            <div style="padding:10px 0;">
-              <div class="field-row">
-                <div class="field"><label>De</label><input type="date" id="edit-week-start-${h.id}" value="${esc(h.startDate||'')}"></div>
-                <div class="field"><label>Até</label><input type="date" id="edit-week-end-${h.id}" value="${esc(h.endDate||'')}"></div>
-              </div>
-              <div class="field"><label>Folhas (0–200)</label><input type="number" min="0" max="200" id="edit-week-sheets-${h.id}" value="${esc(h.sheets)}"></div>
-              <div class="field"><label>Observação / texto</label><input type="text" maxlength="120" id="edit-week-note-${h.id}" value="${esc(h.note||'')}" placeholder="Ex: recesso, prova, férias..."></div>
-              <div class="error-msg" id="edit-week-error-${h.id}"></div>
-              <div class="field-row">
-                <button class="btn btn-ghost btn-block btn-sm" data-cancel-edit-week="${h.id}">Cancelar</button>
-                <button class="btn btn-primary btn-block btn-sm" data-save-edit-week="${h.id}">Salvar</button>
-              </div>
-            </div>`;
-          }
-          return `
-          <div class="row" style="padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
-            <div style="flex:1;min-width:0;">
-              <div class="row" style="justify-content:flex-start;gap:12px;">
-                <span class="muted" style="font-size:13px;">${fmtDate(h.startDate)} – ${fmtDate(h.endDate)}</span>
-                <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap;">${esc(h.sheets)} folhas</span>
-              </div>
-              ${h.note ? `<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>` : ''}
-            </div>
-            <button class="btn btn-ghost btn-sm" data-edit-week="${h.id}" title="Editar histórico">✏️</button>
-          </div>`;
-        }).join('')
-      }
-    </div>
   </div>`;
 }
 
@@ -2995,7 +3380,6 @@ function attachHandlers(){
 
   // Tema
   $$('[data-theme-toggle]').forEach(btn=> btn.onclick = ()=> setTheme(btn.getAttribute('data-theme-toggle')));
-  $$('[data-view-select]').forEach(sel=> sel.onchange = ()=> setViewMode(sel.value));
   if($('#btn-enter-admin')){
     $('#btn-enter-admin').onclick = handleAdminLogin;
     $('#admin-email-input').addEventListener('keydown', e=>{ if(e.key==='Enter') handleAdminLogin(); });
@@ -3014,10 +3398,15 @@ function attachHandlers(){
   if($('#btn-admin-profile')) $('#btn-admin-profile').onclick = ()=>{ ADMIN_VIEW='profile'; render(); };
   if($('#btn-admin-profile-back')) $('#btn-admin-profile-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
   if($('#btn-open-trimbalance')) $('#btn-open-trimbalance').onclick = ()=>{ ADMIN_VIEW='trimbalance'; render(); };
-  $$('[data-hall-period]').forEach(tab=> tab.onclick = ()=>{ HALL_PERIOD_MODE = tab.getAttribute('data-hall-period'); render(); });
+  $$('[data-hall-period]').forEach(tab=> tab.onclick = ()=>{ HALL_PERIOD_MODE = tab.getAttribute('data-hall-period'); if(HALL_PERIOD_MODE==='trimester') HALL_TRIMESTER_INDEX=0; render(); });
   $$('[data-hall-month]').forEach(btn=> btn.onclick = ()=>{
     if(btn.disabled) return;
-    HALL_MONTH = shiftMonth(HALL_MONTH || todayISO().slice(0,7), Number(btn.getAttribute('data-hall-month')));
+    HALL_MONTH = shiftMonth(HALL_MONTH || metaPeriodKeyOf(todayISO()), Number(btn.getAttribute('data-hall-month')));
+    render();
+  });
+  $$('[data-hall-trimester-shift]').forEach(btn=> btn.onclick = ()=>{
+    if(btn.disabled) return;
+    HALL_TRIMESTER_INDEX=Math.max(0,HALL_TRIMESTER_INDEX+Number(btn.getAttribute('data-hall-trimester-shift')));
     render();
   });
   if($('#btn-bulk-end')) $('#btn-bulk-end').onclick = ()=>{
@@ -3042,6 +3431,7 @@ function attachHandlers(){
   $$('[data-adminnav]').forEach(btn=> btn.onclick = ()=>{
     ADMIN_VIEW = btn.getAttribute('data-adminnav');
     if(ADMIN_VIEW==='students') SEARCH_TERM='';
+    if(ADMIN_VIEW==='evolution') EVO_SEARCH='';
     render();
   });
 
@@ -3150,6 +3540,11 @@ function attachHandlers(){
 
   // Admin detail: calendário de constância
   $$('[data-cal-day]').forEach(cell=> cell.onclick = ()=> toggleStudyDay(cell.getAttribute('data-cal-day')));
+  if($('#btn-mark-today')) $('#btn-mark-today').onclick = ()=> toggleStudyDay(todayISO());
+  $$('[data-jump]').forEach(btn=> btn.onclick = ()=>{
+    const el = document.getElementById(btn.getAttribute('data-jump'));
+    if(el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
   if($('#btn-cal-prev')) $('#btn-cal-prev').onclick = ()=>{ shiftCalendarMonth(-1); render(); };
   if($('#btn-cal-next')) $('#btn-cal-next').onclick = ()=>{ shiftCalendarMonth(1); render(); };
 
@@ -3164,7 +3559,24 @@ function attachHandlers(){
   if($('#btn-save-trimester')) $('#btn-save-trimester').onclick = saveTrimesterDefaults;
 
   // Admin evolution
-  if($('#f-evolution-student')) $('#f-evolution-student').onchange = (e)=>{ SELECTED_STUDENT_ID = e.target.value; render(); };
+  const bindEvoPicks = ()=> document.querySelectorAll('[data-evo-pick]').forEach(b=> b.onclick = ()=>{ SELECTED_STUDENT_ID = b.getAttribute('data-evo-pick'); render(); });
+  bindEvoPicks();
+  if($('#evo-search')){
+    $('#evo-search').oninput = (e)=>{
+      EVO_SEARCH = e.target.value;
+      const box = document.getElementById('evo-results');
+      if(box){ box.innerHTML = evoResultsHtml(); bindEvoPicks(); }
+    };
+    $('#evo-search').onkeydown = (e)=>{
+      if(e.key==='Enter'){ const first = document.querySelector('[data-evo-pick]'); if(first) first.click(); }
+    };
+  }
+  $$('[data-open-cal-month]').forEach(btn=> btn.onclick = ()=>{
+    const [y,m] = btn.getAttribute('data-open-cal-month').split('-').map(Number);
+    CALENDAR_MONTH = { year:y, month:m-1 }; render();
+    const el = document.getElementById('sec-calendario');
+    if(el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
 
   // Backups
   if($('#btn-open-backup')) $('#btn-open-backup').onclick = ()=>{ ADMIN_VIEW='backup'; PENDING_RESTORE=null; render(); loadBackupsList(); };
@@ -3656,7 +4068,7 @@ async function endTrimester(){
   TB_MODAL = {
     name: student.name, avatar: student.avatar,
     stage: `${student.startStage}${student.startSheet} → ${student.targetStage}${student.targetSheet}`,
-    periodLabel: `${fmtDate(student.startDate)} – ${fmtDate(archivedEntry.archivedAt)}`,
+    periodLabel: `${fmtDateFull(student.startDate)} a ${fmtDateFull(archivedEntry.archivedAt)}`,
     days: archivedEntry.balance.days, sheets: archivedEntry.balance.sheets,
     percent: archivedEntry.balance.percent, reached: archivedEntry.reached,
     allowUndo: true, studentId: student.id, entryId: archivedEntry.id
@@ -3671,6 +4083,9 @@ async function endTrimester(){
   student.startSheet = newStartSheet;
   student.startDate = newStartDate;
   student.targetStart = newStartDate;
+  // Reinicia as contagens do novo período: constância e prêmios (folhas e correções recomeçam com os novos blocos).
+  student.constancyStart = newStartDate;
+  student.rewards = {};
 
   if(planned){
     const { total, blocks } = buildBlocks(newStartStage, newStartSheet, planned.targetStage, planned.targetSheet);
@@ -3738,9 +4153,16 @@ async function saveTrimesterDefaults(){
   const end = document.getElementById('f-trimester-end').value;
   if(!start || !end){ showToast('Preencha as duas datas do trimestre.'); return; }
   if(start > end){ showToast('A data de início deve ser antes da data de fim.'); return; }
+  const previous=DATA.currentTrimester||{};
+  if(previous.startDate && previous.endDate && (previous.startDate!==start || previous.endDate!==end)){
+    if(!Array.isArray(DATA.trimesterHistory)) DATA.trimesterHistory=[];
+    const exists=DATA.trimesterHistory.some(t=>t.startDate===previous.startDate && t.endDate===previous.endDate);
+    if(!exists) DATA.trimesterHistory.push({id:uid(),startDate:previous.startDate,endDate:previous.endDate,savedAt:todayISO()});
+  }
   DATA.currentTrimester = { startDate: start, endDate: end };
+  HALL_TRIMESTER_INDEX=0;
   await saveData();
-  showToast('Datas do trimestre salvas! Já valem para os próximos alunos cadastrados.');
+  showToast('Período atual salvo! O Hall já pode usar essas datas; elas também serão sugeridas para novos alunos.');
   render();
 }
 async function saveNewStudent(){
@@ -3859,8 +4281,6 @@ async function loadBackupsList(){
 (async function init(){
   loadTheme();
   applyTheme();
-  loadViewMode();
-  applyViewMode();
   await loadData();
   render();
   if(auth){
