@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
 <script>
   // Sua firebaseConfig (inserida conforme você enviou)
   const firebaseConfig = {
@@ -31,12 +32,36 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
     var auth = firebase.auth();
+    var analytics = null;
+    try {
+      if (firebase.analytics && firebaseConfig.measurementId) {
+        analytics = firebase.analytics();
+        console.info('Firebase Analytics inicializado com sucesso.');
+      }
+    } catch (analyticsError) {
+      console.warn('Firebase Analytics não pôde ser inicializado:', analyticsError);
+    }
     try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { console.warn('Não foi possível configurar persistência da autenticação:', e); }
     console.info('Firebase inicializado com sucesso.');
   } catch (e) {
     console.warn('Falha ao inicializar Firebase (continua com localStorage):', e);
     var db = null;
     var auth = null;
+    var analytics = null;
+  }
+
+  // Envia ao Analytics apenas eventos de login concluído; não envia nome, e-mail ou código do aluno.
+  function registrarEventoAcesso(perfil, metodo) {
+    try {
+      if (analytics) {
+        analytics.logEvent('login', {
+          perfil_acesso: perfil,
+          method: metodo
+        });
+      }
+    } catch (e) {
+      console.warn('Não foi possível enviar evento ao Analytics:', e);
+    }
   }
 </script>
 <!-- === fim Firebase === -->
@@ -237,10 +262,10 @@ input,select{font-family:inherit;}
 
 /* ---------- Perfil do aluno: calendário mensal responsivo ---------- */
 .student-calendar-compact{width:100%;max-width:440px;margin:0 auto;padding:0;}
-.student-calendar-card{padding:16px 14px;background:linear-gradient(160deg,var(--bg-surface) 0%,#1b2344 100%);border:1px solid var(--border);border-radius:18px;box-shadow:0 12px 30px #00000018;}
+.student-calendar-card{padding:16px 14px;background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-surface-2) 100%);border:1px solid var(--border);border-radius:18px;box-shadow:0 12px 30px #00000018;}
 .student-calendar-compact .cal-header{margin-bottom:16px;}
 .student-calendar-compact .cal-month-label{font-size:15px;letter-spacing:.01em;}
-.student-calendar-compact .cal-summary{padding:12px;border:1px solid var(--border);border-radius:13px;background:#0f142844;margin-bottom:15px;}
+.student-calendar-compact .cal-summary{padding:12px;border:1px solid var(--border);border-radius:13px;background:var(--bg-surface-3);margin-bottom:15px;}
 .student-calendar-compact .cal-summary-pct{font-size:25px;}
 .student-calendar-compact .cal-summary-breakdown{gap:7px 12px;}
 .student-calendar-compact .cal-summary-breakdown span{font-size:10.5px;}
@@ -752,6 +777,21 @@ input,select{font-family:inherit;}
 
 
 
+
+/* ---------- Perfil do orientador: caixa de informações do aluno ---------- */
+.admin-student-card{padding:16px;border-radius:18px;box-shadow:0 12px 28px #00000018;}
+.asc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.asc-id{display:flex;align-items:center;gap:12px;min-width:0;}
+.asc-id .avatar-circle{width:52px;height:52px;border-radius:16px;font-size:26px;}
+.asc-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;line-height:1.2;overflow-wrap:anywhere;}
+.asc-code{display:inline-flex;align-items:center;margin-top:5px;padding:3px 9px;border-radius:999px;background:var(--bg-surface-3);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);}
+.asc-actions{display:flex;gap:6px;}
+.admin-student-card .jc-route{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);}
+.asc-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);}
+.asc-updated{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.asc-updated b{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text);}
+@media(max-width:380px){.admin-student-card{padding:13px;}.asc-id .avatar-circle{width:46px;height:46px;font-size:23px;}.asc-name{font-size:16.5px;}}
+
 /* ---------- Modo claro/escuro ---------- */
 body.theme-light{
   --bg-deep:#F5F7FB;
@@ -782,6 +822,19 @@ body.theme-light{
     var(--bg-deep);
 }
 body.theme-light .bottom-nav{background:rgba(255,255,255,.90);}
+/* Calendário no modo claro: células brancas com contorno, texto legível e marcações com bom contraste */
+body.theme-light .student-calendar-card{background:linear-gradient(160deg,#FFFFFF 0%,#F3F6FB 100%);box-shadow:0 10px 26px -14px rgba(23,33,59,.25);}
+body.theme-light .student-calendar-compact .cal-summary{background:#F3F6FB;}
+body.theme-light .cal-summary-track{background:rgba(23,33,59,.10);}
+body.theme-light .cal-weekdays span{color:var(--text-muted);}
+body.theme-light .cal-cell{background:#FFFFFF;border-color:rgba(23,33,59,.14);color:var(--text);box-shadow:0 1px 0 rgba(23,33,59,.04);}
+body.theme-light .cal-cell.empty{background:transparent;border:none;box-shadow:none;}
+body.theme-light .cal-cell.marked-kumon{background:var(--mint);border-color:var(--mint);color:#04301D;}
+body.theme-light .cal-cell.marked-presencial{background:var(--sky);border-color:var(--sky);color:#fff;}
+body.theme-light .cal-cell.marked-teste{background:var(--peri);border-color:var(--peri);color:#fff;}
+body.theme-light .cal-cell.today{box-shadow:0 0 0 2px var(--peri);}
+body.theme-light .cal-cell.today:not([class*="marked-"]){background:var(--peri-dim);color:var(--peri);}
+body.theme-light .student-calendar-compact .cal-legend{border-top-color:rgba(23,33,59,.12);}
 body.theme-light .btn-primary{color:#06301F;}
 body.theme-light .goal-banner{background:linear-gradient(135deg,rgba(98,105,217,.10),rgba(22,185,120,.10));}
 body.theme-light .forgot-flag,
@@ -3264,35 +3317,54 @@ function renderAdminDetail(){
   <div class="screen">
     <button class="btn btn-ghost btn-sm" id="btn-back-students" style="margin-bottom:14px;">← Alunos</button>
 
-    <div class="card">
-      <div class="row">
-        <div class="row" style="gap:10px;">
+    <div class="card admin-student-card">
+      <div class="asc-head">
+        <div class="asc-id">
           <div class="avatar-circle">${student.avatar}</div>
-          <div>
-            <div style="font-weight:700;font-size:16.5px;">${esc(student.name)}</div>
-            <div class="faint mono" style="font-size:11.5px;">código ${esc(student.code)}</div>
+          <div style="min-width:0;">
+            <div class="asc-name">${esc(student.name)}</div>
+            <span class="asc-code">código ${esc(student.code)}</span>
           </div>
         </div>
+        <div class="asc-actions">
         ${DELETE_CONFIRM_ID === student.id
-          ? `<div class="row" style="gap:6px;">
-               <button class="btn btn-ghost btn-sm" id="btn-cancel-delete">Cancelar</button>
-               <button class="btn btn-danger btn-sm" id="btn-confirm-delete">Confirmar exclusão</button>
-             </div>`
+          ? `<button class="btn btn-ghost btn-sm" id="btn-cancel-delete">Cancelar</button>
+             <button class="btn btn-danger btn-sm" id="btn-confirm-delete">Confirmar exclusão</button>`
           : `<button class="btn btn-danger btn-sm" id="btn-delete-student">Excluir</button>`}
-      </div>
-      <div class="divider"></div>
-      ${EDIT_STUDENT_MODE ? renderStudentEditForm(student) : `
-        <div class="row">
-          <span class="pill">📍 ${esc(student.startStage)}${esc(student.startSheet)}</span>
-          <span class="pill" style="color:var(--mint);border-color:#37E2A044;">🎯 ${esc(student.targetStage)}${esc(student.targetSheet)}</span>
-          <span class="pill" style="color:var(--peri);border-color:#8C93FF44;">⏰ ${s.daysRemaining>=0?s.daysRemaining:0}d</span>
         </div>
-        <div class="row" style="margin-top:10px;">
-          <div class="faint mono" style="font-size:11.5px;">🕓 Última atualização: ${fmtDateTime(student.updatedAt)}</div>
+      </div>
+      ${EDIT_STUDENT_MODE ? `<div class="divider"></div>${renderStudentEditForm(student)}` : (() => {
+        const st = student.targetStart || student.startDate || '';
+        const en = student.targetEnd || '';
+        const left = s.daysRemaining>=0 ? s.daysRemaining : 0;
+        return `
+        <div class="jc-route">
+          <div class="jc-point">
+            <span class="jc-lbl">📍 Ponto de partida</span>
+            <span class="jc-val">${esc(student.startStage)}${esc(student.startSheet)}</span>
+          </div>
+          <span class="jc-arrow" aria-hidden="true">➜</span>
+          <div class="jc-point goal">
+            <span class="jc-lbl">🎯 Meta</span>
+            <span class="jc-val">${esc(student.targetStage)}${esc(student.targetSheet)}</span>
+          </div>
+        </div>
+        <div class="jc-time">
+          <div class="jc-dates">
+            <div><span class="jc-lbl">Início</span><b>${st ? fmtDate(st) : '—'}</b></div>
+            <div class="jc-count"><b>${left}</b><small>${left===1?'dia restante':'dias restantes'}</small></div>
+            <div class="jc-end"><span class="jc-lbl">Fim</span><b>${en ? fmtDate(en) : '—'}</b></div>
+          </div>
+        </div>
+        <div class="asc-foot">
+          <div class="asc-updated">
+            <span class="jc-lbl">🕓 Última atualização</span>
+            <b>${fmtDateTime(student.updatedAt)}</b>
+          </div>
           ${planResponseBadge(student)}
           <button class="btn btn-ghost btn-sm" id="btn-edit-student">✏️ Editar aluno</button>
-        </div>
-      `}
+        </div>`;
+      })()}
     </div>
 
     <div class="stat-grid">
@@ -3647,7 +3719,8 @@ function handleStudentLogin(){
   if(!student){ LOGIN_ERROR='Código não encontrado. Confira com seu orientador.'; render(); return;
   }
   LOGIN_ERROR=''; SESSION={role:'student',studentId:student.id}; STUDENT_VIEW='journey'; render();
-  loadPlanResponsesForStudent(student).then(changed=>{ if(changed && SESSION && SESSION.studentId===student.id) render(); });
+  registrarEventoAcesso('aluno', 'codigo');
+  // Aluno tem acesso somente para visualização; não sincronizar respostas de metas.
 }
 async function handleAdminLogin(){
   const now=Date.now();
@@ -3681,6 +3754,7 @@ async function handleAdminLogin(){
   try{
     try{ await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); }catch(e){}
     await auth.signInWithEmailAndPassword(email,pass);
+    registrarEventoAcesso('orientador', 'email_senha');
     ADMIN_LOGIN_ATTEMPTS=0;
     ADMIN_LOGIN_LOCK_UNTIL=0;
     LOGIN_ERROR='';
@@ -4290,7 +4364,6 @@ async function loadBackupsList(){
         ADMIN_LOGIN_STAGE=false;
         LOGIN_ERROR='';
         render();
-        syncPlanResponsesAdmin();
       }else if(SESSION.role==='admin'){
         SESSION={role:null,studentId:null};
         ADMIN_LOGIN_STAGE=false;
@@ -4299,7 +4372,6 @@ async function loadBackupsList(){
         render();
       }
     });
-    setInterval(()=>{ if(SESSION && SESSION.role==='admin') syncPlanResponsesAdmin(); }, 60000);
   }
 })();
 </script>
