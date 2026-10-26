@@ -4105,6 +4105,14 @@ function pointToStageSheet(point){
   const idx = p===0 ? 0 : Math.min(STAGES.length-1, Math.ceil(p/BLOCKS_PER_STAGE)-1);
   return { stage: STAGES[idx], sheet: p - idx*BLOCKS_PER_STAGE >= 0 ? (p - idx*BLOCKS_PER_STAGE)*10 : 0 };
 }
+// Ponto de partida = início do bloco (ex.: ponto 9 do estágio E vira E91; ponto 20 vira F1).
+function pointToBlockStart(point){
+  const max = STAGES.length*BLOCKS_PER_STAGE;
+  const p = clamp(Math.round(point), 0, max);
+  if(p>=max) return { stage: STAGES[STAGES.length-1], sheet: 200 };
+  const idx = Math.floor(p/BLOCKS_PER_STAGE);
+  return { stage: STAGES[idx], sheet: (p - idx*BLOCKS_PER_STAGE)*10 + 1 };
+}
 function suggestNextMeta(student){
   const today = todayISO();
   const st = stats(student);
@@ -4150,12 +4158,12 @@ function suggestNextMeta(student){
     newBlocks = Math.max(1, st.total);
     text = `Ainda não há blocos concluídos suficientes para medir o ritmo, então mantive o tamanho da meta atual (${newBlocks} blocos).`;
   }
-  text += ' Partida: onde o aluno está hoje' + (doneBlocks<st.total ? ` (${doneBlocks} de ${st.total} blocos da meta atual feitos; ajuste se ele ainda vai avançar até o encerramento).` : ' (meta atual batida).');
+  text += ' Partida: início do próximo bloco do aluno' + (doneBlocks<st.total ? ` (${doneBlocks} de ${st.total} blocos da meta atual feitos; ajuste se ele ainda vai avançar até o encerramento).` : ' (meta atual batida).');
 
   const maxPoint = STAGES.length*BLOCKS_PER_STAGE;
   let newTargetPoint = clamp(newStartPoint + dir*newBlocks, 0, maxPoint);
   if(newTargetPoint===newStartPoint) text += ' Atenção: chegou ao limite dos estágios, ajuste a meta manualmente.';
-  const a = pointToStageSheet(newStartPoint), b = pointToStageSheet(newTargetPoint);
+  const a = pointToBlockStart(newStartPoint), b = pointToStageSheet(newTargetPoint);
   return { startStage:a.stage, startSheet:a.sheet, targetStage:b.stage, targetSheet:b.sheet, startDate, targetEnd, text };
 }
 function applyMetaSuggestion(){
