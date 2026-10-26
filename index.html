@@ -2268,6 +2268,9 @@ function renderTrimesterSectionAdmin(student){
           <label style="display:block;font-size:13px;color:var(--text);font-weight:700;margin-bottom:4px;">${editing ? '✏️ Editar a próxima meta' : '🎯 Planejar a próxima meta'}</label>
           <p class="faint" style="font-size:11px;margin:0 0 12px;">O aluno verá esta meta como "Próxima missão" (modo férias) ou "Próxima meta" (modo normal). A ativação (transformar em meta atual) continua sendo sua decisão ao encerrar o trimestre.</p>
 
+          <button type="button" class="btn btn-outline btn-block btn-sm" id="btn-suggest-meta" style="margin-bottom:10px;">💡 Sugerir meta (mantendo o ritmo)</button>
+          <div id="plan-suggest-note" class="faint" style="display:none;font-size:11.5px;line-height:1.5;margin:0 0 12px;"></div>
+
           <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;">Ponto de partida</label>
           <div class="field-row">
             <div class="field">
@@ -3586,6 +3589,7 @@ function attachHandlers(){
   bindThemeEditor('edit', ()=>EDIT_THEME_DRAFT);
   if($('#btn-cancel-plan')) $('#btn-cancel-plan').onclick = ()=>{ PLAN_META_MODE=false; PLAN_THEME_DRAFT=null; PLAN_MODE_DRAFT=null; PLAN_EDIT_ID=null; render(); };
   if($('#btn-save-plan')) $('#btn-save-plan').onclick = savePlannedMeta;
+  if($('#btn-suggest-meta')) $('#btn-suggest-meta').onclick = applyMetaSuggestion;
   $$('[data-remove-planned]').forEach(btn=> btn.onclick = ()=> removePlannedMeta(btn.getAttribute('data-remove-planned')));
   if($('#btn-end-trimester')) $('#btn-end-trimester').onclick = ()=>{ END_TRIMESTER_CONFIRM = SELECTED_STUDENT_ID; render(); };
   if($('#btn-close-tb-modal')) $('#btn-close-tb-modal').onclick = ()=>{ TB_MODAL = null; render(); };
@@ -4089,6 +4093,84 @@ async function saveStudentEdit(){
   EDIT_STUDENT_MODE = false;
   showToast('Aluno atualizado! O material didático foi mantido.');
 }
+/* ---------- sugestão da próxima meta (mantendo o ritmo) ---------- */
+function isoAddDays(iso, n){
+  const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function pointToStageSheet(point){
+  const max = STAGES.length*BLOCKS_PER_STAGE;
+  const p = clamp(Math.round(point), 0, max);
+  // múltiplos de 20 ficam como folha 200 do estágio anterior (ex.: E200), igual ao encerramento de trimestre
+  const idx = p===0 ? 0 : Math.min(STAGES.length-1, Math.ceil(p/BLOCKS_PER_STAGE)-1);
+  return { stage: STAGES[idx], sheet: p - idx*BLOCKS_PER_STAGE >= 0 ? (p - idx*BLOCKS_PER_STAGE)*10 : 0 };
+}
+function suggestNextMeta(student){
+  const today = todayISO();
+  const st = stats(student);
+  const fmtRate = n => (Math.round(n*10)/10).toString().replace('.',',');
+  const startPoint = stagePoint(student.startStage, student.startSheet);
+  const targetPoint = stagePoint(student.targetStage, student.targetSheet);
+  const dir = targetPoint >= startPoint ? 1 : -1;
+
+  // 1) ritmo: neste trimestre (se já deu tempo de medir) ou no último trimestre encerrado
+  let pace = 0, origin = '', blocksBase = 0, daysBase = 0;
+  const curDays = student.startDate ? daysBetween(student.startDate, today) : 0;
+  if(st.done>0 && curDays>=14){
+    blocksBase = st.done; daysBase = curDays; origin = 'neste trimestre';
+  } else {
+    const last = (student.metaHistory||[]).filter(e=>e.status==='completed' && e.startDate && e.archivedAt && e.blocksCompleted>0)
+      .sort((a,b)=> (b.archivedAtTime||b.archivedAt||'').localeCompare(a.archivedAtTime||a.archivedAt||''))[0];
+    const d = last ? daysBetween(last.startDate, last.archivedAt) : 0;
+    if(last && d>=7){
+      blocksBase = last.blocksCompleted; daysBase = d;
+      origin = `no trimestre anterior (${fmtDate(last.startDate)} a ${fmtDate(last.archivedAt)})`;
+    }
+  }
+  if(blocksBase>0 && daysBase>0) pace = blocksBase/daysBase;
+
+  // 2) ponto de partida: onde o aluno está hoje
+  const doneBlocks = Math.min(st.done, st.total);
+  const newStartPoint = startPoint + dir*doneBlocks;
+
+  // 3) datas: começa no fim da meta atual e dura o mesmo tempo dela
+  const startDate = student.targetEnd && student.targetEnd>=today ? student.targetEnd : today;
+  let duration = (student.startDate && student.targetEnd) ? daysBetween(student.startDate, student.targetEnd) : 91;
+  if(!Number.isFinite(duration) || duration<14) duration = 91;
+  duration = Math.min(duration, 200);
+  const targetEnd = isoAddDays(startDate, duration);
+
+  // 4) tamanho da meta: ritmo × duração (sem histórico, repete o tamanho da meta atual)
+  let newBlocks, text;
+  const weeks = Math.round(duration/7);
+  if(pace>0){
+    newBlocks = Math.max(1, Math.round(pace*duration));
+    text = `Ritmo ${origin}: ${blocksBase} ${blocksBase===1?'bloco':'blocos'} em ${fmtRate(daysBase/7)} semanas (≈ ${fmtRate(pace*7)} bloco/semana). Em ${weeks} semanas isso dá cerca de ${newBlocks} ${newBlocks===1?'bloco':'blocos'} (${newBlocks*10} folhas).`;
+  } else {
+    newBlocks = Math.max(1, st.total);
+    text = `Ainda não há blocos concluídos suficientes para medir o ritmo, então mantive o tamanho da meta atual (${newBlocks} blocos).`;
+  }
+  text += ' Partida: onde o aluno está hoje' + (doneBlocks<st.total ? ` (${doneBlocks} de ${st.total} blocos da meta atual feitos; ajuste se ele ainda vai avançar até o encerramento).` : ' (meta atual batida).');
+
+  const maxPoint = STAGES.length*BLOCKS_PER_STAGE;
+  let newTargetPoint = clamp(newStartPoint + dir*newBlocks, 0, maxPoint);
+  if(newTargetPoint===newStartPoint) text += ' Atenção: chegou ao limite dos estágios, ajuste a meta manualmente.';
+  const a = pointToStageSheet(newStartPoint), b = pointToStageSheet(newTargetPoint);
+  return { startStage:a.stage, startSheet:a.sheet, targetStage:b.stage, targetSheet:b.sheet, startDate, targetEnd, text };
+}
+function applyMetaSuggestion(){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  if(!student) return;
+  const sg = suggestNextMeta(student);
+  const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v; };
+  set('f-plan-start-stage', sg.startStage); set('f-plan-start-sheet', sg.startSheet);
+  set('f-plan-stage', sg.targetStage);      set('f-plan-sheet', sg.targetSheet);
+  set('f-plan-start-date', sg.startDate);   set('f-plan-date', sg.targetEnd);
+  const note = document.getElementById('plan-suggest-note');
+  if(note){ note.style.display='block'; note.textContent = '💡 ' + sg.text + ' Confira e ajuste o que quiser antes de salvar.'; }
+  const err = document.getElementById('plan-meta-error'); if(err) err.textContent = '';
+}
+
 async function savePlannedMeta(){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   const errEl = document.getElementById('plan-meta-error');
