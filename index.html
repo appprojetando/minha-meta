@@ -847,8 +847,124 @@ body.theme-light .remove-block-flag{background:var(--bg-surface);}
 }
 .theme-option.active{border-color:var(--mint);background:var(--mint-dim);color:var(--mint);}
 .theme-hint{font-size:11.5px;color:var(--text-faint);margin-top:8px;}
+
+/* ---------- Layout responsivo: tablet/desktop com menu lateral ---------- */
+html{-webkit-text-size-adjust:100%;}
+img,svg,canvas{max-width:100%;}
+.card,.stat-grid,.admin-student-card,.student-calendar-card{break-inside:avoid;}
+.section-title{break-after:avoid;}
+@media (min-width:768px){
+  :root{--side-w:92px;}
+  #app{max-width:900px;}
+  #app.has-nav{max-width:none;margin:0;padding-left:var(--side-w);padding-bottom:28px;}
+  #app.has-nav .top-header,#app.has-nav .screen{max-width:1240px;margin-left:auto;margin-right:auto;}
+  #app.has-nav .top-header{padding:24px 24px 6px;}
+  #app.has-nav .screen{padding:20px 24px 12px;columns:440px;column-gap:24px;}
+  /* menu inferior vira menu lateral */
+  .bottom-nav{
+    top:0;bottom:0;left:0;right:auto;width:var(--side-w);max-width:none;margin:0;
+    flex-direction:column;justify-content:flex-start;gap:6px;
+    padding:18px 8px calc(18px + var(--safe-bottom));
+    border-top:none;border-right:1px solid var(--border);overflow-y:auto;
+  }
+  .nav-btn{flex:0 0 auto;padding:12px 4px;font-size:11px;text-align:center;}
+  .nav-btn .ic{font-size:22px;}
+}
+@media (min-width:1100px){
+  :root{--side-w:230px;}
+  .bottom-nav{padding:24px 14px;}
+  .nav-btn{flex-direction:row;justify-content:flex-start;gap:12px;padding:12px 14px;font-size:14px;text-align:left;}
+  .nav-btn .ic{font-size:20px;width:26px;text-align:center;}
+}
+@media (min-width:1600px){
+  #app.has-nav .top-header,#app.has-nav .screen{max-width:1480px;}
+}
+@media print{
+  #app,#app.has-nav{max-width:none !important;padding:0 !important;margin:0 !important;}
+  #app.has-nav .screen{columns:auto !important;max-width:none !important;}
+}
+/* Busca: o campo e os resultados ficam sempre na largura toda, um logo abaixo do outro */
+.screen > .search-input,#admin-students-list,#evo-results{column-span:all;}
+@media (min-width:768px){
+  #admin-students-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0 14px;align-items:start;}
+  #admin-students-list > p{grid-column:1 / -1;}
+}
+/* ---------- Perfil do aluno (orientador): resumo e blocos lado a lado ---------- */
+.student-summary{padding:16px;}
+.ss-top{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.ss-pct{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:700;color:var(--mint);line-height:1;}
+.ss-bar{flex:1;min-width:0;}
+.ss-bar .mini-track{height:9px;}
+.ss-cap{font-size:11.5px;color:var(--text-faint);margin-top:6px;}
+.ss-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.ss-m{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:11px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.ss-ic{font-size:16px;}
+.ss-m .v{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;line-height:1.1;}
+.ss-m .v small{font-size:12px;color:var(--text-faint);font-weight:600;}
+.ss-m .l{font-size:10.5px;color:var(--text-faint);line-height:1.25;}
+.ss-m.warn{border-color:#FFB64866;background:var(--amber-dim);}
+.ss-m.warn .v{color:var(--amber);}
+body.theme-light .ss-m{background:#F3F6FB;}
+body.theme-light .ss-m.warn{background:#FFF3DC;}
+@media (min-width:768px){
+  #app.has-nav .screen.detail-screen{columns:auto;column-gap:0;}
+  .detail-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 24px;align-items:start;}
+  .dg-col{min-width:0;}
+  .detail-screen .detail-row > .dg-col > .card:first-child{margin-top:0;}
+}
 /* small responsive tweaks */
 @media (max-width:420px){ .blocks-grid{grid-template-columns:repeat(3,1fr);} .avatar-circle{width:40px;height:40px;} }
+
+/* ---------- Perfil do aluno (orientador): resumo melhorado + grade 2 colunas ---------- */
+.student-summary{padding:18px;}
+.ss-head{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.ss-ring{--p:0;width:84px;height:84px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;position:relative;background:conic-gradient(var(--mint) calc(var(--p)*1%),var(--bg-surface-2,rgba(255,255,255,.08)) 0);}
+.ss-ring::before{content:'';position:absolute;inset:9px;border-radius:50%;background:var(--bg-surface);}
+.ss-ring span{position:relative;font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;color:var(--mint);}
+.ss-title{font-size:14px;font-weight:600;margin-bottom:8px;}
+.ss-cap{margin-top:8px;}
+.ss-m{padding:14px 8px;gap:4px;border-radius:14px;}
+.ss-m .v{font-size:24px;}
+.ss-m .l{font-size:11.5px;}
+.ss-ic{font-size:20px;}
+.ss-done{border-color:#4ADE8044;}
+.ss-streak{border-color:#FFB64844;}
+.ss-streak .v{color:var(--amber);}
+.hist-scroll{max-height:460px;overflow-y:auto;margin:0 -4px;padding:0 4px;}
+.hist-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.hist-empty-note{margin:0;}
+@media (min-width:768px){
+  .detail-row{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .detail-row > .dg-col:only-child{grid-column:1 / -1;}
+}
+@media (max-width:767px){
+  .ss-ring{width:72px;height:72px;}
+  .ss-ring span{font-size:18px;}
+}
+
+/* ---------- Duas filas: Alunos por progresso e aba Alunos ---------- */
+.progress-list-2col{display:grid;grid-template-columns:1fr;gap:0 24px;}
+.progress-list-2col > div{min-width:0;}
+@media (min-width:600px){
+  .progress-list-2col{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (min-width:768px){
+  #admin-students-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;}
+  .progress-title,.progress-card{column-span:all;}
+}
+@media (min-width:600px) and (max-width:767px){
+  #admin-students-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px;align-items:start;}
+  #admin-students-list > p{grid-column:1 / -1;}
+}
+
+/* ---------- Hall do orientador em duas filas (1º, 2º, 3º... na ordem de leitura) ---------- */
+@media (min-width:600px){
+  .hall-list-2col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px;}
+  .hall-list-2col .hall-row{min-width:0;}
+}
+@media (min-width:768px){
+  #app.has-nav .screen.hall-screen{columns:auto;column-gap:0;}
+}
 </style>
 </head>
 <body>
@@ -929,6 +1045,8 @@ let HALL_TAB = 'sheets';         // aba ativa do Hall: sheets | streak | correct
 let TB_MODAL = null;             // balanço do trimestre recém-encerrado, exibido para o orientador
 let HALL_PERIOD_MODE = 'month';
 let HALL_MONTH = '';
+let EVO_BLOCKS_IDX = 0; // Evolução > Blocos da meta: 0 = meta atual, 1+ = trimestres anteriores
+let BALANCE_TRIMESTER_INDEX = 0; // balanço do trimestre: 0 = atual, 1+ = anteriores
 let HALL_TRIMESTER_INDEX = 0; // 0 = trimestre atual, 1+ = períodos anteriores
 let UNDO_TRIMESTER_CONFIRM = null;
 let ADMIN_VIEW = 'overview';
@@ -940,7 +1058,7 @@ let LOGIN_ERROR = '';
 /* ===== MODO MANUTENÇÃO =====
    true  = alunos veem o aviso de manutenção (o orientador continua entrando normalmente)
    false = site normal para todos */
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 const MAINTENANCE_TEXT = 'Estamos atualizando o site e cadastrando novas informações dos alunos. Volte em breve!';
 let ADMIN_LOGIN_STAGE = false;
 let TOAST = null;
@@ -964,6 +1082,8 @@ let ADMIN_LOGIN_ATTEMPTS = 0;
 let ADMIN_LOGIN_LOCK_UNTIL = 0;
 let ADMIN_LOGIN_LOCK_TIMER = null;
 let EDITING_WEEK_HISTORY_ID = null;
+let DELETE_WEEK_CONFIRM_ID = null;   // registro de período em confirmação de exclusão
+let DELETE_ALL_WEEKS_CONFIRM = null; // id do aluno com 'excluir todo o histórico' em confirmação
 
 /* ---------- Student proposal state (client-side UI) ---------- */
 let STUDENT_PROPOSAL_MODE = null; // id da meta planejada que o aluno está propondo (apenas enquanto edita a proposta)
@@ -1109,6 +1229,8 @@ function updateStudentTarget(student, newTargetStage, newTargetSheet, newTargetE
   student.targetSheet = Number(newTargetSheet);
   student.targetEnd = newTargetEnd;
 }
+// Data final da meta de um trimestre já encerrado (ex.: 20/10), e não o dia em que o orientador clicou em encerrar (ex.: 31/10).
+function metaEndDate(e){ return (e && (e.targetEnd || e.archivedAt)) || ''; }
 function archiveCurrentMeta(student){
   if(!student.metaHistory) student.metaHistory = [];
   const undoSnapshot = JSON.parse(JSON.stringify(student));
@@ -1125,6 +1247,7 @@ function archiveCurrentMeta(student){
     blocksCompleted: s.done,
     blocksTotal: s.total,
     reached,
+    goalCandy: (student.rewards && student.rewards.meta) || null,
     balance: {
       sheets: sheetsInRange(student, periodStart, periodEnd),
       days: attendanceInRange(student, periodStart, periodEnd),
@@ -1244,9 +1367,12 @@ function rewardStats(student){
   const rewards = student.rewards || {};
   let given = 0;
   for(let i=0;i<earned;i++){ if(rewards[i]) given++; }
-  const pending = earned - given;
+  // Doce extra por meta batida (guardado em rewards.meta)
+  const goalEarned = s.goalReached ? 1 : 0;
+  const goalGiven = goalEarned && rewards.meta ? 1 : 0;
+  const pending = (earned - given) + (goalEarned - goalGiven);
   const remaining = BLOCKS_PER_REWARD - (s.corrected % BLOCKS_PER_REWARD);
-  return { earned, given, pending, remaining };
+  return { earned, given, pending, remaining, goalEarned, goalGiven, totalEarned: earned + goalEarned, totalGiven: given + goalGiven };
 }
 function renderRewardDots(student){
   const s = stats(student);
@@ -1553,6 +1679,7 @@ function render(){
   }
   if(TOAST) html += `<div class="toast" role="status" aria-live="polite">${esc(TOAST)}</div>`;
   app.innerHTML = html;
+  app.classList.toggle('has-nav', !!app.querySelector('.bottom-nav'));
   attachHandlers();
 }
 function renderLoading(){
@@ -1631,7 +1758,7 @@ function renderStudentApp(){
     ${unseenBalance ? renderTbOverlay({
         name: student.name, avatar: student.avatar,
         stage: `${unseenBalance.startStage}${unseenBalance.startSheet} → ${unseenBalance.targetStage}${unseenBalance.targetSheet}`,
-        periodLabel: `${fmtDateFull(unseenBalance.startDate)} a ${fmtDateFull(unseenBalance.archivedAt)}`,
+        periodLabel: `${fmtDateFull(unseenBalance.startDate)} a ${fmtDateFull(metaEndDate(unseenBalance))}`,
         days: unseenBalance.balance.days, sheets: unseenBalance.balance.sheets,
         percent: unseenBalance.balance.percent, reached: unseenBalance.reached
       }, null, `data-dismiss-balance="${unseenBalance.id}"`) : ''}
@@ -1827,16 +1954,16 @@ function renderJourney(student){
 
     <div class="section-title">🍬 Prêmios</div>
     <div class="card">
-      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">3 blocos corrigidos, você ganha um doce.</p>
+      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">3 blocos corrigidos = 1 doce. Bateu a meta? +1 doce! 🏆</p>
       ${renderRewardDots(student)}
       <div class="row">
-        <span class="badge badge-peri">🍬 ${rw.earned} conquistado${rw.earned===1?'':'s'}</span>
+        <span class="badge badge-peri">🍬 ${rw.totalEarned} conquistado${rw.totalEarned===1?'':'s'}</span>
         <span class="muted mono" style="font-size:12px;">faltam ${rw.remaining} bloco${rw.remaining===1?'':'s'}</span>
       </div>
-      ${rw.given>0 ? `<div class="faint" style="font-size:16px;margin-top:10px;letter-spacing:2px;">${Array.from({length: rw.earned}).map((_,i)=>{
+      ${rw.totalGiven>0 ? `<div class="faint" style="font-size:16px;margin-top:10px;letter-spacing:2px;">${Array.from({length: rw.earned}).map((_,i)=>{
         const chosen = (student.rewards || {})[i];
         return chosen==='bombom' ? '🍫' : (chosen==='fini' ? '🍬' : '⚪');
-      }).join('')}</div>` : ''}
+      }).join('')}${rw.goalEarned ? ' 🏆' + (({bombom:'🍫',fini:'🍬'})[(student.rewards||{}).meta] || '⚪') : ''}</div>` : ''}
     </div>
 
     <div class="section-title">📅 Histórico mensal</div>
@@ -2129,7 +2256,7 @@ function renderWeeklyHistoryAdmin(student){
   const hist = (student.weeklyHistory||[]).slice().sort((a,b)=> (b.endDate||'').localeCompare(a.endDate||''));
   if(hist.length===0){
     return `<div class="section-title" id="sec-historico">📝 Histórico de períodos</div>
-    <div class="card"><span class="muted" style="font-size:13px;">Nenhum registro ainda.</span></div>`;
+    <div class="card"><span class="muted hist-empty-note" style="font-size:13px;">Nenhum registro ainda. Os períodos registrados aparecerão aqui.</span></div>`;
   }
   const groups = [];
   hist.forEach(h=>{
@@ -2157,6 +2284,17 @@ function renderWeeklyHistoryAdmin(student){
         </div>
       </div>`;
     }
+    if(DELETE_WEEK_CONFIRM_ID===h.id){
+      return `
+      <div style="padding:10px 0;border-top:1px solid var(--border);">
+        <div style="font-size:13px;margin-bottom:4px;">Excluir ${fmtDateFull(h.startDate)} a ${fmtDateFull(h.endDate)} (${esc(h.sheets)} folhas)?</div>
+        <div class="faint" style="font-size:11px;margin-bottom:8px;">As folhas saem das contagens.</div>
+        <div class="field-row">
+          <button class="btn btn-ghost btn-block btn-sm" data-cancel-delete-week="1">Cancelar</button>
+          <button class="btn btn-danger btn-block btn-sm" data-confirm-delete-week="${h.id}">Excluir</button>
+        </div>
+      </div>`;
+    }
     return `
     <div class="row" style="padding:9px 0;border-top:1px solid var(--border);align-items:flex-start;">
       <div style="flex:1;min-width:0;">
@@ -2166,13 +2304,29 @@ function renderWeeklyHistoryAdmin(student){
         </div>
         ${h.note ? `<div class="muted" style="font-size:12px;margin-top:4px;">${esc(h.note)}</div>` : ''}
       </div>
-      <button class="btn btn-ghost btn-sm" data-edit-week="${h.id}" title="Editar histórico">✏️</button>
+      <div class="row" style="gap:4px;flex-shrink:0;">
+        <button class="btn btn-ghost btn-sm" data-edit-week="${h.id}" title="Editar registro">✏️</button>
+        <button class="btn btn-ghost btn-sm" data-delete-week="${h.id}" title="Excluir registro">🗑️</button>
+      </div>
     </div>`;
   };
   return `
     <div class="section-title" id="sec-historico">📝 Histórico de períodos</div>
     <div class="card">
-      <div class="faint" style="font-size:11.5px;margin-bottom:4px;">${hist.length} ${hist.length===1?'registro':'registros'} · ${totalSheets} folhas no total</div>
+      <div class="hist-head">
+        <div class="faint" style="font-size:11.5px;">${hist.length} ${hist.length===1?'registro':'registros'} · ${totalSheets} folhas no total</div>
+        ${DELETE_ALL_WEEKS_CONFIRM===student.id ? '' : `<button class="btn btn-ghost btn-sm" id="btn-delete-all-weeks">🗑️ Excluir histórico</button>`}
+      </div>
+      ${DELETE_ALL_WEEKS_CONFIRM===student.id ? `
+        <div style="padding:12px;border:1px solid #FF6B6B66;border-radius:12px;margin-bottom:8px;">
+          <div style="font-size:13px;margin-bottom:4px;">Excluir todo o histórico de períodos (${hist.length} ${hist.length===1?'registro':'registros'})?</div>
+          <div class="faint" style="font-size:11px;margin-bottom:8px;">Não dá para desfazer. As folhas saem das contagens.</div>
+          <div class="field-row">
+            <button class="btn btn-ghost btn-block btn-sm" id="btn-cancel-delete-all-weeks">Cancelar</button>
+            <button class="btn btn-danger btn-block btn-sm" id="btn-confirm-delete-all-weeks">Excluir tudo</button>
+          </div>
+        </div>` : ''}
+      <div class="hist-scroll">
       ${groups.map((g,i)=>{
         const sum = g.items.reduce((a,h)=>a+Number(h.sheets||0),0);
         const hasEditing = g.items.some(h=>h.id===EDITING_WEEK_HISTORY_ID);
@@ -2188,6 +2342,7 @@ function renderWeeklyHistoryAdmin(student){
           <div style="padding-bottom:6px;">${g.items.map(rowHtml).join('')}</div>
         </details>`;
       }).join('')}
+      </div>
     </div>`;
 }
 
@@ -2232,7 +2387,7 @@ function renderMetaHistoryRows(student, forAdmin){
           <span class="meta-badge completed">${reached ? '🎯 Meta batida' : 'Encerrada'}</span>
           <div class="meta-range">
             <div>${esc(e.startStage)}${esc(e.startSheet)} → ${esc(e.targetStage)}${esc(e.targetSheet)}</div>
-            <div class="meta-extra">${pct}% da meta · encerrada em ${fmtDate(e.archivedAt)}</div>
+            <div class="meta-extra">${pct}% da meta · meta até ${fmtDate(metaEndDate(e))}</div>
             ${e.balance ? `<div class="meta-extra" style="margin-top:3px;">🔥 ${e.balance.days} ${e.balance.days===1?'dia':'dias'} de constância · 📄 ${e.balance.sheets} ${e.balance.sheets===1?'folha':'folhas'}</div>` : ''}
           </div>
           ${canUndo && !askingUndo ? `<button class="btn btn-ghost btn-sm" style="flex-shrink:0;" data-ask-undo-trimester-student="${student.id}" data-ask-undo-trimester-id="${e.id}">↩️ Desfazer</button>` : ''}
@@ -2257,7 +2412,9 @@ function renderTrimesterSectionAdmin(student){
   if(PLAN_META_MODE && !PLAN_THEME_DRAFT) PLAN_THEME_DRAFT = draftFromTheme(editing && editing.theme);
   if(PLAN_META_MODE && !PLAN_MODE_DRAFT) PLAN_MODE_DRAFT = editing ? modeOfEntry(editing) : 'vacation';
   const pv = editing || {};
-  const defStartDate = student.targetEnd && student.targetEnd>=todayISO() ? student.targetEnd : todayISO();
+  const defPeriod = defaultNextPeriod(student);
+  const defStartDate = defPeriod.startDate;
+  const defNext = nextStartAfterLastDone(student);
   return `
     <div class="section-title">📜 Trimestres</div>
     <div class="card">
@@ -2266,7 +2423,7 @@ function renderTrimesterSectionAdmin(student){
       ${PLAN_META_MODE ? `
         <div class="forgot-editor" style="background:var(--peri-dim);border-color:#8C93FF55;margin-top:10px;">
           <label style="display:block;font-size:13px;color:var(--text);font-weight:700;margin-bottom:4px;">${editing ? '✏️ Editar a próxima meta' : '🎯 Planejar a próxima meta'}</label>
-          <p class="faint" style="font-size:11px;margin:0 0 12px;">O aluno verá esta meta como "Próxima missão" (modo férias) ou "Próxima meta" (modo normal). A ativação (transformar em meta atual) continua sendo sua decisão ao encerrar o trimestre.</p>
+          <p class="faint" style="font-size:11px;margin:0 0 12px;">O aluno vê como próxima meta. Ela só vale ao encerrar o trimestre.</p>
 
           <button type="button" class="btn btn-outline btn-block btn-sm" id="btn-suggest-meta" style="margin-bottom:10px;">💡 Sugerir meta (mantendo o ritmo)</button>
           <div id="plan-suggest-note" class="faint" style="display:none;font-size:11.5px;line-height:1.5;margin:0 0 12px;"></div>
@@ -2274,9 +2431,9 @@ function renderTrimesterSectionAdmin(student){
           <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;">Ponto de partida</label>
           <div class="field-row">
             <div class="field">
-              <select id="f-plan-start-stage">${STAGES.map(st=>`<option value="${st}" ${st===(pv.startStage||student.targetStage)?'selected':''}>${st}</option>`).join('')}</select>
+              <select id="f-plan-start-stage">${STAGES.map(st=>`<option value="${st}" ${st===(pv.startStage||defNext.stage)?'selected':''}>${st}</option>`).join('')}</select>
             </div>
-            <div class="field"><input type="number" id="f-plan-start-sheet" min="0" max="200" value="${esc(pv.startSheet!==undefined ? pv.startSheet : student.targetSheet)}" placeholder="Folha"></div>
+            <div class="field"><input type="number" id="f-plan-start-sheet" min="0" max="200" value="${esc(pv.startSheet!==undefined ? pv.startSheet : defNext.sheet)}" placeholder="Folha"></div>
           </div>
 
           <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;">Meta (onde quer chegar)</label>
@@ -2289,8 +2446,9 @@ function renderTrimesterSectionAdmin(student){
 
           <div class="field-row">
             <div class="field"><label>Data inicial</label><input type="date" id="f-plan-start-date" value="${esc(pv.startDate || defStartDate)}"></div>
-            <div class="field"><label>Data final</label><input type="date" id="f-plan-date" value="${esc(pv.targetEnd || '')}"></div>
+            <div class="field"><label>Data final</label><input type="date" id="f-plan-date" value="${esc(pv.targetEnd || defPeriod.endDate || '')}"></div>
           </div>
+          <p class="faint" style="font-size:11px;margin:-4px 0 12px;">${defPeriod.fromTrimester ? 'Datas do trimestre do Perfil (pode alterar).' : 'Datas editáveis. Cadastre o novo trimestre no Perfil para vir preenchido.'} Partida: bloco seguinte ao último feito.</p>
 
           <label style="display:block;font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;">Modo da meta</label>
           ${renderModeSwitch('plan', PLAN_MODE_DRAFT)}
@@ -2311,7 +2469,7 @@ function renderTrimesterSectionAdmin(student){
 
       <div class="divider"></div>
       ${END_TRIMESTER_CONFIRM === student.id ? `
-        <p class="faint" style="font-size:11px;margin:0 0 10px;">Isso arquiva a meta atual como concluída e libera o ponto de partida para uma nova meta (a planejada acima, se houver, ou uma nova a ser definida).</p>
+        <p class="faint" style="font-size:11px;margin:0 0 10px;">Arquiva a meta atual e começa a próxima (a planejada, se houver).</p>
         <div class="field-row">
           <button class="btn btn-ghost btn-block btn-sm" id="btn-cancel-end-trimester">Cancelar</button>
           <button class="btn btn-danger btn-block btn-sm" id="btn-confirm-end-trimester">Confirmar encerramento</button>
@@ -2362,7 +2520,7 @@ function renderTrimesterSectionStudent(student){
       <div class="tl-card">
         <div class="tl-top"><span class="tl-badge ${reached?'win':'end'}">${reached?'🎯 Meta batida':'Encerrada'}</span><span class="tl-pct">${pct}%</span></div>
         ${route(e.startStage, e.startSheet, e.targetStage, e.targetSheet)}
-        <div class="tl-dates">${e.startDate ? fmtDate(e.startDate)+' → ' : 'até '}${fmtDate(e.archivedAt)}</div>
+        <div class="tl-dates">${e.startDate ? fmtDate(e.startDate)+' → ' : 'até '}${fmtDate(metaEndDate(e))}</div>
         ${e.balance ? `<div class="tl-chips"><span>🔥 ${e.balance.days} ${e.balance.days===1?'dia':'dias'}</span><span>📄 ${e.balance.sheets} ${e.balance.sheets===1?'folha':'folhas'}</span></div>` : ''}
       </div>
     </div>`);
@@ -2494,7 +2652,7 @@ function renderAdminProfile(){
       <section class="admin-profile-section">
         <h3 class="admin-profile-section-title"><span>🗓️</span> Período do trimestre atual</h3>
         <div class="admin-profile-card">
-          <p class="admin-profile-help">Esse intervalo alimenta o Hall do trimestre e a Visão geral. Também serve como sugestão no cadastro de novos alunos; alterar o período não modifica metas individuais já cadastradas.</p>
+          <p class="admin-profile-help">Alimenta o Hall e a Visão geral e já vem preenchido em novos alunos.</p>
           <div class="field-row">
             <div class="field"><label>Início do trimestre</label><input type="date" id="f-trimester-start" value="${esc(trimester.startDate || todayISO())}"></div>
             <div class="field"><label>Fim do trimestre</label><input type="date" id="f-trimester-end" value="${esc(trimester.endDate || '')}"></div>
@@ -2506,7 +2664,7 @@ function renderAdminProfile(){
       <section class="admin-profile-section">
         <h3 class="admin-profile-section-title"><span>📅</span> Fim da meta de todos os alunos</h3>
         <div class="admin-profile-card">
-          <p class="admin-profile-help">Aplica uma nova data final à meta atual dos ${DATA.students.length} alunos cadastrados. O material didático e o progresso não são alterados.</p>
+          <p class="admin-profile-help">Muda a data final da meta de todos os alunos. O progresso não muda.</p>
           <div class="field">
             <label>Nova data de fim</label>
             <input type="date" id="f-bulk-end" value="${esc(BULK_END_CONFIRM || '')}">
@@ -2570,14 +2728,17 @@ function attendanceInRange(student, rangeStart, rangeEnd){
   return Object.keys(student.attendance || {}).filter(d=> d>=rangeStart && d<=rangeEnd).length;
 }
 function metasConcluidasInRange(student, rangeStart, rangeEnd){
-  return (student.metaHistory || []).filter(h=>
-    h.status==='completed' && h.archivedAt && h.archivedAt>=rangeStart && h.archivedAt<=rangeEnd &&
-    (h.reached !== undefined ? h.reached : h.blocksCompleted===h.blocksTotal)
-  );
+  // Conta pela data de FIM DA META (targetEnd), não pela data em que o orientador encerrou o trimestre.
+  return (student.metaHistory || []).filter(h=>{
+    const goalEnd = h.targetEnd || h.archivedAt;
+    return h.status==='completed' && goalEnd && goalEnd>=rangeStart && goalEnd<=rangeEnd &&
+      (h.reached !== undefined ? h.reached : h.blocksCompleted===h.blocksTotal);
+  });
 }
 function hallTrimesterOptions(){
   const options=[];
   const seen=new Set();
+  const today=todayISO();
   const add=(item,isCurrent=false)=>{
     if(!item || !item.startDate || !item.endDate || item.startDate>item.endDate) return;
     const key=item.startDate+'|'+item.endDate;
@@ -2585,16 +2746,25 @@ function hallTrimesterOptions(){
     seen.add(key);
     options.push({start:item.startDate,end:item.endDate,isCurrent,label:`${fmtDate(item.startDate)} a ${fmtDate(item.endDate)}`});
   };
-  const current=DATA.currentTrimester||{};
-  add(current,true);
-  // Período anterior confirmado pelo orientador.
-  add({startDate:'2026-08-01',endDate:'2026-10-20'},false);
-  (DATA.trimesterHistory||[]).slice().sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||'')).forEach(item=>add(item,false));
-  // Older files did not keep a global trimester archive. Recover available ranges from each student's saved meta history.
+  // Períodos de meta confirmados pelo orientador (mais recente primeiro).
+  const KNOWN=[
+    {startDate:'2026-10-21',endDate:'2027-01-20'},
+    {startDate:'2026-08-01',endDate:'2026-10-20'}
+  ];
+  const overlapsKnown=item=> KNOWN.some(k=> item.startDate<=k.endDate && item.endDate>=k.startDate);
+  KNOWN.forEach(k=> add(k, today>=k.startDate && today<=k.endDate));
+  // Garante que sempre exista um "atual": se hoje não cai em nenhum, o mais recente vira o atual.
+  if(options.length && !options.some(o=>o.isCurrent)) options[0].isCurrent=true;
+  // Outros períodos cadastrados (que não se sobrepõem aos confirmados acima).
+  const extra=[];
+  const collect=item=>{ if(item && item.startDate && item.endDate && !overlapsKnown(item)) extra.push(item); };
+  collect(DATA.currentTrimester||{});
+  (DATA.trimesterHistory||[]).forEach(collect);
   DATA.students.forEach(st=>(st.metaHistory||[]).filter(e=>e.status==='completed').forEach(e=>{
     const end=e.targetEnd||e.archivedAt;
-    if(e.startDate && end) add({startDate:e.startDate,endDate:end},false);
+    if(e.startDate && end) collect({startDate:e.startDate,endDate:end});
   }));
+  extra.sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||'')).forEach(item=>add(item,false));
   return options;
 }
 function hallFolhasRange(){
@@ -2612,7 +2782,7 @@ function hallFolhasRange(){
 function renderSheetsRanking(){
   const range = hallFolhasRange();
   if(!range){
-    return `<p class="muted center" style="margin:24px 0;font-size:13px;">Defina as datas do trimestre atual em Perfil → Trimestre atual pra ver esse período aqui.</p>`;
+    return `<p class="muted center" style="margin:24px 0;font-size:13px;">Defina o trimestre em Perfil.</p>`;
   }
   const sorted = DATA.students
     .map(st=>({ st, sheets: sheetsInRange(st, range.start, range.end) }))
@@ -2620,7 +2790,7 @@ function renderSheetsRanking(){
   const ranked = withCompetitionRank(sorted, r=>r.sheets);
   return `
     <p class="faint" style="font-size:11.5px;margin:0 0 10px;text-transform:capitalize;">${esc(range.label)}</p>
-    <div class="card">
+    <div class="card hall-list-2col">
       ${ranked.map(({item:r, rank, tied})=>`
       <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${r.st.id}" style="cursor:pointer;">
         ${hallRankMark(rank)}
@@ -2642,8 +2812,8 @@ function renderAdminHall(){
   const list = DATA.students;
   if(list.length===0) return `<div class="screen"><p class="muted center" style="margin-top:30px;">Cadastre alunos para ver o Hall da Evolução.</p></div>`;
   return `
-  <div class="screen">
-    <div class="growth-msg">✨ Acompanhe as folhas, a constância e as correções de todos os alunos. Toque em um aluno para abrir o perfil dele.</div>
+  <div class="screen hall-screen">
+    <div class="growth-msg">✨ Toque em um aluno para abrir o perfil.</div>
 
     <div class="hall-tabs" style="margin-bottom:8px;">
       <div class="hall-tab ${HALL_PERIOD_MODE==='month'?'active':''}" data-hall-period="month">📅 Mês</div>
@@ -2663,7 +2833,7 @@ function renderAdminHall(){
         <div class="faint" style="font-size:11.5px;margin-top:2px;">${esc(range.label)}</div>
       </div>
       <button class="btn btn-ghost btn-sm" data-hall-trimester-shift="-1" aria-label="Trimestre mais recente" ${range.index<=0?'disabled style="opacity:.4;"':''}>›</button>
-    </div>`:`<p class="muted center" style="font-size:12px;margin:12px 0;">Defina as datas do trimestre atual em Perfil do orientador → Período do trimestre atual.</p>`;})()}
+    </div>`:`<p class="muted center" style="font-size:12px;margin:12px 0;">Defina o trimestre em Perfil.</p>`;})()}
     `}
 
     <div class="hall-tabs">
@@ -2680,7 +2850,7 @@ function renderHallTabBody(){
     // Constância e Correções respeitam o período escolhido (Mês ou Trimestre), igual às Folhas
     const range = hallFolhasRange();
     if(!range){
-      return `<p class="muted center" style="margin:24px 0;font-size:13px;">Defina as datas do trimestre atual em Perfil → Trimestre atual pra ver esse período aqui.</p>`;
+      return `<p class="muted center" style="margin:24px 0;font-size:13px;">Defina o trimestre em Perfil.</p>`;
     }
     const isStreak = HALL_TAB==='streak';
     const valueOf = (st)=> isStreak ? attendanceInRange(st, range.start, range.end) : hallCorrectedInRange(st, range.start, range.end);
@@ -2690,7 +2860,7 @@ function renderHallTabBody(){
     const ranked = withCompetitionRank(sorted, r=>r.v);
     return `
       <p class="faint" style="font-size:11.5px;margin:0 0 10px;text-transform:capitalize;">${esc(range.label)}</p>
-      <div class="card">${ranked.map(({item:r, rank, tied})=>`
+      <div class="card hall-list-2col">${ranked.map(({item:r, rank, tied})=>`
       <div class="hall-row ${rank<=3?'top3':''}" data-open-student="${r.st.id}" style="cursor:pointer;">
         ${hallRankMark(rank)}
         <span class="hall-avatar">${r.st.avatar}</span>
@@ -2733,21 +2903,21 @@ function renderAdminBackup(){
 
   return `
   <div class="screen">
-    <div class="growth-msg">💾 Seus dados são salvos automaticamente todos os dias, além do que você já vê no app. Use esta tela para baixar uma cópia no seu computador ou restaurar um backup caso algo se perca.</div>
+    <div class="growth-msg">💾 Os dados são salvos todo dia. Aqui você baixa ou restaura uma cópia.</div>
 
     <div class="section-title">Backup manual (no seu computador)</div>
     <div class="card">
-      <p class="muted" style="font-size:13px;margin:0 0 12px;">Baixa um arquivo .json com todos os dados de todos os alunos, agora mesmo. Guarde esse arquivo em um lugar seguro (computador, e-mail, Drive...).</p>
+      <p class="muted" style="font-size:13px;margin:0 0 12px;">Baixa um arquivo com os dados de todos os alunos.</p>
       <button class="btn btn-primary btn-block" id="btn-download-backup">⬇️ Baixar backup agora (.json)</button>
       <div class="divider"></div>
-      <p class="muted" style="font-size:13px;margin:0 0 12px;">Tem um arquivo de backup salvo no computador? Restaure a partir dele:</p>
+      <p class="muted" style="font-size:13px;margin:0 0 12px;">Restaurar de um arquivo:</p>
       <button class="btn btn-ghost btn-block" id="btn-restore-file">⬆️ Restaurar de um arquivo do computador</button>
       <input type="file" id="input-restore-file" accept="application/json,.json" style="display:none;">
     </div>
 
     <div class="section-title">Backups automáticos (na nuvem)</div>
     <div class="card">
-      <p class="muted" style="font-size:13px;margin:0 0 10px;">A cada alteração salva no app, uma cópia do dia é guardada aqui também. Você pode voltar para qualquer um desses dias.</p>
+      <p class="muted" style="font-size:13px;margin:0 0 10px;">Uma cópia é guardada a cada alteração. Escolha um dia para voltar.</p>
       ${BACKUPS_LOADING ? `<span class="muted" style="font-size:13px;">Carregando lista de backups…</span>` : (rows || `<span class="muted" style="font-size:13px;">Nenhum backup automático encontrado ainda.</span>`)}
     </div>
   </div>`;
@@ -2760,19 +2930,21 @@ function prizeMark(student){
 }
 function renderAdminTrimesterBalance(){
   const list = DATA.students;
-  const trimester = DATA.currentTrimester || {};
-  const start = trimester.startDate, end = trimester.endDate;
   const backBtn = `<button class="btn btn-ghost btn-sm no-print" id="btn-balance-back">← Voltar</button>`;
+  const options = hallTrimesterOptions();
 
-  if(!start || !end){
+  if(options.length===0){
     return `<div class="screen">
       ${backBtn}
-      <p class="muted center" style="margin-top:30px;">Defina as datas do trimestre atual em Perfil → Trimestre atual para ver o balanço.</p>
+      <p class="muted center" style="margin-top:30px;">Defina o trimestre em Perfil.</p>
     </div>`;
   }
   if(list.length===0){
     return `<div class="screen">${backBtn}<p class="muted center" style="margin-top:30px;">Cadastre alunos para ver o balanço do trimestre.</p></div>`;
   }
+  BALANCE_TRIMESTER_INDEX = clamp(BALANCE_TRIMESTER_INDEX, 0, options.length-1);
+  const sel = options[BALANCE_TRIMESTER_INDEX];
+  const start = sel.start, end = sel.end, isCurrent = !!sel.isCurrent;
 
   const today = todayISO();
   const totalDays = daysBetween(start,end)+1;
@@ -2780,10 +2952,11 @@ function renderAdminTrimesterBalance(){
   const timePct = totalDays>0 ? Math.round(clamp(elapsed,0,totalDays)/totalDays*100) : 0;
   const periodLabel = `${fmtDateFull(start)} a ${fmtDateFull(end)}`;
 
+  // Metas concluídas: contam no trimestre em que cai a DATA DE FIM DA META (não a data de encerramento).
   const rows = list.map(st=>{
     const s = stats(st);
     const archivedDone = metasConcluidasInRange(st, start, end).length;
-    const currentlyReached = s.goalReached;
+    const currentlyReached = s.goalReached && !!st.targetEnd && st.targetEnd>=start && st.targetEnd<=end;
     return {
       st,
       sheets: sheetsInRange(st, start, end),
@@ -2797,6 +2970,8 @@ function renderAdminTrimesterBalance(){
   const totalCorrected = rows.reduce((sum,r)=>sum+r.corrected,0);
   const totalGoals = rows.reduce((sum,r)=>sum+r.goalsDone,0);
   const avgProgress = Math.round(list.reduce((sum,s)=>sum+stats(s).percent,0)/list.length);
+  const studentsWithGoal = rows.filter(r=>r.goalsDone>0).length;
+  const goalRate = Math.round(studentsWithGoal/list.length*100);
 
   const bySheets = rows.slice().sort((a,b)=> b.sheets-a.sheets || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
   const byDays = rows.slice().sort((a,b)=> b.days-a.days || a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
@@ -2816,10 +2991,19 @@ function renderAdminTrimesterBalance(){
 
   const metGoalList = [];
   rows.forEach(r=>{
-    metasConcluidasInRange(r.st, start, end).forEach(e=> metGoalList.push({ st: r.st, archived: true, archivedAt: e.archivedAt }));
-    if(r.currentlyReached) metGoalList.push({ st: r.st, archived: false });
+    metasConcluidasInRange(r.st, start, end).forEach(e=> metGoalList.push({ st: r.st, entryId: e.id, goalEnd: e.targetEnd || e.archivedAt, candy: e.goalCandy || null }));
+    if(r.currentlyReached) metGoalList.push({ st: r.st, entryId: 'current', goalEnd: r.st.targetEnd, candy: (r.st.rewards||{}).meta || null });
   });
   metGoalList.sort((a,b)=> a.st.name.localeCompare(b.st.name,'pt-BR',{sensitivity:'base'}));
+  const candyText = c => c==='bombom' ? '🍫 Bombom' : (c==='fini' ? '🍬 Fini' : '⚪ doce a entregar');
+
+  const lastIdx = options.length-1;
+  const selector = `
+    <div class="row no-print" style="justify-content:center;gap:10px;margin:10px 0 2px;">
+      <button class="btn btn-ghost btn-sm" data-bal-shift="1" aria-label="Trimestre anterior" ${BALANCE_TRIMESTER_INDEX>=lastIdx?'disabled style="opacity:.4;"':''}>‹</button>
+      <div style="font-weight:700;font-size:13px;min-width:130px;text-align:center;">${isCurrent?'Trimestre atual':`Anterior ${BALANCE_TRIMESTER_INDEX} de ${lastIdx}`}</div>
+      <button class="btn btn-ghost btn-sm" data-bal-shift="-1" aria-label="Trimestre mais recente" ${BALANCE_TRIMESTER_INDEX<=0?'disabled style="opacity:.4;"':''}>›</button>
+    </div>`;
 
   return `
   <div class="screen">
@@ -2829,14 +3013,17 @@ function renderAdminTrimesterBalance(){
       <div class="display" style="font-size:20px;font-weight:700;">📊 Balanço do trimestre</div>
       <div class="faint" style="font-size:12px;margin-top:2px;">${esc(periodLabel)}</div>
     </div>
+    ${selector}
     <div class="mini-track" style="margin:12px 0 4px;"><div class="mini-fill" style="width:${timePct}%;"></div></div>
-    <p class="faint" style="font-size:11px;text-align:center;margin-bottom:18px;">${timePct}% do trimestre decorrido</p>
+    <p class="faint" style="font-size:11px;text-align:center;margin-bottom:18px;">${isCurrent ? `${timePct}% do trimestre decorrido` : 'Trimestre anterior'}</p>
 
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-num" style="color:var(--peri);">${totalSheets}</div><div class="stat-label">Folhas no trimestre</div></div>
       <div class="stat-card"><div class="stat-num" style="color:var(--mint);">${totalCorrected}</div><div class="stat-label">Blocos corrigidos</div></div>
       <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${totalGoals}</div><div class="stat-label">Metas concluídas</div></div>
-      <div class="stat-card"><div class="stat-num">${avgProgress}%</div><div class="stat-label">Progresso médio atual</div></div>
+      ${isCurrent
+        ? `<div class="stat-card"><div class="stat-num">${avgProgress}%</div><div class="stat-label">Progresso médio atual</div></div>`
+        : `<div class="stat-card"><div class="stat-num">${goalRate}%</div><div class="stat-label">Alunos que bateram a meta</div></div>`}
     </div>
 
     ${winnerBlock('📄 Quem mais fez folhas', bySheets, 'sheets', 'folhas', 'var(--peri)')}
@@ -2844,13 +3031,18 @@ function renderAdminTrimesterBalance(){
     ${winnerBlock('🧠 Quem mais fez correção', byCorrected, 'corrected', 'correções', 'var(--mint)')}
 
     <div class="section-title">🎯 Alunos que bateram a meta</div>
+    <p class="faint" style="font-size:11px;margin:-4px 0 8px;">Conta pelo fim da meta.</p>
     ${metGoalList.length===0 ? `
-    <div class="card"><span class="muted" style="font-size:13px;">Ninguém bateu a meta neste trimestre ainda.</span></div>` : `
+    <div class="card"><span class="muted" style="font-size:13px;">Ninguém bateu a meta neste trimestre.</span></div>` : `
     <div class="card" style="border-color:#8C93FF55;">
       ${metGoalList.map(r=>`
       <div class="hall-row" data-open-student="${r.st.id}" style="cursor:pointer;">
         <span class="hall-avatar">${r.st.avatar}</span>
-        <span class="hall-name">${esc(r.st.name)}</span>
+        <span class="hall-name">${esc(r.st.name)}<span class="faint" style="display:block;font-size:11px;font-weight:400;">meta até ${fmtDate(r.goalEnd)} · ${candyText(r.candy)}</span></span>
+      </div>
+      <div class="reward-choice no-print" style="margin:2px 0 10px 4px;">
+        <button class="reward-chip ${r.candy==='bombom'?'active':''}" data-bc-student="${r.st.id}" data-bc-entry="${r.entryId}" data-bc-candy="bombom">🍫 Bombom</button>
+        <button class="reward-chip ${r.candy==='fini'?'active':''}" data-bc-student="${r.st.id}" data-bc-entry="${r.entryId}" data-bc-candy="fini">🍬 Fini</button>
       </div>`).join('')}
     </div>`}
 
@@ -2891,7 +3083,10 @@ function renderAdminOverview(){
   return `
   <div class="screen">
     <div class="card" style="padding:15px;margin:0 0 14px;border-color:#37E2A055;background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-surface-2) 100%);">
-      <div class="eyebrow" style="margin:0 0 9px;color:var(--mint);">🗓️ META DO TRIMESTRE</div>
+      <div class="row" style="align-items:center;gap:8px;margin:0 0 9px;">
+        <div class="eyebrow" style="margin:0;color:var(--mint);">🗓️ META DO TRIMESTRE</div>
+        <button class="btn btn-outline btn-sm" id="btn-open-trimbalance" style="width:auto;flex-shrink:0;padding:5px 10px;font-size:12px;">📊 Balanço</button>
+      </div>
       <div class="faint" style="font-size:11px;margin-bottom:3px;">Período definido</div>
       <div style="font-size:15px;font-weight:700;">${esc(trimesterPeriod)}</div>
       <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--amber);margin-top:7px;">${esc(trimesterCounter)}</div>
@@ -2903,11 +3098,9 @@ function renderAdminOverview(){
       <div class="stat-card"><div class="stat-num" style="color:var(--mint);">${avgProgress}%</div><div class="stat-label">Progresso médio</div></div>
     </div>
 
-    <button class="btn btn-outline btn-block" id="btn-open-trimbalance" style="margin:0 0 16px;">📊 Balanço do trimestre</button>
-
-    <div class="section-title">Alunos por progresso</div>
-    <div class="card">
-      ${list.length===0 ? `<div class="empty-history"><span>👥</span><b>Nenhum aluno cadastrado</b><small>Cadastre alunos para acompanhar o progresso por aqui.</small></div>` : list.slice().sort((a,b)=>stats(b).percent-stats(a).percent).map(s=>{
+    <div class="section-title progress-title">Alunos por progresso</div>
+    <div class="card progress-card">
+      ${list.length===0 ? `<div class="empty-history"><span>👥</span><b>Nenhum aluno cadastrado</b><small>Cadastre alunos para acompanhar o progresso por aqui.</small></div>` : `<div class="progress-list-2col">${list.slice().sort((a,b)=>stats(b).percent-stats(a).percent).map(s=>{
         const p = stats(s).percent;
         const pending = stats(s).pending;
         return `<div style="margin-bottom:12px;cursor:pointer;" data-open-student="${s.id}">
@@ -2917,7 +3110,7 @@ function renderAdminOverview(){
           </div>
           <div class="mini-track"><div class="mini-fill" style="width:${p}%;"></div></div>
         </div>`;
-      }).join('')}
+      }).join('')}</div>`}
     </div>
   </div>`;
 }
@@ -2956,7 +3149,7 @@ function studentsListHtml(){
 }
 function renderAdminStudents(){
   return `
-  <div class="screen">
+  <div class="screen screen-search">
     <input class="search-input" id="admin-search" placeholder="🔍 Buscar aluno…" value="${esc(SEARCH_TERM)}" aria-label="Buscar aluno" autocomplete="off">
     <div id="admin-students-list">${studentsListHtml()}</div>
   </div>`;
@@ -2965,7 +3158,7 @@ function renderAdminStudents(){
 function renderBlocksSection(student){
   if(EDIT_LABELS_MODE){
     return `
-      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Personalize o número de cada bloco (ex: E141, E151…) conforme o material do aluno. Toque em "Salvar números" ao concluir.</p>
+      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Edite o número de cada bloco e toque em "Salvar números".</p>
       <div class="blocks-grid">
         ${student.blocks.map(b=>`
           <input class="block-label-input" data-block-label-input="${b.index}" value="${esc(b.label)}">
@@ -2978,7 +3171,7 @@ function renderBlocksSection(student){
   }
   return `
     <div class="row" style="align-items:flex-start;margin-bottom:12px;">
-      <p class="faint" style="font-size:11.5px;margin:0;flex:1;">Toque no bloco para alternar status. 📌 marca folha esquecida. 🗑️ remove o bloco.</p>
+      <p class="faint" style="font-size:11.5px;margin:0;flex:1;">Toque no bloco para mudar o status. 📌 folha esquecida · 🗑️ remove.</p>
       <button class="btn btn-ghost btn-sm" id="btn-edit-labels" style="flex-shrink:0;">✏️ Números</button>
     </div>
     <div class="blocks-grid">
@@ -3073,7 +3266,7 @@ function renderCalendar(student, readOnly){
       <span><span class="cal-dot" style="background:var(--sky);"></span>veio para a unidade</span>
       <span><span class="cal-dot" style="background:var(--peri);"></span>dia de teste</span>
     </div>
-    ${readOnly ? '' : `<p class="faint" style="font-size:11px;margin-top:8px;">Toque em um dia para alternar: sem marcação → fez o Kumon → veio para a unidade → dia de teste.</p>`}
+    ${readOnly ? '' : `<p class="faint" style="font-size:11px;margin-top:8px;">Toque no dia para alternar: Kumon → unidade → teste.</p>`}
   `;
 }
 
@@ -3081,7 +3274,7 @@ function renderStudentEditForm(student){
   if(!EDIT_THEME_DRAFT) EDIT_THEME_DRAFT = draftFromTheme(student.missionTheme);
   if(!EDIT_MODE_DRAFT) EDIT_MODE_DRAFT = student.missionTheme ? 'vacation' : 'normal';
   return `
-    <div class="profile-edit-intro"><strong>Atualizar perfil do aluno</strong><span>Altere os dados abaixo e salve ao final. As informações serão atualizadas no perfil do aluno.</span></div>
+    <div class="profile-edit-intro"><strong>Atualizar perfil do aluno</strong><span>Altere e salve ao final.</span></div>
     <div class="eyebrow" style="margin:16px 0 8px;">👤 Dados do aluno</div>
     <div class="field"><label>Nome completo</label><input id="f-edit-name" value="${esc(student.name)}" autocomplete="name"></div>
     <div class="field"><label>Código individual de acesso</label><input id="f-edit-code" inputmode="numeric" value="${esc(student.code)}" autocomplete="off"></div>
@@ -3099,7 +3292,7 @@ function renderStudentEditForm(student){
       <div class="field"><label>Folha inicial (0–200)</label><input type="number" id="f-edit-start-sheet" value="${student.startSheet}"></div>
     </div>
     <div class="field"><label>Data de início</label><input type="date" id="f-edit-start-date" value="${student.startDate}"></div>
-    <p class="faint" style="font-size:11px;margin:-6px 0 16px;">⚠️ Mudar o ponto de partida recalcula toda a trilha de blocos, reiniciando o progresso.</p>
+    <p class="faint" style="font-size:11px;margin:-6px 0 16px;">⚠️ Mudar a partida reinicia o progresso.</p>
 
     <div class="eyebrow" style="margin:0 0 8px;">🎯 Meta trimestral</div>
     <div class="field-row">
@@ -3109,7 +3302,7 @@ function renderStudentEditForm(student){
       <div class="field"><label>Folha final (0–200)</label><input type="number" id="f-edit-target-sheet" value="${student.targetSheet}"></div>
     </div>
     <div class="field"><label>Data final da meta</label><input type="date" id="f-edit-target-date" value="${student.targetEnd}"></div>
-    <p class="faint" style="font-size:11px;margin:-6px 0 16px;">O progresso já feito é mantido ao mudar só a meta — blocos são adicionados ou removidos do final.</p>
+    <p class="faint" style="font-size:11px;margin:-6px 0 16px;">Mudar só a meta mantém o progresso.</p>
 
     <div class="eyebrow" style="margin:6px 0 8px;">🎯 Modo da meta atual</div>
     ${renderModeSwitch('edit', EDIT_MODE_DRAFT)}
@@ -3129,11 +3322,11 @@ function renderAdminAdd(){
   return `
   <div class="screen">
     <h3 style="margin:0 0 4px;">Cadastrar aluno</h3>
-    <p class="faint" style="font-size:12.5px;margin:0 0 18px;">Preencha os dados do aluno, o ponto de partida e a meta trimestral.</p>
+    <p class="faint" style="font-size:12.5px;margin:0 0 18px;">Dados do aluno, partida e meta.</p>
 
     <div class="section-title" style="margin-top:0;">Trimestre atual</div>
     <div class="card">
-      <p class="muted" style="font-size:12.5px;margin:0 0 12px;">Essas datas costumam ser as mesmas para todos os alunos. Defina aqui uma vez e elas já vêm preenchidas (mas continuam editáveis) no cadastro de cada aluno novo.</p>
+      <p class="muted" style="font-size:12.5px;margin:0 0 12px;">Já vêm preenchidas no cadastro de novos alunos (editáveis).</p>
       <div class="field-row">
         <div class="field"><label>Início do trimestre</label><input type="date" id="f-trimester-start" value="${esc(trimester.startDate || todayISO())}"></div>
         <div class="field"><label>Fim do trimestre</label><input type="date" id="f-trimester-end" value="${esc(trimester.endDate || '')}"></div>
@@ -3152,8 +3345,6 @@ function renderAdminAdd(){
       </div>
     </div>
 
-    <p class="faint" style="font-size:11.5px;margin:-6px 0 16px;">Cada estágio tem 200 folhas (20 blocos de 10 folhas: 1-10, 11-20 … 191-200). Ao ultrapassar 200, a contagem continua no próximo estágio.</p>
-
     <div class="section-title">Ponto de partida</div>
     <div class="card">
       <div class="field-row">
@@ -3164,6 +3355,7 @@ function renderAdminAdd(){
       </div>
       <div class="field"><label>Data de início</label><input type="date" id="f-start-date" value="${esc(trimester.startDate || todayISO())}"></div>
     </div>
+    <p class="faint" style="font-size:11.5px;margin:-6px 0 16px;">Cada estágio tem 200 folhas (20 blocos de 10 folhas).</p>
 
     <div class="section-title">Meta trimestral</div>
     <div class="card">
@@ -3201,6 +3393,57 @@ function evoResultsHtml(){
       <span class="evo-result-action">${st.id===selectedId?'Selecionado':'Ver evolução'} <span aria-hidden="true">›</span></span>
     </button>`).join('')}</div>`;
 }
+// Blocos da meta: 0 = meta atual, 1+ = trimestres anteriores (metas encerradas)
+function evoBlocksCardHtml(student, s, rw, notDone){
+  const past = (student.metaHistory||[]).filter(e=>e.status==='completed')
+    .sort((a,b)=> (b.archivedAtTime||b.archivedAt||'').localeCompare(a.archivedAtTime||a.archivedAt||''));
+  EVO_BLOCKS_IDX = clamp(EVO_BLOCKS_IDX, 0, past.length);
+  const idx = EVO_BLOCKS_IDX;
+  let corrected, pending, rest, percent, title, range, extra='';
+  if(idx===0){
+    corrected = s.corrected; pending = s.pending; rest = notDone; percent = s.percent;
+    title = 'Meta atual';
+    range = `${esc(student.startStage)}${esc(student.startSheet)} → ${esc(student.targetStage)}${esc(student.targetSheet)}${student.targetEnd?' · até '+fmtDate(student.targetEnd):''}`;
+    extra = `<div class="faint" style="font-size:11.5px;">🍬 ${rw.totalEarned} ${rw.totalEarned===1?'doce ganho':'doces ganhos'} · ${rw.totalGiven} entregue${rw.totalGiven===1?'':'s'}</div>`;
+  } else {
+    const e = past[idx-1];
+    const snap = e.undoSnapshot && Array.isArray(e.undoSnapshot.blocks) ? e.undoSnapshot.blocks : null;
+    const total = e.blocksTotal || (snap ? snap.length : 0);
+    const done = e.blocksCompleted || 0;
+    if(snap){
+      corrected = snap.filter(b=>b.status==='corrected').length;
+      pending = snap.filter(b=>b.status==='pending_correction').length;
+    } else { corrected = done; pending = 0; }
+    rest = Math.max(0, total - corrected - pending);
+    percent = total>0 ? Math.round((done/total)*100) : 0;
+    title = idx===1 ? 'Trimestre anterior' : `Anterior ${idx} de ${past.length}`;
+    range = `${esc(e.startStage||'')}${esc(e.startSheet||'')} → ${esc(e.targetStage||'')}${esc(e.targetSheet||'')} · ${e.startDate?fmtDate(e.startDate)+' a ':'até '}${fmtDate(metaEndDate(e))}`;
+    if(e.reached) extra = `<div class="faint" style="font-size:11.5px;">🎯 Meta batida</div>`;
+  }
+  const nav = past.length===0 ? '' : `
+    <div class="row no-print" style="gap:8px;margin-bottom:12px;">
+      <button class="btn btn-ghost btn-sm" data-evo-blocks-shift="1" aria-label="Trimestre anterior" ${idx>=past.length?'disabled style="opacity:.4;"':''}>‹</button>
+      <div style="flex:1;text-align:center;min-width:0;">
+        <div style="font-weight:700;font-size:13px;">${esc(title)}</div>
+        <div class="faint mono" style="font-size:11px;margin-top:2px;">${range}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" data-evo-blocks-shift="-1" aria-label="Meta mais recente" ${idx<=0?'disabled style="opacity:.4;"':''}>›</button>
+    </div>`;
+  return `${nav}
+    <div class="row" style="justify-content:flex-start;gap:16px;">
+      ${evoDonut([
+        { value:corrected, color:'var(--mint)' },
+        { value:pending, color:'var(--amber)' },
+        { value:rest, color:'var(--text-faint)' }
+      ], percent+'%')}
+      <div style="font-size:12.5px;line-height:1.9;">
+        <div>🟢 <b>${corrected}</b> corrigidos</div>
+        <div>🟡 <b>${pending}</b> aguardando correção</div>
+        <div>⚪ <b>${rest}</b> a fazer</div>
+        ${extra}
+      </div>
+    </div>`;
+}
 function renderAdminEvolution(){
   const list = DATA.students;
   if(list.length===0) return `<div class="screen"><p class="muted center">Cadastre um aluno para ver a evolução.</p></div>`;
@@ -3236,26 +3479,9 @@ function renderAdminEvolution(){
       </div>
     </div>
 
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">🔥 ${streak.total}</div><div class="stat-label">Dias de constância</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--peri);">${s.sheetsCompleted}</div><div class="stat-label">Folhas na meta atual</div></div>
-    </div>
-
     <div class="section-title">🎯 Blocos da meta</div>
     <div class="card">
-      <div class="row" style="justify-content:flex-start;gap:16px;">
-        ${evoDonut([
-          { value:s.corrected, color:'var(--mint)' },
-          { value:s.pending, color:'var(--amber)' },
-          { value:notDone, color:'var(--text-faint)' }
-        ], s.percent+'%')}
-        <div style="font-size:12.5px;line-height:1.9;">
-          <div>🟢 <b>${s.corrected}</b> corrigidos</div>
-          <div>🟡 <b>${s.pending}</b> aguardando correção</div>
-          <div>⚪ <b>${notDone}</b> a fazer</div>
-          <div class="faint" style="font-size:11.5px;">🍬 ${rw.earned} ${rw.earned===1?'doce ganho':'doces ganhos'} · ${rw.given} entregue${rw.given===1?'':'s'}</div>
-        </div>
-      </div>
+      ${evoBlocksCardHtml(student, s, rw, notDone)}
     </div>
 
     <div class="section-title">📄 Folhas por período</div>
@@ -3294,7 +3520,7 @@ function renderAdminEvolution(){
         <span class="evo-trend-icon">${!latestMonth?'📌':(activeMonths.length>1 && latestMonth.sheets>activeMonths[activeMonths.length-2].sheets)?'📈':(activeMonths.length>1 && latestMonth.sheets<activeMonths[activeMonths.length-2].sheets)?'📉':'📊'}</span>
         <div><strong>${esc(trend.title)}</strong><p>${esc(trend.detail)}</p></div>
       </div>
-      <p class="faint" style="font-size:11px;margin:10px 0 0;">Comparações usam apenas meses com algum registro. Um mês em andamento pode ter números menores por ainda não estar completo.</p>
+      <p class="faint" style="font-size:11px;margin:10px 0 0;">Só meses com registro. O mês atual ainda está em andamento.</p>
     </div>
 
 
@@ -3317,9 +3543,11 @@ function renderAdminDetail(){
   }
 
   return `
-  <div class="screen">
+  <div class="screen detail-screen">
     <button class="btn btn-ghost btn-sm" id="btn-back-students" style="margin-bottom:14px;">← Alunos</button>
 
+    <div class="detail-row">
+    <div class="dg-col">
     <div class="card admin-student-card">
       <div class="asc-head">
         <div class="asc-id">
@@ -3369,25 +3597,41 @@ function renderAdminDetail(){
         </div>`;
       })()}
     </div>
-
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num">${s.percent}%</div><div class="stat-label">Progresso</div></div>
-      <div class="stat-card"><div class="stat-num">${s.done}/${s.total}</div><div class="stat-label">Blocos feitos</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--amber);">${s.pending}</div><div class="stat-label">Correções pendentes</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--peri);">🔥 ${streak.total}</div><div class="stat-label">Dias de constância</div></div>
+    </div>
+    <div class="dg-col">
+    <div class="card student-summary">
+      <div class="ss-head">
+        <div class="ss-ring" style="--p:${s.percent};"><span>${s.percent}%</span></div>
+        <div class="ss-bar">
+          <div class="ss-title">Progresso da meta</div>
+          <div class="mini-track"><div class="mini-fill" style="width:${s.percent}%;"></div></div>
+          <div class="ss-cap">${s.done} de ${s.total} blocos concluídos</div>
+        </div>
+      </div>
+      <div class="ss-metrics">
+        <div class="ss-m ss-done"><span class="ss-ic">✅</span><span class="v">${s.done}<small>/${s.total}</small></span><span class="l">Blocos feitos</span></div>
+        <div class="ss-m ss-pend ${s.pending>0?'warn':''}"><span class="ss-ic">⏳</span><span class="v">${s.pending}</span><span class="l">Correções pendentes</span></div>
+        <div class="ss-m ss-streak"><span class="ss-ic">🔥</span><span class="v">${streak.total}</span><span class="l">Dias de constância</span></div>
+      </div>
+    </div>
+    </div>
     </div>
 
+    <div class="detail-row">
+    <div class="dg-col">
     <div class="section-title" id="sec-material">Material didático</div>
     <div class="card">
       ${renderBlocksSection(student)}
     </div>
 
-    <div class="section-title" id="sec-premios">🍬 Prêmios (bombom ou Fini)</div>
+    </div>
+    <div class="dg-col">
+    <div class="section-title" id="sec-premios">🍬 Prêmios</div>
     <div class="card">
-      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">A cada 3 blocos corrigidos, o aluno ganha 1 doce — um bombom ou um Fini, não os dois. Toque no doce que ele escolheu; toque de novo para desfazer.</p>
+      <p class="muted" style="font-size:12.5px;margin:0 0 4px;">3 blocos = 1 doce. Bateu a meta, mais 1 doce.</p>
       ${renderRewardDots(student)}
       <p class="faint" style="font-size:11px;margin:0 0 14px;">faltam ${rw.remaining} bloco${rw.remaining===1?'':'s'} para o próximo doce</p>
-      ${rw.earned===0 ? `<p class="faint" style="font-size:11.5px;margin:0;">Ainda não conquistou nenhum doce.</p>` : `
+      ${rw.totalEarned===0 ? `<p class="faint" style="font-size:11.5px;margin:0;">Ainda não conquistou nenhum doce.</p>` : `
       <div class="reward-list">
         ${Array.from({length: rw.earned}).map((_,i)=>{
           const chosen = (student.rewards || {})[i] || null;
@@ -3399,12 +3643,24 @@ function renderAdminDetail(){
             </div>
           </div>`;
         }).join('')}
+        ${rw.goalEarned ? (()=>{ const chosen = (student.rewards || {}).meta || null; return `<div class="reward-item">
+            <span>🏆 Doce da meta batida</span>
+            <div class="reward-choice">
+              <button class="reward-chip ${chosen==='bombom'?'active':''}" data-reward-choice="meta:bombom">🍫 Bombom</button>
+              <button class="reward-chip ${chosen==='fini'?'active':''}" data-reward-choice="meta:fini">🍬 Fini</button>
+            </div>
+          </div>`; })() : ''}
       </div>`}
     </div>
 
+    </div>
+    </div>
+
+    <div class="detail-row">
+    <div class="dg-col">
     <div class="section-title" id="sec-periodo">Registrar período</div>
     <div class="card">
-      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">O período já começa no dia seguinte ao último registro. Pode mudar as datas se quiser — não precisa ser de segunda a domingo.</p>
+      <p class="faint" style="font-size:11.5px;margin:0 0 12px;">Começa no dia seguinte ao último registro. Pode mudar as datas.</p>
       <div class="field-row">
         <div class="field"><label>De</label><input type="date" id="input-week-start" value="${periodFrom}"></div>
         <div class="field"><label>Até</label><input type="date" id="input-week-end" value="${todayISO()}"></div>
@@ -3421,8 +3677,14 @@ function renderAdminDetail(){
       <button class="btn btn-primary btn-block" id="btn-register-week">Registrar período</button>
     </div>
 
+    </div>
+    <div class="dg-col">
     ${renderWeeklyHistoryAdmin(student)}
+    </div>
+    </div>
 
+    <div class="detail-row">
+    <div class="dg-col">
     <div class="section-title" id="sec-calendario">🗓️ Calendário</div>
     <div class="card">
       <div class="row" style="margin-bottom:14px;">
@@ -3432,9 +3694,17 @@ function renderAdminDetail(){
       ${renderCalendar(student)}
     </div>
 
+    </div>
+    <div class="dg-col">
     ${renderMonthlyHistoryAdmin(student)}
+    </div>
+    </div>
 
+    <div class="detail-row">
+    <div class="dg-col">
     ${renderTrimesterSectionAdmin(student)}
+    </div>
+    </div>
   </div>`;
 }
 
@@ -3472,7 +3742,7 @@ function attachHandlers(){
 
   if($('#btn-admin-profile')) $('#btn-admin-profile').onclick = ()=>{ ADMIN_VIEW='profile'; render(); };
   if($('#btn-admin-profile-back')) $('#btn-admin-profile-back').onclick = ()=>{ ADMIN_VIEW='overview'; render(); };
-  if($('#btn-open-trimbalance')) $('#btn-open-trimbalance').onclick = ()=>{ ADMIN_VIEW='trimbalance'; render(); };
+  if($('#btn-open-trimbalance')) $('#btn-open-trimbalance').onclick = ()=>{ BALANCE_TRIMESTER_INDEX=0; ADMIN_VIEW='trimbalance'; render(); };
   $$('[data-hall-period]').forEach(tab=> tab.onclick = ()=>{ HALL_PERIOD_MODE = tab.getAttribute('data-hall-period'); if(HALL_PERIOD_MODE==='trimester') HALL_TRIMESTER_INDEX=0; render(); });
   $$('[data-hall-month]').forEach(btn=> btn.onclick = ()=>{
     if(btn.disabled) return;
@@ -3538,6 +3808,12 @@ function attachHandlers(){
   if($('#btn-remove-forgot')) $('#btn-remove-forgot').onclick = removeForgottenNote;
   if($('#btn-register-week')) $('#btn-register-week').onclick = registerWeek;
   $$('[data-edit-week]').forEach(btn=> btn.onclick = ()=>{ EDITING_WEEK_HISTORY_ID = btn.getAttribute('data-edit-week'); render(); });
+  $$('[data-delete-week]').forEach(btn=> btn.onclick = ()=>{ DELETE_WEEK_CONFIRM_ID = btn.getAttribute('data-delete-week'); EDITING_WEEK_HISTORY_ID = null; render(); });
+  $$('[data-cancel-delete-week]').forEach(btn=> btn.onclick = ()=>{ DELETE_WEEK_CONFIRM_ID = null; render(); });
+  $$('[data-confirm-delete-week]').forEach(btn=> btn.onclick = ()=> deleteWeeklyHistory(btn.getAttribute('data-confirm-delete-week')));
+  if($('#btn-delete-all-weeks')) $('#btn-delete-all-weeks').onclick = ()=>{ DELETE_ALL_WEEKS_CONFIRM = SELECTED_STUDENT_ID; render(); };
+  if($('#btn-cancel-delete-all-weeks')) $('#btn-cancel-delete-all-weeks').onclick = ()=>{ DELETE_ALL_WEEKS_CONFIRM = null; render(); };
+  if($('#btn-confirm-delete-all-weeks')) $('#btn-confirm-delete-all-weeks').onclick = deleteAllWeeklyHistory;
   $$('[data-cancel-edit-week]').forEach(btn=> btn.onclick = ()=>{ EDITING_WEEK_HISTORY_ID = null; render(); });
   $$('[data-save-edit-week]').forEach(btn=> btn.onclick = ()=> saveWeeklyHistoryEdit(btn.getAttribute('data-save-edit-week')));
   if($('#btn-delete-student')) $('#btn-delete-student').onclick = ()=>{ DELETE_CONFIRM_ID = SELECTED_STUDENT_ID; render(); };
@@ -3545,7 +3821,13 @@ function attachHandlers(){
   if($('#btn-confirm-delete')) $('#btn-confirm-delete').onclick = deleteStudent;
   $$('[data-reward-choice]').forEach(btn=> btn.onclick = ()=>{
     const [idx, candy] = btn.getAttribute('data-reward-choice').split(':');
-    setRewardCandy(parseInt(idx), candy);
+    setRewardCandy(idx==='meta' ? 'meta' : parseInt(idx), candy);
+  });
+  $$('[data-bc-student]').forEach(btn=> btn.onclick = ()=> setGoalCandy(btn.getAttribute('data-bc-student'), btn.getAttribute('data-bc-entry'), btn.getAttribute('data-bc-candy')));
+  $$('[data-bal-shift]').forEach(btn=> btn.onclick = ()=>{
+    if(btn.disabled) return;
+    BALANCE_TRIMESTER_INDEX = Math.max(0, BALANCE_TRIMESTER_INDEX + Number(btn.getAttribute('data-bal-shift')));
+    render();
   });
 
   // Admin detail: números personalizados dos blocos
@@ -3635,7 +3917,8 @@ function attachHandlers(){
   if($('#btn-save-trimester')) $('#btn-save-trimester').onclick = saveTrimesterDefaults;
 
   // Admin evolution
-  const bindEvoPicks = ()=> document.querySelectorAll('[data-evo-pick]').forEach(b=> b.onclick = ()=>{ SELECTED_STUDENT_ID = b.getAttribute('data-evo-pick'); render(); });
+  const bindEvoPicks = ()=> document.querySelectorAll('[data-evo-pick]').forEach(b=> b.onclick = ()=>{ SELECTED_STUDENT_ID = b.getAttribute('data-evo-pick'); EVO_BLOCKS_IDX = 0; render(); });
+  document.querySelectorAll('[data-evo-blocks-shift]').forEach(b=> b.onclick = ()=>{ EVO_BLOCKS_IDX = Math.max(0, EVO_BLOCKS_IDX + Number(b.getAttribute('data-evo-blocks-shift'))); render(); });
   bindEvoPicks();
   if($('#evo-search')){
     $('#evo-search').oninput = (e)=>{
@@ -3989,6 +4272,27 @@ async function registerWeek(){
   await saveData();
   showToast('Período registrado!');
 }
+async function deleteWeeklyHistory(id){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  if(!student) return;
+  student.weeklyHistory = (student.weeklyHistory||[]).filter(h=>h.id!==id);
+  DELETE_WEEK_CONFIRM_ID = null;
+  if(EDITING_WEEK_HISTORY_ID===id) EDITING_WEEK_HISTORY_ID = null;
+  touch(student);
+  await saveData();
+  showToast('Registro excluído.');
+  render();
+}
+async function deleteAllWeeklyHistory(){
+  const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
+  if(!student) return;
+  student.weeklyHistory = [];
+  DELETE_WEEK_CONFIRM_ID = null; DELETE_ALL_WEEKS_CONFIRM = null; EDITING_WEEK_HISTORY_ID = null;
+  touch(student);
+  await saveData();
+  showToast('Histórico de períodos excluído.');
+  render();
+}
 async function saveWeeklyHistoryEdit(id){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   const entry = student && (student.weeklyHistory || []).find(h=>h.id===id);
@@ -4017,6 +4321,22 @@ async function saveWeeklyHistoryEdit(id){
 }
 
 /* ---------- Recompensas ---------- */
+// Doce da meta batida registrado no balanço (meta atual ou meta já encerrada)
+async function setGoalCandy(studentId, entryId, candy){
+  const st = DATA.students.find(x=>x.id===studentId);
+  if(!st) return;
+  if(entryId==='current'){
+    if(!st.rewards) st.rewards = {};
+    if(st.rewards.meta===candy) delete st.rewards.meta; else st.rewards.meta = candy;
+  } else {
+    const e = (st.metaHistory||[]).find(h=>h.id===entryId);
+    if(!e) return;
+    e.goalCandy = (e.goalCandy===candy) ? null : candy;
+  }
+  touch(st);
+  await saveData();
+  render();
+}
 async function setRewardCandy(index, candy){
   const student = DATA.students.find(s=>s.id===SELECTED_STUDENT_ID);
   if(!student.rewards) student.rewards = {};
@@ -4113,6 +4433,37 @@ function pointToBlockStart(point){
   const idx = Math.floor(p/BLOCKS_PER_STAGE);
   return { stage: STAGES[idx], sheet: (p - idx*BLOCKS_PER_STAGE)*10 + 1 };
 }
+// Último bloco que o aluno fez (maior índice com algum status diferente de "a fazer")
+function lastDoneIndex(student){
+  let last = 0;
+  (student.blocks||[]).forEach(b=>{ if(b.status!=='not_done' && b.index>last) last = b.index; });
+  return last;
+}
+// Ponto de partida da próxima meta = início do bloco SEGUINTE ao último que o aluno fez
+function nextStartAfterLastDone(student){
+  const startPoint = stagePoint(student.startStage, student.startSheet);
+  const targetPoint = stagePoint(student.targetStage, student.targetSheet);
+  const dir = targetPoint >= startPoint ? 1 : -1;
+  const r = pointToBlockStart(startPoint + dir*lastDoneIndex(student));
+  return { stage: r.stage, sheet: r.sheet };
+}
+// Datas padrão da próxima meta: as do trimestre cadastrado no Perfil (quando já é um período novo); editáveis.
+function defaultNextPeriod(student){
+  const t = DATA.currentTrimester || {};
+  if(t.startDate && t.endDate && t.startDate<=t.endDate &&
+     t.startDate > (student.startDate||'') && t.endDate > (student.targetEnd||'')){
+    return { startDate: t.startDate, endDate: t.endDate, fromTrimester: true };
+  }
+  const today = todayISO();
+  return { startDate: (student.targetEnd && student.targetEnd>=today) ? student.targetEnd : today, endDate: '', fromTrimester: false };
+}
+// Ajuste do tamanho da meta conforme o desempenho na meta atual (mexa nos fatores aqui se quiser)
+const SUGGEST_TIERS = [
+  { min:100, factor:1.10, label:'bateu a meta',               advice:'subi um pouco o desafio (+10%)' },
+  { min:90,  factor:1.00, label:'chegou a 90% ou mais',       advice:'mantive o tamanho' },
+  { min:70,  factor:0.90, label:'chegou a 70% ou mais',       advice:'reduzi um pouco (−10%)' },
+  { min:0,   factor:0.80, label:'ficou abaixo de 70%',        advice:'reduzi mais (−20%)' }
+];
 function suggestNextMeta(student){
   const today = todayISO();
   const st = stats(student);
@@ -4132,37 +4483,50 @@ function suggestNextMeta(student){
     const d = last ? daysBetween(last.startDate, last.archivedAt) : 0;
     if(last && d>=7){
       blocksBase = last.blocksCompleted; daysBase = d;
-      origin = `no trimestre anterior (${fmtDate(last.startDate)} a ${fmtDate(last.archivedAt)})`;
+      origin = `no trimestre anterior (${fmtDate(last.startDate)} a ${fmtDate(metaEndDate(last))})`;
     }
   }
   if(blocksBase>0 && daysBase>0) pace = blocksBase/daysBase;
 
-  // 2) ponto de partida: onde o aluno está hoje
-  const doneBlocks = Math.min(st.done, st.total);
-  const newStartPoint = startPoint + dir*doneBlocks;
+  // 2) ponto de partida: bloco seguinte ao último que o aluno fez
+  const lastIdx = lastDoneIndex(student);
+  const newStartPoint = startPoint + dir*lastIdx;
+  const lastBlock = (student.blocks||[]).find(b=>b.index===lastIdx);
 
-  // 3) datas: começa no fim da meta atual e dura o mesmo tempo dela
-  const startDate = student.targetEnd && student.targetEnd>=today ? student.targetEnd : today;
-  let duration = (student.startDate && student.targetEnd) ? daysBetween(student.startDate, student.targetEnd) : 91;
-  if(!Number.isFinite(duration) || duration<14) duration = 91;
-  duration = Math.min(duration, 200);
-  const targetEnd = isoAddDays(startDate, duration);
-
-  // 4) tamanho da meta: ritmo × duração (sem histórico, repete o tamanho da meta atual)
-  let newBlocks, text;
-  const weeks = Math.round(duration/7);
-  if(pace>0){
-    newBlocks = Math.max(1, Math.round(pace*duration));
-    text = `Ritmo ${origin}: ${blocksBase} ${blocksBase===1?'bloco':'blocos'} em ${fmtRate(daysBase/7)} semanas (≈ ${fmtRate(pace*7)} bloco/semana). Em ${weeks} semanas isso dá cerca de ${newBlocks} ${newBlocks===1?'bloco':'blocos'} (${newBlocks*10} folhas).`;
+  // 3) datas: as do trimestre cadastrado (se for um período novo) ou, senão, começa no fim da meta atual e dura o mesmo tempo
+  const per = defaultNextPeriod(student);
+  const startDate = per.startDate;
+  let duration, targetEnd;
+  if(per.fromTrimester){
+    targetEnd = per.endDate; duration = Math.max(1, daysBetween(startDate, targetEnd));
   } else {
-    newBlocks = Math.max(1, st.total);
-    text = `Ainda não há blocos concluídos suficientes para medir o ritmo, então mantive o tamanho da meta atual (${newBlocks} blocos).`;
+    duration = (student.startDate && student.targetEnd) ? daysBetween(student.startDate, student.targetEnd) : 91;
+    if(!Number.isFinite(duration) || duration<14) duration = 91;
+    duration = Math.min(duration, 200);
+    targetEnd = isoAddDays(startDate, duration);
   }
-  text += ' Partida: início do próximo bloco do aluno' + (doneBlocks<st.total ? ` (${doneBlocks} de ${st.total} blocos da meta atual feitos; ajuste se ele ainda vai avançar até o encerramento).` : ' (meta atual batida).');
+
+  // 4) tamanho da meta: ritmo × duração, ajustado pelo desempenho (bateu / 90% / 70%)
+  const tier = st.goalReached ? SUGGEST_TIERS[0] : SUGGEST_TIERS.slice(1).find(t=>st.percent>=t.min);
+  const weeks = Math.round(duration/7);
+  let baseBlocks, text;
+  if(pace>0){
+    baseBlocks = Math.max(1, Math.round(pace*duration));
+    text = `Ritmo ${origin}: ≈ ${fmtRate(pace*7)} bloco/semana (${baseBlocks} em ${weeks} semanas).`;
+  } else {
+    baseBlocks = Math.max(1, st.total);
+    text = `Sem ritmo medido: usei o tamanho da meta atual (${baseBlocks} blocos).`;
+  }
+  const newBlocks = Math.max(1, Math.round(baseBlocks * tier.factor));
+  text += ` O aluno ${tier.label} (${st.percent}%): ${tier.advice} → ${newBlocks} ${newBlocks===1?'bloco':'blocos'}.`;
+  text += lastIdx>0
+    ? ` Partida após o bloco ${lastBlock ? lastBlock.label : lastIdx}.`
+    : ' Partida: primeiro bloco.';
+  if(per.fromTrimester) text += ' Datas do trimestre.';
 
   const maxPoint = STAGES.length*BLOCKS_PER_STAGE;
   let newTargetPoint = clamp(newStartPoint + dir*newBlocks, 0, maxPoint);
-  if(newTargetPoint===newStartPoint) text += ' Atenção: chegou ao limite dos estágios, ajuste a meta manualmente.';
+  if(newTargetPoint===newStartPoint) text += ' Limite dos estágios: ajuste a meta.';
   const a = pointToBlockStart(newStartPoint), b = pointToStageSheet(newTargetPoint);
   return { startStage:a.stage, startSheet:a.sheet, targetStage:b.stage, targetSheet:b.sheet, startDate, targetEnd, text };
 }
@@ -4175,7 +4539,7 @@ function applyMetaSuggestion(){
   set('f-plan-stage', sg.targetStage);      set('f-plan-sheet', sg.targetSheet);
   set('f-plan-start-date', sg.startDate);   set('f-plan-date', sg.targetEnd);
   const note = document.getElementById('plan-suggest-note');
-  if(note){ note.style.display='block'; note.textContent = '💡 ' + sg.text + ' Confira e ajuste o que quiser antes de salvar.'; }
+  if(note){ note.style.display='block'; note.textContent = '💡 ' + sg.text + ' Ajuste se quiser.'; }
   const err = document.getElementById('plan-meta-error'); if(err) err.textContent = '';
 }
 
@@ -4232,15 +4596,16 @@ async function endTrimester(){
   TB_MODAL = {
     name: student.name, avatar: student.avatar,
     stage: `${student.startStage}${student.startSheet} → ${student.targetStage}${student.targetSheet}`,
-    periodLabel: `${fmtDateFull(student.startDate)} a ${fmtDateFull(archivedEntry.archivedAt)}`,
+    periodLabel: `${fmtDateFull(student.startDate)} a ${fmtDateFull(metaEndDate(archivedEntry))}`,
     days: archivedEntry.balance.days, sheets: archivedEntry.balance.sheets,
     percent: archivedEntry.balance.percent, reached: archivedEntry.reached,
     allowUndo: true, studentId: student.id, entryId: archivedEntry.id
   };
 
   const planned = (student.metaHistory||[]).find(e=>e.status==='planned');
-  const newStartStage = (planned && planned.startStage) || student.targetStage;
-  const newStartSheet = (planned && planned.startStage) ? planned.startSheet : student.targetSheet;
+  const nextAfterLast = nextStartAfterLastDone(student);
+  const newStartStage = (planned && planned.startStage) || nextAfterLast.stage;
+  const newStartSheet = (planned && planned.startStage) ? planned.startSheet : nextAfterLast.sheet;
   const newStartDate = (planned && planned.startDate) || todayISO();
 
   student.startStage = newStartStage;
